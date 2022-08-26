@@ -79,7 +79,7 @@ if windowHeight > 800:
 
 windowWidth = int(round((1200/800) * windowHeight, -1))
 
-widget.resize(windowWidth, windowHeight)
+#widget.resize(windowWidth, windowHeight)
 
 #Close splash screen
 if '_PYIBoot_SPLASH' in os.environ and importlib.util.find_spec("pyi_splash"):
