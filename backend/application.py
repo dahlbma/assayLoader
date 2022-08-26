@@ -36,6 +36,55 @@ class GetDatabase(tornado.web.RequestHandler):
         self.finish(sRes)
 
 
+@jwtauth
+class GetSingelPointConfig(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
+@jwtauth
+class GetDoseResponseConfig(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
+@jwtauth
+class GetProjects(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
+@jwtauth
+class GetTargets(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
+@jwtauth
+class GetAssayTypes(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
+@jwtauth
+class GetDetectionTypes(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
+@jwtauth
+class GetOperators(tornado.web.RequestHandler):
+    def get(self):
+        sRes = json.dumps([['Live'], ['Test']])
+        self.finish(sRes)
+
+
 def res_to_json(response, cursor):
     columns = cursor.description()
     to_js = [{columns[index][0]:column for index,

@@ -75,7 +75,7 @@ class login(tornado.web.RequestHandler):
     def get(self):
         pass
 
-class getVersionData(tornado.web.RequestHandler):
+class GetVersionData(tornado.web.RequestHandler):
     def post(self):
         pass
 
@@ -90,7 +90,7 @@ class getVersionData(tornado.web.RequestHandler):
             self.write({'message': 'ver.dat not available'})
 
 
-class getAssayLoaderBinary(tornado.web.RequestHandler):
+class GetAssayLoaderBinary(tornado.web.RequestHandler):
     def post(self):
         pass
 
@@ -121,9 +121,15 @@ def make_app():
         (r"/getDatabase", application.GetDatabase),
         (r"/login", login),
         (r"/pingDB", application.PingDB),
-        (r"/getVersionData", getVersionData),
-        (r"/getAssayLoaderBinary/(?P<os_name>[^\/]+)", getAssayLoaderBinary),
-        (r"/mols/(.*)", tornado.web.StaticFileHandler, {"path": "mols/"}),
+        (r"/getVersionData", GetVersionData),
+        (r"/getSingelPointConfig", application.GetSingelPointConfig),
+        (r"/getDoseResponseConfig", application.GetDoseResponseConfig),
+        (r"/getAssayTypes", application.GetAssayTypes),
+        (r"/getDetectionTypes", application.GetDetectionTypes),
+        (r"/getOperators", application.GetOperators),
+        (r"/getProjects", application.GetProjects),
+        (r"/getTargets", application.GetTargets),
+        (r"/getAssayLoaderBinary/(?P<os_name>[^\/]+)", GetAssayLoaderBinary),
         (r"/dist/(.*)", tornado.web.StaticFileHandler, {"path": "dist/"}),
         (r"/uploadBinary", application.UploadBinary),
         (r"/uploadLauncher", application.UploadLauncher),
