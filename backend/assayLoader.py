@@ -122,7 +122,7 @@ def make_app():
         (r"/login", login),
         (r"/pingDB", application.PingDB),
         (r"/getVersionData", GetVersionData),
-        (r"/getSingelPointConfig", application.GetSingelPointConfig),
+        (r"/getSinglePointConfig", application.GetSinglePointConfig),
         (r"/getDoseResponseConfig", application.GetDoseResponseConfig),
         (r"/getAssayTypes", application.GetAssayTypes),
         (r"/getDetectionTypes", application.GetDetectionTypes),

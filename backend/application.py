@@ -37,9 +37,9 @@ class GetDatabase(tornado.web.RequestHandler):
 
 
 @jwtauth
-class GetSingelPointConfig(tornado.web.RequestHandler):
+class GetSinglePointConfig(tornado.web.RequestHandler):
     def get(self):
-        sRes = json.dumps([['Live'], ['Test']])
+        sRes = json.dumps(['DWell', 'rawIntensity', 'screen_id', 'Plate', 'ProductName', 'Concentration', 'DCol', 'Column', 'DRow', 'Row', 'readout', 'Content', 'inhibition_percent'])
         self.finish(sRes)
 
 
