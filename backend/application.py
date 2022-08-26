@@ -25,9 +25,9 @@ def getDatabase(parent):
     jsonData = json.loads(data)
     database = jsonData['database']
     if database == 'Live':
-        return 'glass', 'cool', 'microtube', 'loctree'
+        return 'assay'
     else:
-        return 'glass_test', 'cool_test', 'microtube_test', 'loctree_test'
+        return 'assay_test'
 
 
 class GetDatabase(tornado.web.RequestHandler):
@@ -41,20 +41,6 @@ def res_to_json(response, cursor):
     to_js = [{columns[index][0]:column for index,
               column in enumerate(value)} for value in response]
     return to_js
-
-def createPngFromMolfile(regno, molfile):
-    m = Chem.MolFromMolBlock(molfile)
-    try:
-        Draw.MolToFile(m, f'mols/{regno}.png', size=(300, 300))
-    except:
-        logging.error(f"regno {regno} is nostruct")
-
-
-class home(tornado.web.RequestHandler):
-    def get(self, *args, **kwargs):
-        self.redirect('/vialdb/index.html')
-        return
-
 
 
 class PingDB(tornado.web.RequestHandler):
