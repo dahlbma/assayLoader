@@ -1,10 +1,11 @@
 import sys, os, importlib, platform, traceback, logging
+from assaylib import *
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtGui
 # from loaderlib import *
-# from loginscreen import LoginScreen
+from loginscreen import LoginScreen
 
 os_name = platform.system()
 exec_path = ""
@@ -48,7 +49,7 @@ logger.addHandler(fh)
 
 
 #v_path = os.path.join(".", "ver.dat")
-#version = ""
+version = ""
 #if os.path.exists(v_path):
 #    with open(v_path) as f:
 #        try:
@@ -63,9 +64,9 @@ app = QApplication(['AssayLoader'])
 clipboard = app.clipboard()
 
 app.setApplicationName(f"AssayLoader")
-#welcome = LoginScreen(f'AssayLoader {version}')
+welcome = LoginScreen(f'AssayLoader {version}')
 widget = QtWidgets.QStackedWidget()
-#widget.addWidget(welcome)
+widget.addWidget(welcome)
 
 #window sizing stuff
 desktop = QApplication.desktop()
@@ -81,12 +82,12 @@ windowWidth = int(round((1200/800) * windowHeight, -1))
 widget.resize(windowWidth, windowHeight)
 
 #Close splash screen
-#if '_PYIBoot_SPLASH' in os.environ and importlib.util.find_spec("pyi_splash"):
-#    import pyi_splash
-#    pyi_splash.close()
+if '_PYIBoot_SPLASH' in os.environ and importlib.util.find_spec("pyi_splash"):
+    import pyi_splash
+    pyi_splash.close()
 
 #show app
 widget.show()
-#app.setWindowIcon(QtGui.QIcon(resource_path('assets/cello.ico')))
-#widget.setWindowIcon(QtGui.QIcon(resource_path('assets/cello.ico')))
+app.setWindowIcon(QtGui.QIcon(resource_path('assets/loader.ico')))
+widget.setWindowIcon(QtGui.QIcon(resource_path('assets/loader.ico')))
 sys.exit(app.exec_())
