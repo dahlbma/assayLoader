@@ -20,6 +20,11 @@ db = mydb.disconnectSafeConnect()
 cur = db.cursor()
 NR_OF_VIALS_IN_BOX = 200
 
+def res2json():
+    result = [list(i) for i in cur.fetchall()]
+    return json.dumps(result)
+
+
 def getDatabase(parent):
     data = parent.request.headers['Token']
     jsonData = json.loads(data)
@@ -53,36 +58,46 @@ class GetDoseResponseConfig(tornado.web.RequestHandler):
 @jwtauth
 class GetProjects(tornado.web.RequestHandler):
     def get(self):
-        sRes = json.dumps([['Live'], ['Test']])
-        self.finish(sRes)
+        sSql = 'select distinct(project) project from assay.lcb_sp'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
 
 
 @jwtauth
 class GetTargets(tornado.web.RequestHandler):
     def get(self):
-        sRes = json.dumps([['Live'], ['Test']])
-        self.finish(sRes)
+        sSql = 'select distinct(target) target from assay.lcb_sp'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
 
 
 @jwtauth
 class GetAssayTypes(tornado.web.RequestHandler):
     def get(self):
-        sRes = json.dumps([['Live'], ['Test']])
-        self.finish(sRes)
+        sSql = 'select distinct(assay_type) assay_type from assay.lcb_sp'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
 
 
 @jwtauth
 class GetDetectionTypes(tornado.web.RequestHandler):
     def get(self):
-        sRes = json.dumps([['Live'], ['Test']])
-        self.finish(sRes)
+        sSql = 'select distinct(detection_type) detection_type from assay.lcb_sp'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
 
 
 @jwtauth
 class GetOperators(tornado.web.RequestHandler):
     def get(self):
-        sRes = json.dumps([['Live'], ['Test']])
-        self.finish(sRes)
+        sSql = 'select distinct(operator) detection_type from assay.lcb_sp'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
 
 
 def res_to_json(response, cursor):
