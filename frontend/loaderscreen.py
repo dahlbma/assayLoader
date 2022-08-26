@@ -13,6 +13,20 @@ class LoaderScreen(QMainWindow):
         logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/loaderwindow.ui"), self)
         
+        try:
+            js = dbInterface.getSinglePointConfig(self.token)
+            res1 = json.loads(js)
+            h1 = [str(h) for h in res1]
+            js = dbInterface.getDoseResponseConfig(self.token)
+            res2 = json.loads(js)
+            h2 = [str(h) for h in res2]
+        except:
+            print("oops")   
+
+        self.sp_table.setColumnCount(len(h1))
+        self.sp_table.setHorizontalHeaderLabels(h1)
+        self.dr_table.setColumnCount(len(h2))
+        self.dr_table.setHorizontalHeaderLabels(h2)
 
 
     def keyPressEvent(self, event):

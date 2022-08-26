@@ -108,3 +108,18 @@ def getOperators(token):
         return r.content
 
 
+def getSinglePointConfig(token):
+    r = requests.get(f'{baseUrl}getSinglePointConfig',
+            headers={'token':token})
+    try:
+        return r.content.decode()
+    except:
+        return r.content
+
+def getDoseResponseConfig(token):
+    r = requests.get(f'{baseUrl}getDoseResponseConfig',
+            headers={'token':token})
+    try:
+        return r.content.decode()
+    except:
+        return r.content
