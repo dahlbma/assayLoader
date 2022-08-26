@@ -63,11 +63,48 @@ def uploadLauncher(token, os_name, file):
     else:
         return r.content.decode(), True
 
-def getProjects(token, vialId):
+def getProjects(token):
     r = requests.get(f'{baseUrl}getProjects',
             headers={'token':token})
     try:
         return r.content.decode()
     except:
         return r.content
+
+
+def getTargets(token):
+    r = requests.get(f'{baseUrl}getTargets',
+            headers={'token':token})
+    try:
+        return r.content.decode()
+    except:
+        return r.content
+
+
+def getAssayTypes(token):
+    r = requests.get(f'{baseUrl}getAssayTypes',
+            headers={'token':token})
+    try:
+        return r.content.decode()
+    except:
+        return r.content
+
+
+def getDetectionTypes(token):
+    r = requests.get(f'{baseUrl}getDetectionTypes',
+            headers={'token':token})
+    try:
+        return r.content.decode()
+    except:
+        return r.content
+
+
+def getOperators(token):
+    r = requests.get(f'{baseUrl}getOperators',
+            headers={'token':token})
+    try:
+        return r.content.decode()
+    except:
+        return r.content
+
 
