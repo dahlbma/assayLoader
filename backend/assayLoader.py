@@ -108,7 +108,7 @@ class getAssayLoaderBinary(tornado.web.RequestHandler):
         pass
 
     def get(self, os_name):
-        # send cello
+        # send assayLoader
         #os_name = self.get_argument('os_name')
         # tentative
         
@@ -154,11 +154,11 @@ class getAssayLoaderBinary(tornado.web.RequestHandler):
            
 def make_app():
     return tornado.web.Application([
+        (r"/getDatabase", application.GetDatabase),
         (r"/login", login),
         (r"/pingDB", application.PingDB),
         (r"/getVersionData", getVersionData),
         (r"/getAssayLoaderBinary/(?P<os_name>[^\/]+)", getAssayLoaderBinary),
-        (r"/getDatabase", application.GetDatabase),
         (r"/mols/(.*)", tornado.web.StaticFileHandler, {"path": "mols/"}),
         (r"/dist/(.*)", tornado.web.StaticFileHandler, {"path": "dist/"}),
         (r"/uploadBinary", application.UploadBinary),

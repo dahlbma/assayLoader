@@ -115,11 +115,11 @@ class UploadLauncher(tornado.web.RequestHandler):
 
         bin_file = ""
         if os_name == 'Windows':
-            bin_file = f'dist/launchers/{os_name}/cello.exe'
+            bin_file = f'dist/launchers/{os_name}/assayLoader.exe'
         elif os_name == 'Linux':
-            bin_file = f'dist/launchers/{os_name}/cello'
+            bin_file = f'dist/launchers/{os_name}/assayLoader'
         elif os_name == 'Darwin':
-            bin_file = f'dist/launchers/{os_name}/cello'
+            bin_file = f'dist/launchers/{os_name}/assayLoader'
         else:
             # unsupported OS
             self.set_status(500)
