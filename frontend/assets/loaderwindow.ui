@@ -16,9 +16,9 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="loader_tab_wg">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="sp_tab">
        <attribute name="title">
@@ -279,6 +279,30 @@
         </item>
         <item row="2" column="0">
          <layout class="QGridLayout" name="gridLayout_6">
+          <item row="2" column="0">
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Load / Send</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
           <item row="0" column="0">
            <layout class="QGridLayout" name="gridLayout_7">
             <item row="0" column="2">
@@ -311,31 +335,7 @@
            </layout>
           </item>
           <item row="1" column="0">
-           <widget class="QTextEdit" name="textEdit"/>
-          </item>
-          <item row="2" column="0">
-           <layout class="QGridLayout" name="gridLayout_8">
-            <item row="0" column="0">
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="pushButton">
-              <property name="text">
-               <string>Load / Send</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QTableWidget" name="sp_table"/>
           </item>
          </layout>
         </item>
@@ -413,8 +413,8 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>13</width>
-              <height>92</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -485,8 +485,8 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>13</width>
-              <height>92</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -544,8 +544,8 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>13</width>
-              <height>92</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -632,7 +632,7 @@
            </layout>
           </item>
           <item row="1" column="0">
-           <widget class="QTextEdit" name="textEdit_3"/>
+           <widget class="QTableWidget" name="dr_table"/>
           </item>
           <item row="2" column="0">
            <layout class="QGridLayout" name="gridLayout_23">

@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QMessageBox
 
 from assaylib import *
+from loaderscreen import LoaderScreen
 
 class LoginScreen(QMainWindow):
     def __init__(self, appName):
@@ -60,6 +61,7 @@ class LoginScreen(QMainWindow):
         self.window().setWindowTitle(f"{self.appName} {db}")
 
         #init
+        loader = LoaderScreen(self.jwt_token, test)
         '''
         search = SearchScreen(self.jwt_token, test)
         vials = VialsScreen(self.jwt_token, test)
@@ -69,6 +71,7 @@ class LoginScreen(QMainWindow):
         '''
         
         #add screens to stackedwidget
+        self.window().addWidget(loader)
         '''
         self.window().addWidget(search)
         self.window().addWidget(vials)
@@ -79,3 +82,4 @@ class LoginScreen(QMainWindow):
         #first screen
         gotoSearch(self)
         '''
+        gotoLoader(self)

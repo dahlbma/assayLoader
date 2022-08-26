@@ -7,6 +7,13 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidge
 from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
+
+def gotoLoader(self):
+    resize_window(self)
+    self.window().setCurrentIndex(1)
+    return
+
+
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(int)
@@ -41,7 +48,6 @@ class PopUpProgress(QWidget):
 
     def on_count_changed(self, value):
         self.pbar.setValue(value)
-            
 
 def send_msg(title, text, icon=QMessageBox.Information, e=None):
     msg = QMessageBox()
