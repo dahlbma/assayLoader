@@ -66,47 +66,34 @@ def uploadLauncher(token, os_name, file):
 def getProjects(token):
     r = requests.get(f'{baseUrl}getProjects',
             headers={'token':token})
-    try:
-        return r.content.decode()
-    except:
-        return r.content
 
+    cleanList = listify(r, False)
+    return cleanList
 
 def getTargets(token):
     r = requests.get(f'{baseUrl}getTargets',
             headers={'token':token})
-    try:
-        return r.content.decode()
-    except:
-        return r.content
 
+    cleanList = listify(r, False)
+    return cleanList
 
 def getAssayTypes(token):
     r = requests.get(f'{baseUrl}getAssayTypes',
             headers={'token':token})
-    try:
-        return r.content.decode()
-    except:
-        return r.content
-
+    cleanList = listify(r, False)
+    return cleanList
 
 def getDetectionTypes(token):
     r = requests.get(f'{baseUrl}getDetectionTypes',
             headers={'token':token})
-    try:
-        return r.content.decode()
-    except:
-        return r.content
-
+    cleanList = listify(r, False)
+    return cleanList
 
 def getOperators(token):
     r = requests.get(f'{baseUrl}getOperators',
             headers={'token':token})
-    try:
-        return r.content.decode()
-    except:
-        return r.content
-
+    cleanList = listify(r, False)
+    return cleanList
 
 def getSinglePointConfig(token):
     r = requests.get(f'{baseUrl}getSinglePointConfig',

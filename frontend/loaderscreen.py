@@ -13,6 +13,21 @@ class LoaderScreen(QMainWindow):
         logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/loaderwindow.ui"), self)
         
+        projects = dbInterface.getProjects(self.token)
+        self.project_cb.addItems(projects)
+
+        targets = dbInterface.getTargets(self.token)
+        self.target_cb.addItems(targets)
+
+        assayTypes = dbInterface.getAssayTypes(self.token)
+        self.assay_type_cb.addItems(assayTypes)
+
+        detectionTypes = dbInterface.getDetectionTypes(self.token)
+        self.det_type_cb.addItems(detectionTypes)
+        
+        operators = dbInterface.getOperators(self.token)
+        self.operator_cb.addItems(operators)
+
         try:
             js = dbInterface.getSinglePointConfig(self.token)
             res1 = json.loads(js)
