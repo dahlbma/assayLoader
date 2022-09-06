@@ -58,7 +58,8 @@ class GetDoseResponseConfig(tornado.web.RequestHandler):
 @jwtauth
 class GetProjects(tornado.web.RequestHandler):
     def get(self):
-        sSql = 'select distinct(project) project from assay.lcb_sp'
+        assayDB = getDatabase(self)
+        sSql = f'select distinct(project) project from {assayDB}.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -67,7 +68,8 @@ class GetProjects(tornado.web.RequestHandler):
 @jwtauth
 class GetTargets(tornado.web.RequestHandler):
     def get(self):
-        sSql = 'select distinct(target) target from assay.lcb_sp'
+        assayDB = getDatabase(self)
+        sSql = f'select distinct(target) target from {assayDB}.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -76,7 +78,8 @@ class GetTargets(tornado.web.RequestHandler):
 @jwtauth
 class GetAssayTypes(tornado.web.RequestHandler):
     def get(self):
-        sSql = 'select distinct(assay_type) assay_type from assay.lcb_sp'
+        assayDB = getDatabase(self)
+        sSql = f'select distinct(assay_type) assay_type from {assayDB}.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -85,7 +88,8 @@ class GetAssayTypes(tornado.web.RequestHandler):
 @jwtauth
 class GetDetectionTypes(tornado.web.RequestHandler):
     def get(self):
-        sSql = 'select distinct(detection_type) detection_type from assay.lcb_sp'
+        assayDB = getDatabase(self)
+        sSql = f'select distinct(detection_type) detection_type from {assayDB}.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -94,7 +98,8 @@ class GetDetectionTypes(tornado.web.RequestHandler):
 @jwtauth
 class GetOperators(tornado.web.RequestHandler):
     def get(self):
-        sSql = 'select distinct(operator) detection_type from assay.lcb_sp'
+        assayDB = getDatabase(self)
+        sSql = f'select distinct(operator) detection_type from {assayDB}.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
