@@ -12,6 +12,9 @@ class LoaderScreen(QMainWindow):
         self.mod_name = "loader"
         logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/loaderwindow.ui"), self)
+
+        self.testDate.setCalendarPopup(True)
+        self.testDate.setDateTime(QtCore.QDateTime.currentDateTime())
         
         projects = dbInterface.getProjects(self.token)
         self.project_cb.addItems(projects)
