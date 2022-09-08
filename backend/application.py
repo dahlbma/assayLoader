@@ -44,7 +44,63 @@ class GetDatabase(tornado.web.RequestHandler):
 @jwtauth
 class GetSinglePointConfig(tornado.web.RequestHandler):
     def get(self):
+        sJson = '''{
+	"DWell": {
+		"upload": true,
+		"db_col": "well"
+	},
+	"rawIntensity": {
+		"upload": false,
+		"db_col": ""
+	},
+	"screen_id": {
+		"upload": false,
+		"db_col": ""
+	},
+	"Plate": {
+		"upload": true,
+		"db_col": "plate_id"
+	},
+	"ProductName": {
+		"upload": true,
+		"db_col": "batch_id"
+	},
+	"Concentration": {
+		"upload": true,
+		"db_col": "concentration"
+	},
+	"DCol": {
+		"upload": false,
+		"db_col": ""
+	},
+	"Column": {
+		"upload": false,
+		"db_col": ""
+	},
+	"DRow": {
+		"upload": false,
+		"db_col": ""
+	},
+	"Row": {
+		"upload": false,
+		"db_col": ""
+	},
+	"readout": {
+		"upload": false,
+		"db_col": ""
+	},
+	"Content": {
+		"upload": false,
+		"db_col": ""
+	},
+	"inhibition_percent": {
+		"upload": true,
+		"db_col": "inhibition"
+	}
+}
+        '''
         sRes = json.dumps(['DWell', 'rawIntensity', 'screen_id', 'Plate', 'ProductName', 'Concentration', 'DCol', 'Column', 'DRow', 'Row', 'readout', 'Content', 'inhibition_percent'])
+        sRes = json.dumps(sJson)
         self.finish(sRes)
 
 
