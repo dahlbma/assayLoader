@@ -99,9 +99,8 @@ class GetSinglePointConfig(tornado.web.RequestHandler):
 	}
 }
         '''
-        sRes = json.dumps(['DWell', 'rawIntensity', 'screen_id', 'Plate', 'ProductName', 'Concentration', 'DCol', 'Column', 'DRow', 'Row', 'readout', 'Content', 'inhibition_percent'])
         sRes = json.dumps(sJson)
-        self.finish(sRes)
+        self.finish(sJson)
 
 
 @jwtauth
