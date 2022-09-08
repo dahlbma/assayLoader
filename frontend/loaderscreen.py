@@ -35,7 +35,6 @@ class LoaderScreen(QMainWindow):
         try:
             js = dbInterface.getSinglePointConfig(self.token)
             res1 = json.loads(js)
-            res1 = json.loads(res1)
             for i in res1:
                 print(i, res1[i])
             h1 = [str(h) for h in res1]
