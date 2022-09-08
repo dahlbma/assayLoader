@@ -31,9 +31,13 @@ class LoaderScreen(QMainWindow):
         operators = dbInterface.getOperators(self.token)
         self.operator_cb.addItems(operators)
 
+        
         try:
             js = dbInterface.getSinglePointConfig(self.token)
             res1 = json.loads(js)
+            res1 = json.loads(res1)
+            for i in res1:
+                print(i, res1[i])
             h1 = [str(h) for h in res1]
             js = dbInterface.getDoseResponseConfig(self.token)
             res2 = json.loads(js)
