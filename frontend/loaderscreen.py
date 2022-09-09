@@ -33,6 +33,9 @@ class LoaderScreen(QMainWindow):
 
         self.screenType_cb.addItems(['Activation', 'Inhibition'])
 
+        self.loadAssayFile_btn.clicked.connect(self.loadAssayFile)
+
+        self.saveData_btn.setEnabled(False)
         
         try:
             js = dbInterface.getSinglePointConfig(self.token)
@@ -66,3 +69,8 @@ class LoaderScreen(QMainWindow):
         elif page_index == 1:
             return
 
+    def loadAssayFile(self):
+        fname = QFileDialog.getOpenFileName(self, 'Import Assay Data', 
+                                            '.', "")
+        if fname[0] == '':
+            return
