@@ -99,7 +99,6 @@ class GetSinglePointConfig(tornado.web.RequestHandler):
 	}
 }
         '''
-        sRes = json.dumps(sJson)
         self.finish(sJson)
 
 
