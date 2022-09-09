@@ -31,6 +31,8 @@ class LoaderScreen(QMainWindow):
         operators = dbInterface.getOperators(self.token)
         self.operator_cb.addItems(operators)
 
+        self.screenType_cb.addItems(['Activation', 'Inhibition'])
+
         
         try:
             js = dbInterface.getSinglePointConfig(self.token)
