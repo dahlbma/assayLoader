@@ -2,7 +2,7 @@ import re, sys, os, logging
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt
-
+import openpyxl
 from assaylib import *
 
 class LoaderScreen(QMainWindow):
@@ -74,3 +74,10 @@ class LoaderScreen(QMainWindow):
                                             '.', "")
         if fname[0] == '':
             return
+
+        workBook = openpyxl.load_workbook(fname[0], read_only=True)
+        workSheet = workBook[workBook.sheetnames[0]]
+
+        for row in workSheet.rows:
+            for cell in row:
+                print(cell.value)
