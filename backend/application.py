@@ -24,7 +24,6 @@ def res2json():
     result = [list(i) for i in cur.fetchall()]
     return json.dumps(result)
 
-
 def getDatabase(parent):
     data = parent.request.headers['Token']
     jsonData = json.loads(data)
