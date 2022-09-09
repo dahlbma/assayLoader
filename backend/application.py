@@ -18,7 +18,6 @@ from os.path import exists
 
 db = mydb.disconnectSafeConnect()
 cur = db.cursor()
-NR_OF_VIALS_IN_BOX = 200
 
 def res2json():
     result = [list(i) for i in cur.fetchall()]
@@ -156,13 +155,6 @@ class GetOperators(tornado.web.RequestHandler):
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
-
-
-def res_to_json(response, cursor):
-    columns = cursor.description()
-    to_js = [{columns[index][0]:column for index,
-              column in enumerate(value)} for value in response]
-    return to_js
 
 
 class PingDB(tornado.web.RequestHandler):
