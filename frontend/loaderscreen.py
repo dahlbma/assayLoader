@@ -39,13 +39,13 @@ class LoaderScreen(QMainWindow):
         
         try:
             js = dbInterface.getSinglePointConfig(self.token)
-            res1 = json.loads(js)
-            for i in res1:
-                print(i, res1[i])
-            h1 = [str(h) for h in res1]
+            self.spConfig = json.loads(js)
+            for i in self.spConfig:
+                print(i, self.spConfig[i])
+            h1 = [str(h) for h in self.spConfig]
             js = dbInterface.getDoseResponseConfig(self.token)
-            res2 = json.loads(js)
-            h2 = [str(h) for h in res2]
+            self.drConfig = json.loads(js)
+            h2 = [str(h) for h in self.drConfig]
         except:
             print("oops")   
 
@@ -78,6 +78,47 @@ class LoaderScreen(QMainWindow):
         workBook = openpyxl.load_workbook(fname[0], read_only=True)
         workSheet = workBook[workBook.sheetnames[0]]
 
+        workSheet.reset_dimensions()
+        workSheet.calculate_dimension(force=True)
+
+        iRow = 0
+        saSheetHeader = []
         for row in workSheet.rows:
-            for cell in row:
-                print(cell.value)
+            if iRow == 0:
+                for cell in row:
+                    saSheetHeader.append(cell.value)
+            break
+
+        if self.verifyXlHeader(self.spConfig, saSheetHeader) == True:
+            self.populateAssayTable(workSheet)
+
+
+    def verifyXlHeader(self, confHeader, xlHeader):
+        print(confHeader)
+        iCount = 0
+        lAllOK = True
+        for item in confHeader:
+            if item == xlHeader[iCount]:
+                print(item, xlHeader[iCount])
+            else:
+                lAllOK = False
+                print(f'Column error: Expected column name "{item}" in position \
+                {iCount +1}, but got "{xlHeader[iCount]}"')
+            
+            iCount += 1
+        return lAllOK
+
+
+    def populateAssayTable(self, workSheet):
+        iRow = 0
+        for row in workSheet.values:
+            if iRow == 0:
+                iRow +=1
+                continue
+            iRow += 1
+            rowPosition = self.sp_table.rowCount()
+            self.sp_table.insertRow(rowPosition)
+            iCol = 0
+            for value in row:
+                self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(value)))
+                iCol += 1
