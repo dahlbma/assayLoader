@@ -129,6 +129,7 @@ def make_app():
         (r"/getOperators", application.GetOperators),
         (r"/getProjects", application.GetProjects),
         (r"/getTargets", application.GetTargets),
+        (r"/getBatchCompound/(?P<sBatchCompound>[^\/]+)", application.GetBatchCompound),
         (r"/getAssayLoaderBinary/(?P<os_name>[^\/]+)", GetAssayLoaderBinary),
         (r"/dist/(.*)", tornado.web.StaticFileHandler, {"path": "dist/"}),
         (r"/uploadBinary", application.UploadBinary),

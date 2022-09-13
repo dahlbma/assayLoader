@@ -44,56 +44,70 @@ class GetSinglePointConfig(tornado.web.RequestHandler):
     def get(self):
         sJson = '''{
 	"DWell": {
-		"upload": true,
-		"db_col": "well"
+	    "upload": true,
+	    "db_col": "well",
+                "verify_id": false
 	},
 	"rawIntensity": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"screen_id": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"Plate": {
 		"upload": true,
-		"db_col": "plate_id"
+		"db_col": "plate_id",
+                "verify_id": false
 	},
 	"ProductName": {
 		"upload": true,
-		"db_col": "batch_id"
+		"db_col": "compound_id",
+                "verify_id": true,
+                "verify_name": "compound"
 	},
 	"Concentration": {
 		"upload": true,
-		"db_col": "concentration"
+		"db_col": "concentration",
+                "verify_id": false
 	},
 	"DCol": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"Column": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"DRow": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"Row": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"readout": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"Content": {
 		"upload": false,
-		"db_col": ""
+		"db_col": "",
+                "verify_id": false
 	},
 	"inhibition_percent": {
 		"upload": true,
-		"db_col": "inhibition"
+		"db_col": "inhibition",
+                "verify_id": false
 	}
 }
         '''
@@ -152,6 +166,22 @@ class GetOperators(tornado.web.RequestHandler):
     def get(self):
         assayDB = getDatabase(self)
         sSql = f'select distinct(operator) detection_type from {assayDB}.lcb_sp'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
+
+
+@jwtauth
+class GetBatchCompound(tornado.web.RequestHandler):
+    def get(self, sBatchCompound):
+        if sBatchCompound == 'batch':
+            sSql = f'select notebook_ref detection_type from bcpvs.batch'
+        elif sBatchCompound == 'compound':
+            sSql = f'select compound_id from bcpvs.compound'
+        else:
+            self.finish()
+            return
+
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
