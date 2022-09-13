@@ -95,6 +95,12 @@ def getOperators(token):
     cleanList = listify(r, False)
     return cleanList
 
+def getBatchCompound(token, sBatchCompound):
+    r = requests.get(f'{baseUrl}getBatchCompound/{sBatchCompound}',
+                     headers={'token':token})
+    cleanList = listify(r, False)
+    return cleanList
+
 def getSinglePointConfig(token):
     r = requests.get(f'{baseUrl}getSinglePointConfig',
             headers={'token':token})
