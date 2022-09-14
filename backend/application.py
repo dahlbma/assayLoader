@@ -46,68 +46,68 @@ class GetSinglePointConfig(tornado.web.RequestHandler):
 	"DWell": {
 	    "upload": true,
 	    "db_col": "well",
-                "verify_id": false
+        "verify_id": false
 	},
 	"rawIntensity": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"screen_id": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Plate": {
 		"upload": true,
 		"db_col": "plate_id",
-                "verify_id": false
+        "verify_id": false
 	},
 	"ProductName": {
 		"upload": true,
 		"db_col": "compound_id",
-                "verify_id": true,
-                "verify_name": "compound"
+        "verify_id": true,
+        "verify_name": "compound"
 	},
 	"Concentration": {
 		"upload": true,
 		"db_col": "concentration",
-                "verify_id": false
+        "verify_id": false
 	},
 	"DCol": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Column": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"DRow": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Row": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"readout": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Content": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"inhibition_percent": {
 		"upload": true,
 		"db_col": "inhibition",
-                "verify_id": false
+        "verify_id": false
 	}
 }
         '''
