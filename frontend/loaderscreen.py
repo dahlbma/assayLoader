@@ -7,13 +7,19 @@ import openpyxl
 from assaylib import *
 
 class LoaderScreen(QMainWindow):
+    from assaylib import gotoDR, gotoSP
     def __init__(self, token, test):
         super(LoaderScreen, self).__init__()
         self.token = token
         self.mod_name = "loader"
         logger = logging.getLogger(self.mod_name)
-        loadUi(resource_path("assets/loaderwindow.ui"), self)
+        #loadUi(resource_path("assets/loaderwindow.ui"), self)
+        loadUi(resource_path("assets/doseResponseTab.ui"), self)
+        loadUi(resource_path("assets/singlePointTab.ui"), self)
 
+        self.goto_sp_btn.clicked.connect(self.gotoSP)
+        self.goto_dr_btn.clicked.connect(self.gotoDR)
+        
         self.testDate.setCalendarPopup(True)
         self.testDate.setDateTime(QtCore.QDateTime.currentDateTime())
         

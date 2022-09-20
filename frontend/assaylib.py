@@ -13,6 +13,17 @@ def gotoLoader(self):
     self.window().setCurrentIndex(1)
     return
 
+def gotoSP(self):
+    resize_window(self)
+    self.window().setCurrentIndex(1)
+    self.window().widget(1).plateIdFile_btn.setFocus()
+    return
+
+def gotoDR(self):
+    resize_window(self)
+    self.window().setCurrentIndex(2)
+    self.window().widget(1).drPlateIdFile_btn.setFocus()
+    return
 
 class Worker(QObject):
     finished = pyqtSignal()
