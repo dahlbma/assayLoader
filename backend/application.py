@@ -23,6 +23,12 @@ def res2json():
     result = [list(i) for i in cur.fetchall()]
     return json.dumps(result)
 
+def res_to_json(response, cursor):
+    columns = cursor.description()
+    to_js = [{columns[index][0]:column for index,
+              column in enumerate(value)} for value in response]
+    return to_js
+
 def getDatabase(parent):
     data = parent.request.headers['Token']
     jsonData = json.loads(data)
@@ -169,6 +175,24 @@ class GetOperators(tornado.web.RequestHandler):
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
+
+
+@jwtauth
+class GetPlate(tornado.web.RequestHandler):
+    def get(self, sPlate):
+        sSql = f'''select p.plate_id PLATE,
+        c.well WELL,
+        c.notebook_ref DRUG_NAME,
+        c.CONC CONCENTRATION
+        from cool.config c, cool.plate p
+        where p.plate_id = '{sPlate}' and p.config_id = c.config_id
+        '''
+        cur.execute(sSql)
+        tRes = cur.fetchall()
+        self.finish(json.dumps(res_to_json(tRes, cur), indent=4))
+        #res = res2json()
+        #self.finish(res)
+
 
 
 @jwtauth
