@@ -101,6 +101,11 @@ def getBatchCompound(token, sBatchCompound):
     cleanList = listify(r, False)
     return cleanList
 
+def getPlate(token, sPlate):
+    r = requests.get(f'{baseUrl}getPlate/{sPlate}',
+                     headers={'token':token})
+    return r.content.decode()
+
 def getSinglePointConfig(token):
     r = requests.get(f'{baseUrl}getSinglePointConfig',
             headers={'token':token})
