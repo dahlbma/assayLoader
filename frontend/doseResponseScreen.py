@@ -13,7 +13,6 @@ class DoseResponseScreen(QMainWindow):
         self.token = token
         self.mod_name = "loader"
         logger = logging.getLogger(self.mod_name)
-        #loadUi(resource_path("assets/loaderwindow.ui"), self)
         loadUi(resource_path("assets/doseResponseTab.ui"), self)
         
         
@@ -60,25 +59,9 @@ class DoseResponseScreen(QMainWindow):
         except Exception as e:
             print(str(e))
 
-        #self.sp_table.setColumnCount(len(sp_header))
-        #self.sp_table.setHorizontalHeaderLabels(sp_header)
         self.dr_table.setColumnCount(len(dr_header))
         self.dr_table.setHorizontalHeaderLabels(dr_header)
 
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
-            if self.loader_tab_wg.currentIndex() == 1:
-                return
-            else: # tab 0, no btn
-                return
-
-    def tabChanged(self):
-        page_index = self.loader_tab_wg.currentIndex()
-        if page_index == 0:
-            return
-        elif page_index == 1:
-            return
 
     def loadAssayFile(self):
         fname = QFileDialog.getOpenFileName(self, 'Import Assay Data', 

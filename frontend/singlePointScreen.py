@@ -18,6 +18,9 @@ class SinglePointScreen(QMainWindow):
         
         self.goto_sp_btn.clicked.connect(self.gotoSP)
         self.goto_dr_btn.clicked.connect(self.gotoDR)
+
+        self.plateIdFile_btn.clicked.connect(self.loadPlates)
+        self.rawDataFiles_btn.clicked.connect(self.loadRawData)
         
         self.testDate.setCalendarPopup(True)
         self.testDate.setDateTime(QtCore.QDateTime.currentDateTime())
@@ -63,23 +66,7 @@ class SinglePointScreen(QMainWindow):
 
         self.sp_table.setColumnCount(len(sp_header))
         self.sp_table.setHorizontalHeaderLabels(sp_header)
-        #self.dr_table.setColumnCount(len(dr_header))
-        #self.dr_table.setHorizontalHeaderLabels(dr_header)
 
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
-            if self.loader_tab_wg.currentIndex() == 1:
-                return
-            else: # tab 0, no btn
-                return
-
-    def tabChanged(self):
-        page_index = self.loader_tab_wg.currentIndex()
-        if page_index == 0:
-            return
-        elif page_index == 1:
-            return
 
     def loadAssayFile(self):
         fname = QFileDialog.getOpenFileName(self, 'Import Assay Data', 
@@ -150,3 +137,28 @@ class SinglePointScreen(QMainWindow):
 
         self.sp_table.setSortingEnabled(True)
         
+
+    def loadPlates(self):
+        fname = QFileDialog.getOpenFileName(self, 'Import plates', 
+                                            '.', "")
+        if fname[0] == '':
+            return
+        self.plateFile_lab.setText(fname[0])
+        
+
+    def loadRawData(self):
+
+        filter = "TXT (*.txt);;PDF (*)"
+        file_name = QFileDialog()
+        file_name.setFileMode(QFileDialog.ExistingFiles)
+        names = file_name.getOpenFileNames(self, 'Import plates', 
+                                           '.', "")
+        if names[0] == '':
+            return
+        sFiles = ""
+        for file in names[0]:
+            print(file)
+            sFiles += str(file) + '\n'
+        self.rawDataFiles_text.setText(sFiles)
+
+
