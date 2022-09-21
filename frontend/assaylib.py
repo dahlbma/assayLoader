@@ -8,11 +8,6 @@ from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
 
-def gotoLoader(self):
-    resize_window(self)
-    self.window().setCurrentIndex(1)
-    return
-
 def gotoSP(self):
     resize_window(self)
     self.window().setCurrentIndex(1)
@@ -22,7 +17,7 @@ def gotoSP(self):
 def gotoDR(self):
     resize_window(self)
     self.window().setCurrentIndex(2)
-    self.window().widget(1).drPlateIdFile_btn.setFocus()
+    self.window().widget(2).drPlateIdFile_btn.setFocus()
     return
 
 class Worker(QObject):

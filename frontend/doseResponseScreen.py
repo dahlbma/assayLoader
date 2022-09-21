@@ -6,43 +6,41 @@ from PyQt5 import QtGui
 import openpyxl
 from assaylib import *
 
-class LoaderScreen(QMainWindow):
+class DoseResponseScreen(QMainWindow):
     from assaylib import gotoDR, gotoSP
     def __init__(self, token, test):
-        super(LoaderScreen, self).__init__()
+        super(DoseResponseScreen, self).__init__()
         self.token = token
         self.mod_name = "loader"
         logger = logging.getLogger(self.mod_name)
         #loadUi(resource_path("assets/loaderwindow.ui"), self)
         loadUi(resource_path("assets/doseResponseTab.ui"), self)
-        loadUi(resource_path("assets/singlePointTab.ui"), self)
-
+        
+        
         self.goto_sp_btn.clicked.connect(self.gotoSP)
         self.goto_dr_btn.clicked.connect(self.gotoDR)
         
-        self.testDate.setCalendarPopup(True)
-        self.testDate.setDateTime(QtCore.QDateTime.currentDateTime())
+        self.testDate_dr.setCalendarPopup(True)
+        self.testDate_dr.setDateTime(QtCore.QDateTime.currentDateTime())
         
         projects = dbInterface.getProjects(self.token)
-        self.project_cb.addItems(projects)
+        self.projectDr_cb.addItems(projects)
 
         targets = dbInterface.getTargets(self.token)
-        self.target_cb.addItems(targets)
+        self.targetDr_cb.addItems(targets)
 
         assayTypes = dbInterface.getAssayTypes(self.token)
-        self.assay_type_cb.addItems(assayTypes)
+        self.assay_typeDr_cb.addItems(assayTypes)
 
         detectionTypes = dbInterface.getDetectionTypes(self.token)
-        self.det_type_cb.addItems(detectionTypes)
+        self.det_typeDr_cb.addItems(detectionTypes)
         
         operators = dbInterface.getOperators(self.token)
-        self.operator_cb.addItems(operators)
+        self.operatorDr_cb.addItems(operators)
 
-        self.screenType_cb.addItems(['Activation', 'Inhibition'])
+        self.loadAssayFileDr_btn.clicked.connect(self.loadAssayFile)
 
-        self.loadAssayFile_btn.clicked.connect(self.loadAssayFile)
-
-        self.saveData_btn.setEnabled(False)
+        self.saveDataDr_btn.setEnabled(False)
         
         try:
             js = dbInterface.getSinglePointConfig(self.token)
@@ -62,8 +60,8 @@ class LoaderScreen(QMainWindow):
         except Exception as e:
             print(str(e))
 
-        self.sp_table.setColumnCount(len(sp_header))
-        self.sp_table.setHorizontalHeaderLabels(sp_header)
+        #self.sp_table.setColumnCount(len(sp_header))
+        #self.sp_table.setHorizontalHeaderLabels(sp_header)
         self.dr_table.setColumnCount(len(dr_header))
         self.dr_table.setHorizontalHeaderLabels(dr_header)
 
@@ -133,21 +131,21 @@ class LoaderScreen(QMainWindow):
                 iRow +=1
                 continue
             iRow += 1
-            rowPosition = self.sp_table.rowCount()
-            self.sp_table.insertRow(rowPosition)
+            rowPosition = self.dr_table.rowCount()
+            self.dr_table.insertRow(rowPosition)
             iCol = 0
             lError = False
             for value in row:
-                self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(value)))
+                self.dr_table.setItem(rowPosition, iCol, QTableWidgetItem(str(value)))
                 if iCol == self.spVerifyColInfo['verifyCol'] and value not in saCompIds:
-                    self.sp_table.item(rowPosition, self.spVerifyColInfo['verifyCol']).setBackground(errorColor)
+                    self.dr_table.item(rowPosition, self.spVerifyColInfo['verifyCol']).setBackground(errorColor)
                     lError = True
                 iCol += 1
                 
             if lError:
-                self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(1)))
+                self.dr_table.setItem(rowPosition, iCol, QTableWidgetItem(str(1)))
             else:
-                self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(0)))
+                self.dr_table.setItem(rowPosition, iCol, QTableWidgetItem(str(0)))
 
-        self.sp_table.setSortingEnabled(True)
+        self.dr_table.setSortingEnabled(True)
         

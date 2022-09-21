@@ -47,7 +47,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QTabWidget" name="sp_tab">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="sp_prep_data_tab">
          <attribute name="title">
