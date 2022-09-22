@@ -25,8 +25,7 @@ def res2json():
 
 def res_to_json(response, cursor):
     columns = cursor.description()
-    to_js = [{columns[index][0]:column for index,
-              column in enumerate(value)} for value in response]
+    to_js = [{columns[index][0]:column for index, column in enumerate(value)} for value in response]
     return to_js
 
 def getDatabase(parent):
