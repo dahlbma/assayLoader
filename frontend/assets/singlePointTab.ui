@@ -53,7 +53,7 @@
          <attribute name="title">
           <string>SP prep data</string>
          </attribute>
-         <widget class="QPushButton" name="plateIdFile_btn">
+         <widget class="QPushButton" name="spPlateIdFile_btn">
           <property name="geometry">
            <rect>
             <x>30</x>
@@ -102,7 +102,7 @@
            <string>Instrument type</string>
           </property>
          </widget>
-         <widget class="QLabel" name="plateFile_lab">
+         <widget class="QLabel" name="spPlateFile_lab">
           <property name="geometry">
            <rect>
             <x>30</x>
@@ -125,7 +125,7 @@
            </rect>
           </property>
          </widget>
-         <widget class="QPushButton" name="generateBreezeInput_btn">
+         <widget class="QPushButton" name="spGenerateBreezeInput_btn">
           <property name="geometry">
            <rect>
             <x>40</x>

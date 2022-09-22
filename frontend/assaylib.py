@@ -11,7 +11,7 @@ from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 def gotoSP(self):
     resize_window(self)
     self.window().setCurrentIndex(1)
-    self.window().widget(1).plateIdFile_btn.setFocus()
+    self.window().widget(1).spPlateIdFile_btn.setFocus()
     return
 
 def gotoDR(self):
