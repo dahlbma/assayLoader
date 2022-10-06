@@ -188,10 +188,16 @@ class GetPlate(tornado.web.RequestHandler):
         '''
         cur.execute(sSql)
         tRes = cur.fetchall()
-        self.finish(json.dumps(res_to_json(tRes, cur), indent=4))
-        #res = res2json()
-        #self.finish(res)
-
+        if len(tRes) > 0:
+            try:
+                self.finish(json.dumps(res_to_json(tRes, cur), indent=4))
+            except:
+                print(tRes)
+        else:
+            sError = f"Plate not found {sPlate}"
+            logging.error(sError)
+            self.set_status(400)
+            self.finish(sError)
 
 
 @jwtauth
