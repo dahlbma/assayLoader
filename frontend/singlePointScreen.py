@@ -4,6 +4,9 @@ from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 import openpyxl
+import csv
+from pathlib import Path
+
 from assaylib import *
 
 class SinglePointScreen(QMainWindow):
@@ -19,8 +22,10 @@ class SinglePointScreen(QMainWindow):
         self.goto_sp_btn.clicked.connect(self.gotoSP)
         self.goto_dr_btn.clicked.connect(self.gotoDR)
 
-        self.plateIdFile_btn.clicked.connect(self.loadPlates)
+        self.spPlateIdFile_btn.clicked.connect(self.loadPlates)
         self.rawDataFiles_btn.clicked.connect(self.loadRawData)
+
+        self.spGenerateBreezeInput_btn.clicked.connect(self.createBreezeFile)
         
         self.testDate.setCalendarPopup(True)
         self.testDate.setDateTime(QtCore.QDateTime.currentDateTime())
@@ -137,28 +142,77 @@ class SinglePointScreen(QMainWindow):
 
         self.sp_table.setSortingEnabled(True)
         
-
     def loadPlates(self):
-        fname = QFileDialog.getOpenFileName(self, 'Import plates', 
-                                            '.', "")
+        fname = QFileDialog.getOpenFileName(self, 'Import plates', '.', "")
         if fname[0] == '':
             return
-        self.plateFile_lab.setText(fname[0])
+        self.spPlateFile_lab.setText(fname[0])
         
-
     def loadRawData(self):
-
         filter = "TXT (*.txt);;PDF (*)"
         file_name = QFileDialog()
         file_name.setFileMode(QFileDialog.ExistingFiles)
-        names = file_name.getOpenFileNames(self, 'Import plates', 
-                                           '.', "")
+        names = file_name.getOpenFileNames(self, 'Import plates', '.', "")
         if names[0] == '':
             return
         sFiles = ""
+        self.saFiles = []
         for file in names[0]:
+            self.saFiles.append(file)
             print(file)
             sFiles += str(file) + '\n'
         self.rawDataFiles_text.setText(sFiles)
 
+    def createBreezeFile(self):
+        workBook = openpyxl.load_workbook(self.spPlateFile_lab.text(), read_only=True)
+        workSheet = workBook[workBook.sheetnames[0]]
 
+        workSheet.reset_dimensions()
+        workSheet.calculate_dimension(force=True)
+
+        sPlateIdColName = workSheet["B1"].value
+        sPlateFilenameColName = workSheet["C1"].value
+
+        if sPlateIdColName != 'Platt ID' or sPlateFilenameColName != 'Filename':
+            send_msg(f'Wrong header in file',
+                     f'Column B1 must be named "Platt ID" and C1 "Filename"\nGot: B1 "{sPlateIdColName}" and C1 "{sPlateFilenameColName}"')
+            return
+
+        iRow = 0
+        saSheetHeader = []
+        for row in workSheet.rows:
+            iCol = 0
+            if iRow == 0: # Skip header row
+                iRow += 1
+                continue
+            iRow += 1
+            sPlateId = ""
+            sRawDataFilename = ""
+            for cell in row:
+                if iCol == 1:
+                    sPlateId = str(cell.value)
+                if iCol == 2:
+                    sRawDataFilename = str(cell.value)
+                if iCol == 2:
+                    sFullRawDataFilePath = self.checkIfFileExists(sRawDataFilename)
+                    if not sFullRawDataFilePath:
+                        send_msg('Raw data file not found',
+                                 f'Could not find the rawdata file "{sRawDataFilename}"')
+                        return
+                    else:
+                        self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId)
+                        
+                iCol += 1
+                
+
+    def checkIfFileExists(self, sRawDataFilename):
+        for sFile in self.saFiles:
+            if sRawDataFilename in sFile:
+                return sFile
+
+        return False
+            
+    def parseRawDataAndPlate(self, sFullRawDataFilePath, sPlateId):
+        saPlate = dbInterface.getPlate(self.token, sPlateId)
+        print(saPlate)
+        print(sFullRawDataFilePath, sPlateId)
