@@ -156,12 +156,19 @@ class SinglePointScreen(QMainWindow):
         if names[0] == '':
             return
         sFiles = ""
+
+        self.rawDataFiles_table.setRowCount(0)
+        self.rawDataFiles_table.setRowCount(len(names[0]))
+        
+        iRow = 0
+        iCol = 0
         self.saFiles = []
         for file in names[0]:
             self.saFiles.append(file)
-            print(file)
-            sFiles += str(file) + '\n'
-        self.rawDataFiles_text.setText(sFiles)
+            newItem = QTableWidgetItem(str(file))
+            self.rawDataFiles_table.setItem(iRow, iCol, newItem)
+            self.rawDataFiles_table.setRowHeight(iRow, 12)
+            iRow += 1
 
     def createBreezeFile(self):
         workBook = openpyxl.load_workbook(self.spPlateFile_lab.text(), read_only=True)
@@ -213,6 +220,11 @@ class SinglePointScreen(QMainWindow):
         return False
             
     def parseRawDataAndPlate(self, sFullRawDataFilePath, sPlateId):
-        saPlate = dbInterface.getPlate(self.token, sPlateId)
-        print(saPlate)
-        print(sFullRawDataFilePath, sPlateId)
+        saPlate, bStatus = dbInterface.getPlate(self.token, sPlateId)
+        if bStatus == False:
+            print(saPlate)
+        else:
+            jsonPlate = json.loads(saPlate)
+            print(f'Loaded {len(jsonPlate)} wells from plate {sPlateId}')
+        #print(saPlate)
+        #print(sFullRawDataFilePath, sPlateId)
