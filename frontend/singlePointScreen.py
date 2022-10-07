@@ -210,13 +210,11 @@ class SinglePointScreen(QMainWindow):
                         self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId)
                         
                 iCol += 1
-                
 
     def checkIfFileExists(self, sRawDataFilename):
         for sFile in self.saFiles:
             if sRawDataFilename in sFile:
                 return sFile
-
         return False
             
     def parseRawDataAndPlate(self, sFullRawDataFilePath, sPlateId):
@@ -226,5 +224,40 @@ class SinglePointScreen(QMainWindow):
         else:
             jsonPlate = json.loads(saPlate)
             print(f'Loaded {len(jsonPlate)} wells from plate {sPlateId}')
-        #print(saPlate)
-        #print(sFullRawDataFilePath, sPlateId)
+            f = open(sFullRawDataFilePath, "r")
+            bDataFound = False
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                line = line.strip()
+                saColumns = line.split(',')
+                if bDataFound and len(saColumns) == 1:
+                    break
+                if saColumns[0] == 'PlateNumber':
+                    bDataFound = True
+                if bDataFound:
+                    print(saColumns)
+                    for row in jsonPlate:
+                        if row['WELL'] == saColumns[4] :
+                            
+
+                    # jsonPlate entry looks like:
+                    #{
+                    #        "PLATE": "P014544",
+                    #        "WELL": "P13",
+                    #        "DRUG_NAME": "AA3081722",
+                    #        "CONCENTRATION": 10.0
+                    #}
+
+                    # The two columns in the raw datafile that we need are:
+                    # well   = col 5
+                    # result = col 15
+
+                    # Output file should have these columns
+                    # WELL  WELL_SIGNAL SCREEN_NAME PLATE   DRUG_NAME CONCENTRATION
+                    # A1    64240       Holmgren    P014569 CBK062263 10
+
+                    
+                #saVals = getDataFromReadout(saColumns)
+
