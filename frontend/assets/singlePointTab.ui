@@ -17,6 +17,13 @@
    <layout class="QGridLayout" name="gridLayout_7">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="goto_dr_btn">
+        <property name="text">
+         <string>Dose Response</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <spacer name="horizontalSpacer_5">
         <property name="orientation">
@@ -34,13 +41,6 @@
        <widget class="QPushButton" name="goto_sp_btn">
         <property name="text">
          <string>Single Point</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="goto_dr_btn">
-        <property name="text">
-         <string>Dose Response</string>
         </property>
        </widget>
       </item>
@@ -82,7 +82,7 @@
          <widget class="QComboBox" name="instumentType_cb">
           <property name="geometry">
            <rect>
-            <x>490</x>
+            <x>360</x>
             <y>60</y>
             <width>141</width>
             <height>24</height>
@@ -92,7 +92,7 @@
          <widget class="QLabel" name="label">
           <property name="geometry">
            <rect>
-            <x>390</x>
+            <x>260</x>
             <y>60</y>
             <width>101</width>
             <height>16</height>
@@ -118,8 +118,8 @@
          <widget class="QPushButton" name="spGenerateBreezeInput_btn">
           <property name="geometry">
            <rect>
-            <x>40</x>
-            <y>550</y>
+            <x>30</x>
+            <y>600</y>
             <width>201</width>
             <height>41</height>
            </rect>
@@ -131,11 +131,14 @@
          <widget class="QTableWidget" name="rawDataFiles_table">
           <property name="geometry">
            <rect>
-            <x>200</x>
-            <y>140</y>
-            <width>651</width>
+            <x>30</x>
+            <y>170</y>
+            <width>1011</width>
             <height>401</height>
            </rect>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
           </property>
           <attribute name="horizontalHeaderDefaultSectionSize">
            <number>125</number>
@@ -148,9 +151,37 @@
           </attribute>
           <column>
            <property name="text">
-            <string>Raw data file</string>
+            <string>RawDataFile</string>
            </property>
           </column>
+          <column>
+           <property name="text">
+            <string>Status</string>
+           </property>
+          </column>
+         </widget>
+         <widget class="QLineEdit" name="screenName_eb">
+          <property name="geometry">
+           <rect>
+            <x>720</x>
+            <y>60</y>
+            <width>141</width>
+            <height>24</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_10">
+          <property name="geometry">
+           <rect>
+            <x>640</x>
+            <y>60</y>
+            <width>81</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Screen name</string>
+          </property>
          </widget>
         </widget>
         <widget class="QWidget" name="sp_load_data">

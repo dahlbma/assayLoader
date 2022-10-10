@@ -24,6 +24,10 @@ class SinglePointScreen(QMainWindow):
 
         self.spPlateIdFile_btn.clicked.connect(self.loadPlates)
         self.rawDataFiles_btn.clicked.connect(self.loadRawData)
+        header = self.rawDataFiles_table.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+
 
         self.spGenerateBreezeInput_btn.clicked.connect(self.createBreezeFile)
         
@@ -71,6 +75,9 @@ class SinglePointScreen(QMainWindow):
 
         self.sp_table.setColumnCount(len(sp_header))
         self.sp_table.setHorizontalHeaderLabels(sp_header)
+        #header = self.sp_table.horizontalHeader()
+        #header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        #header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
 
 
     def loadAssayFile(self):
@@ -207,7 +214,7 @@ class SinglePointScreen(QMainWindow):
                                  f'Could not find the rawdata file "{sRawDataFilename}"')
                         return
                     else:
-                        self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId)
+                        self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId, iRow-2)
                         
                 iCol += 1
 
@@ -217,30 +224,40 @@ class SinglePointScreen(QMainWindow):
                 return sFile
         return False
             
-    def parseRawDataAndPlate(self, sFullRawDataFilePath, sPlateId):
+    def parseRawDataAndPlate(self, sFullRawDataFilePath, sPlateId, iTableRow):
         saPlate, bStatus = dbInterface.getPlate(self.token, sPlateId)
         if bStatus == False:
-            print(saPlate)
+            errorColor = QtGui.QColor(255, 0, 0)
+            newItem = QTableWidgetItem(str(saPlate))
+            self.rawDataFiles_table.setItem(iTableRow, 1, newItem)
+            self.rawDataFiles_table.item(iTableRow, 1).setBackground(errorColor)
         else:
             jsonPlate = json.loads(saPlate)
-            print(f'Loaded {len(jsonPlate)} wells from plate {sPlateId}')
+            newItem = QTableWidgetItem(f'Loaded {len(jsonPlate)} wells from plate {sPlateId}')
+            self.rawDataFiles_table.setItem(iTableRow, 1, newItem)
+            okColor = QtGui.QColor(0, 255, 0)
+            self.rawDataFiles_table.item(iTableRow, 1).setBackground(okColor)
+            
             f = open(sFullRawDataFilePath, "r")
             bDataFound = False
+            sScreenName = self.screenName_eb.text()
+
             while True:
                 line = f.readline()
                 if not line:
                     break
                 line = line.strip()
-                saColumns = line.split(',')
-                if bDataFound and len(saColumns) == 1:
+                saRawColumns = line.split(',')
+                if bDataFound and len(saRawColumns) == 1:  # This is true when all assay lines are read
                     break
-                if saColumns[0] == 'PlateNumber':
+                if saRawColumns[0] == 'PlateNumber': # This is the header line for assay lines
                     bDataFound = True
+                    continue
                 if bDataFound:
-                    print(saColumns)
                     for row in jsonPlate:
-                        if row['WELL'] == saColumns[4] :
-                            
+                        if row['WELL'] == saRawColumns[4]: # Find the plate info for the current well in the raw data file
+                            pass
+                            #print(row['WELL'], saRawColumns[14], sScreenName, row['PLATE'], row['DRUG_NAME'], row['CONCENTRATION'])
 
                     # jsonPlate entry looks like:
                     #{
