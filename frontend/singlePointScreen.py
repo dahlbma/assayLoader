@@ -75,10 +75,6 @@ class SinglePointScreen(QMainWindow):
 
         self.sp_table.setColumnCount(len(sp_header))
         self.sp_table.setHorizontalHeaderLabels(sp_header)
-        #header = self.sp_table.horizontalHeader()
-        #header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        #header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-
 
     def loadAssayFile(self):
         fname = QFileDialog.getOpenFileName(self, 'Import Assay Data', 
@@ -202,6 +198,7 @@ class SinglePointScreen(QMainWindow):
             iRow += 1
             sPlateId = ""
             sRawDataFilename = ""
+            resultList = list()
             for cell in row:
                 if iCol == 1:
                     sPlateId = str(cell.value)
@@ -214,10 +211,18 @@ class SinglePointScreen(QMainWindow):
                                  f'Could not find the rawdata file "{sRawDataFilename}"')
                         return
                     else:
-                        self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId, iRow-2)
-                        
-                iCol += 1
+                        res = self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId, iRow-2)
+                        if res:
+                            resultList.append(res)
 
+                iCol += 1
+                
+        filename, _ = QFileDialog.getSaveFileName()
+        if filename:
+            with open(filename, "w") as f:
+                print(filename)
+
+        
     def checkIfFileExists(self, sRawDataFilename):
         for sFile in self.saFiles:
             if sRawDataFilename in sFile:
@@ -231,6 +236,7 @@ class SinglePointScreen(QMainWindow):
             newItem = QTableWidgetItem(str(saPlate))
             self.rawDataFiles_table.setItem(iTableRow, 1, newItem)
             self.rawDataFiles_table.item(iTableRow, 1).setBackground(errorColor)
+            return False
         else:
             jsonPlate = json.loads(saPlate)
             newItem = QTableWidgetItem(f'Loaded {len(jsonPlate)} wells from plate {sPlateId}')
@@ -241,7 +247,8 @@ class SinglePointScreen(QMainWindow):
             f = open(sFullRawDataFilePath, "r")
             bDataFound = False
             sScreenName = self.screenName_eb.text()
-
+            saResult = list()
+            
             while True:
                 line = f.readline()
                 if not line:
@@ -256,25 +263,21 @@ class SinglePointScreen(QMainWindow):
                 if bDataFound:
                     for row in jsonPlate:
                         if row['WELL'] == saRawColumns[4]: # Find the plate info for the current well in the raw data file
-                            pass
-                            #print(row['WELL'], saRawColumns[14], sScreenName, row['PLATE'], row['DRUG_NAME'], row['CONCENTRATION'])
-
-                    # jsonPlate entry looks like:
-                    #{
-                    #        "PLATE": "P014544",
-                    #        "WELL": "P13",
-                    #        "DRUG_NAME": "AA3081722",
-                    #        "CONCENTRATION": 10.0
-                    #}
-
-                    # The two columns in the raw datafile that we need are:
-                    # well   = col 5
-                    # result = col 15
-
-                    # Output file should have these columns
-                    # WELL  WELL_SIGNAL SCREEN_NAME PLATE   DRUG_NAME CONCENTRATION
-                    # A1    64240       Holmgren    P014569 CBK062263 10
-
-                    
-                #saVals = getDataFromReadout(saColumns)
+                            saResult.append(list((row['WELL'], saRawColumns[14], sScreenName, row['PLATE'], row['DRUG_NAME'], row['CONCENTRATION'])))
+            return saResult
+        # jsonPlate entry looks like:
+        #{
+        #        "PLATE": "P014544",
+        #        "WELL": "P13",
+        #        "DRUG_NAME": "AA3081722",
+        #        "CONCENTRATION": 10.0
+        #}
+        
+        # The two columns in the raw datafile that we need are:
+        # well   = col 5
+        # result = col 15
+        
+        # Output file should have these columns
+        # WELL  WELL_SIGNAL SCREEN_NAME PLATE   DRUG_NAME CONCENTRATION
+        # A1    64240       Holmgren    P014569 CBK062263 10
 
