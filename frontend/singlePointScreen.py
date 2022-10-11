@@ -190,6 +190,8 @@ class SinglePointScreen(QMainWindow):
 
         iRow = 0
         saSheetHeader = []
+        resultList = list()
+
         for row in workSheet.rows:
             iCol = 0
             if iRow == 0: # Skip header row
@@ -198,7 +200,6 @@ class SinglePointScreen(QMainWindow):
             iRow += 1
             sPlateId = ""
             sRawDataFilename = ""
-            resultList = list()
             for cell in row:
                 if iCol == 1:
                     sPlateId = str(cell.value)
@@ -211,15 +212,20 @@ class SinglePointScreen(QMainWindow):
                                  f'Could not find the rawdata file "{sRawDataFilename}"')
                         return
                     else:
+                        print(len(resultList))
                         res = self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId, iRow-2)
                         if res:
                             resultList.append(res)
+                            print(sPlateId, len(resultList), len(resultList[0]), resultList[0][1])
 
                 iCol += 1
-        resultList = resultList[0]    
+        print(len(resultList))
+        resultList = resultList[0]
         filename, _ = QFileDialog.getSaveFileName()
         if not filename.endswith('.xlsx'):
             filename = filename + '.xlsx'
+        if filename == '.xlsx':
+            return
             
         if filename:
             with open(filename, "w") as f:
