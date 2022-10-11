@@ -216,12 +216,34 @@ class SinglePointScreen(QMainWindow):
                             resultList.append(res)
 
                 iCol += 1
-                
+        resultList = resultList[0]    
         filename, _ = QFileDialog.getSaveFileName()
+        if not filename.endswith('.xlsx'):
+            filename = filename + '.xlsx'
+            
         if filename:
             with open(filename, "w") as f:
+                wb = openpyxl.Workbook()
+                ws =  wb.active
+                ws.title = "BreezeData"
                 print(filename)
+                saHeader = ['WELL', 'WELL_SIGNAL', 'SCREEN_NAME', 'PLATE', 'DRUG_NAME', 'CONCENTRATION']
+                for iCol in range(0, 6):
+                    cellRef = ws.cell(row=1, column = iCol+1)
+                    cellRef.value = saHeader[iCol]
 
+                iRow = 1
+                for resLine in resultList:
+                    iRow += 1
+                    iCol = 1
+                    for cellVal in resLine:
+                        if iCol == 2:
+                            cellVal = int(cellVal)
+                        cellRef = ws.cell(row=iRow, column = iCol)
+                        cellRef.value = cellVal
+                        iCol += 1
+                wb.save(filename = filename)
+                wb.close()
         
     def checkIfFileExists(self, sRawDataFilename):
         for sFile in self.saFiles:
