@@ -191,8 +191,8 @@ class GetPlate(tornado.web.RequestHandler):
         if len(tRes) > 0:
             try:
                 self.finish(json.dumps(res_to_json(tRes, cur), indent=4))
-            except:
-                print(tRes)
+            except Exception as e:
+                print(str(e))
         else:
             sError = f"Plate not found {sPlate}"
             logging.error(sError)
