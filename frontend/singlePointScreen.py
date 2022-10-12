@@ -133,9 +133,10 @@ class SinglePointScreen(QMainWindow):
             lError = False
             for value in row:
                 self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(value)))
-                if iCol == self.spVerifyColInfo['verifyCol'] and value not in saCompIds:
-                    self.sp_table.item(rowPosition, self.spVerifyColInfo['verifyCol']).setBackground(errorColor)
-                    lError = True
+                if iCol == self.spVerifyColInfo['verifyCol'] and value not in ('POS', 'DMSO', 'empty'):
+                    if iCol == self.spVerifyColInfo['verifyCol'] and value not in saCompIds:
+                        self.sp_table.item(rowPosition, self.spVerifyColInfo['verifyCol']).setBackground(errorColor)
+                        lError = True
                 iCol += 1
                 
             if lError:
@@ -247,6 +248,7 @@ class SinglePointScreen(QMainWindow):
                         iCol += 1
                 wb.save(filename)
                 wb.close()
+            f.close()
         
     def checkIfFileExists(self, sRawDataFilename):
         for sFile in self.saFiles:
