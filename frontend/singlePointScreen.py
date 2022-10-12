@@ -212,15 +212,13 @@ class SinglePointScreen(QMainWindow):
                                  f'Could not find the rawdata file "{sRawDataFilename}"')
                         return
                     else:
-                        print(len(resultList))
                         res = self.parseRawDataAndPlate(sFullRawDataFilePath, sPlateId, iRow-2)
                         if res:
                             resultList.append(res)
-                            print(sPlateId, len(resultList), len(resultList[0]), resultList[0][1])
 
                 iCol += 1
-        print(len(resultList))
-        resultList = resultList[0]
+        #resultList = resultList[0]
+        resultList = [item for subList in resultList for item in subList]
         filename, _ = QFileDialog.getSaveFileName()
         if not filename.endswith('.xlsx'):
             filename = filename + '.xlsx'
@@ -230,9 +228,8 @@ class SinglePointScreen(QMainWindow):
         if filename:
             with open(filename, "w") as f:
                 wb = openpyxl.Workbook()
-                ws =  wb.active
+                ws = wb.active
                 ws.title = "BreezeData"
-                print(filename)
                 saHeader = ['WELL', 'WELL_SIGNAL', 'SCREEN_NAME', 'PLATE', 'DRUG_NAME', 'CONCENTRATION']
                 for iCol in range(0, 6):
                     cellRef = ws.cell(row=1, column = iCol+1)
@@ -248,7 +245,7 @@ class SinglePointScreen(QMainWindow):
                         cellRef = ws.cell(row=iRow, column = iCol)
                         cellRef.value = cellVal
                         iCol += 1
-                wb.save(filename = filename)
+                wb.save(filename)
                 wb.close()
         
     def checkIfFileExists(self, sRawDataFilename):
