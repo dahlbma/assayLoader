@@ -70,9 +70,9 @@ class GetSinglePointConfig(tornado.web.RequestHandler):
 	},
 	"ProductName": {
 		"upload": true,
-		"db_col": "compound_id",
+		"db_col": "compound_batch",
         "verify_id": true,
-        "verify_name": "compound"
+        "verify_name": "batch"
 	},
 	"Concentration": {
 		"upload": true,
@@ -181,7 +181,7 @@ class GetPlate(tornado.web.RequestHandler):
     def get(self, sPlate):
         sSql = f'''select p.plate_id PLATE,
         c.well WELL,
-        c.notebook_ref DRUG_NAME,
+        IF(c.notebook_ref='CTRL', 'POS', c.notebook_ref) DRUG_NAME,
         c.CONC CONCENTRATION
         from cool.config c, cool.plate p
         where p.plate_id = '{sPlate}' and p.config_id = c.config_id
@@ -204,7 +204,8 @@ class GetPlate(tornado.web.RequestHandler):
 class GetBatchCompound(tornado.web.RequestHandler):
     def get(self, sBatchCompound):
         if sBatchCompound == 'batch':
-            sSql = f'select notebook_ref detection_type from bcpvs.batch'
+            #sSql = f'select notebook_ref detection_type from bcpvs.batch'
+            sSql = f'select notebook_ref from bcpvs.batch'
         elif sBatchCompound == 'compound':
             sSql = f'select compound_id from bcpvs.compound'
         else:
