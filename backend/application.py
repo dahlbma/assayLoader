@@ -130,7 +130,7 @@ class GetDoseResponseConfig(tornado.web.RequestHandler):
 class GetProjects(tornado.web.RequestHandler):
     def get(self):
         assayDB = getDatabase(self)
-        sSql = f'select distinct(project) project from {assayDB}.lcb_sp'
+        sSql = f'select project_name project from hive.project_details where terminated_date is null'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -170,7 +170,7 @@ class GetDetectionTypes(tornado.web.RequestHandler):
 class GetOperators(tornado.web.RequestHandler):
     def get(self):
         assayDB = getDatabase(self)
-        sSql = f'select distinct(operator) detection_type from {assayDB}.lcb_sp'
+        sSql = f'''select userid from hive.user_details where organization = 'screen' '''
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
