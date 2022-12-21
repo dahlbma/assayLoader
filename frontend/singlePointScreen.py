@@ -6,6 +6,7 @@ from PyQt5 import QtGui
 import openpyxl
 import csv
 from pathlib import Path
+import xlsxwriter
 
 from assaylib import *
 
@@ -227,11 +228,11 @@ class SinglePointScreen(QMainWindow):
             return
             
         if filename:
+            saHeader = ['WELL', 'WELL_SIGNAL', 'SCREEN_NAME', 'PLATE', 'DRUG_NAME', 'CONCENTRATION']
             with open(filename, "w") as f:
                 wb = openpyxl.Workbook()
                 ws = wb.active
                 ws.title = "BreezeData"
-                saHeader = ['WELL', 'WELL_SIGNAL', 'SCREEN_NAME', 'PLATE', 'DRUG_NAME', 'CONCENTRATION']
                 for iCol in range(0, 6):
                     cellRef = ws.cell(row=1, column = iCol+1)
                     cellRef.value = saHeader[iCol]
@@ -249,6 +250,35 @@ class SinglePointScreen(QMainWindow):
                 wb.save(filename)
                 wb.close()
             f.close()
+
+
+            workbook = xlsxwriter.Workbook('hello.xlsx')
+            worksheet = workbook.add_worksheet()
+            iRow = 0
+
+            for iCol in range(0, 6):
+                cellRef = worksheet.write(0, iCol, saHeader[iCol])
+
+            for resLine in resultList:
+                iRow += 1
+                iCol = 0
+                for cellVal in resLine:
+                    #if iCol == 2:
+                    #    cellVal = int(cellVal)
+
+                    cellRef = worksheet.write(iRow, iCol, cellVal)
+                    iCol += 1
+            #workbook.save(filename)
+            workbook.close()
+                
+            with open(filename + '.csv', 'w', encoding='UTF8', newline='\n') as f:
+                writer = csv.writer(f, dialect='unix')
+                # write the header
+                writer.writerow(saHeader)
+                # write multiple rows
+                writer.writerows(resultList)
+            f.close()
+                
         
     def checkIfFileExists(self, sRawDataFilename):
         for sFile in self.saFiles:
