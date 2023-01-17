@@ -222,57 +222,17 @@ class SinglePointScreen(QMainWindow):
         #resultList = resultList[0]
         resultList = [item for subList in resultList for item in subList]
         filename, _ = QFileDialog.getSaveFileName()
-        if not filename.endswith('.xlsx'):
-            filename = filename + '.xlsx'
-        if filename == '.xlsx':
+        
+        if not filename.endswith('.txt'):
+            filename = filename + '.txt'
+        if filename == '.csv':
             return
             
         if filename:
             saHeader = ['WELL', 'WELL_SIGNAL', 'SCREEN_NAME', 'PLATE', 'DRUG_NAME', 'CONCENTRATION']
-            with open(filename, "w") as f:
-                wb = openpyxl.Workbook()
-                ws = wb.active
-                ws.title = "BreezeData"
-                for iCol in range(0, 6):
-                    cellRef = ws.cell(row=1, column = iCol+1)
-                    cellRef.value = saHeader[iCol]
-
-                iRow = 1
-                for resLine in resultList:
-                    iRow += 1
-                    iCol = 1
-                    for cellVal in resLine:
-                        if iCol == 2:
-                            cellVal = int(cellVal)
-                        cellRef = ws.cell(row=iRow, column = iCol)
-                        cellRef.value = cellVal
-                        iCol += 1
-                wb.save(filename)
-                wb.close()
-            f.close()
-
-
-            workbook = xlsxwriter.Workbook('hello.xlsx')
-            worksheet = workbook.add_worksheet()
-            iRow = 0
-
-            for iCol in range(0, 6):
-                cellRef = worksheet.write(0, iCol, saHeader[iCol])
-
-            for resLine in resultList:
-                iRow += 1
-                iCol = 0
-                for cellVal in resLine:
-                    #if iCol == 2:
-                    #    cellVal = int(cellVal)
-
-                    cellRef = worksheet.write(iRow, iCol, cellVal)
-                    iCol += 1
-            #workbook.save(filename)
-            workbook.close()
-                
-            with open(filename + '.csv', 'w', encoding='UTF8', newline='\n') as f:
-                writer = csv.writer(f, dialect='unix')
+            with open(filename, 'w', encoding='UTF8', newline='\n') as f:
+                #writer = csv.writer(f, delimiter='\t', quoting=csv.QUOTE_NONE)
+                writer = csv.writer(f, dialect='unix', quoting=csv.QUOTE_NONE, delimiter='\t')
                 # write the header
                 writer.writerow(saHeader)
                 # write multiple rows
