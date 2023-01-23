@@ -19,10 +19,18 @@ myshape=c("sample"=1,"cells"=16,"cellsTR"=16,"internal1"=16,"internal2"=16,"neg1
           "pos2"=16,"mpos1"=16,"mpos2"=16,"blanks"=16)
 
 
-screen_table <- read.csv(file = 't.csv', sep='\t')
+screen_table <- read.csv(file = 'D:\\chemreg\\assayLoader\\backend\\R\\t.csv', sep='\t')
 data_ <- unique(screen_table[c("screen_id", "Plate")]);
 print(head(data_))
 print(head(screen_table))
+
+
+
+dimnames(rawdatamat) <- list(LETTERS[1:16], 1:24); data_tbl <- reshape2::melt(as.matrix(rawdatamat))
+colnames(data_tbl) <- c("Row","Column","rawIntensity")
+
+
+
 
 qcstat = do.call(rbind, lapply(1:dim((data_))[1], function(i){
     plate_table=screen_table[screen_table$screen_id == data_[i,1] & screen_table$Plate == data_[i,2], ]
