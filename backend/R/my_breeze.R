@@ -11,23 +11,57 @@ ssmd <- compiler::cmpfun(function(x,y)round((mean(x)-mean(y))/sqrt(var(x)+var(y)
 zfactor <- compiler::cmpfun(function(x,y)round((1-(3 * (pop.sd(x)+pop.sd(y)))/(abs(mean(x)-mean(y)))),2));
 robustzfactor <- compiler::cmpfun(function(x,y)round((1-(3 * (mad(x)+mad(y)))/(abs(median(x)-median(y)))),2));
 mycol=c("sample"="gray50","cells"="darkgreen","cellsTR"="green1","internal1"="darkorchid1","internal2"="darkorchid2",
-        "neg1"="red1","neg"="red1","DMSO"="red1","neg2"="red4","neg3"="firebrick1","neg4"="firebrick2","mneg1"="tomato1",
-        "mneg2"="tomato3","pos1"="blue1","pos"="blue1","BzCl"="blue1","bzt"="magenta4","pos2"="slateblue1",
-        "mpos1"="steelblue1","mpos2"="steelblue2","blanks"="cyan")
+        "neg1"="red1","neg"="red1","DMSO"="red1","neg2"="red4","neg3"="firebrick1","neg4"="firebrick2",
+        "mneg1"="tomato1","mneg2"="tomato3","pos1"="blue1","pos"="blue1","BzCl"="blue1","bzt"="magenta4",
+        "pos2"="slateblue1","mpos1"="steelblue1","mpos2"="steelblue2","blanks"="cyan")
 myshape=c("sample"=1,"cells"=16,"cellsTR"=16,"internal1"=16,"internal2"=16,"neg1"=16,"neg"=16,"DMSO"=16,
           "neg2"=16,"neg3"=16,"neg4"=16,"mneg1"=16,"mneg2"=16,"pos1"=16,"pos"=16,"BzCl"=16,"bzt"=16,
           "pos2"=16,"mpos1"=16,"mpos2"=16,"blanks"=16)
 
 
-screen_table <- read.csv(file = 'D:\\chemreg\\assayLoader\\backend\\R\\t.csv', sep='\t')
+#######################################################################
+################# outlier removal function.
+
+outlier_remove <- compiler::cmpfun(function(x){
+  qq <- unname(quantile(x, probs=c(.25, .75), na.rm = T))
+  outlier_detector <- 1.5 * IQR(x, na.rm = T)
+  x[x < (qq[1] - outlier_detector) | x > (qq[2] + outlier_detector)] <- NA
+  x
+})  
+#######################################################################
+
+
+
+
+
+#screen_table <- read.csv(file = 'D:\\chemreg\\assayLoader\\backend\\R\\t.csv', sep='\t')
+screen_table <- read.csv(file = 't.csv', sep='\t')
 data_ <- unique(screen_table[c("screen_id", "Plate")]);
+
+
 print(head(data_))
 print(head(screen_table))
 
+#dimnames(rawdatamat) <- list(LETTERS[1:16], 1:24); data_tbl <- reshape2::melt(as.matrix(rawdatamat))
+data_tbl <- read.csv(file = 'data_tbl.csv', sep='\t')
+
+#colnames(data_tbl) <- c("Row","Column","rawIntensity")
+
+cols_ <- list("Barcode", "read_date", "screen_id", "readout", "DWell"); 
+rows_ <- list(barcode, read_date, file_info$screen_id, file_info$Readout, paste0(data_tbl$Row, data_tbl$Column))
+invisible(lapply(1:length(cols_), function(i) data_tbl[, cols_[[i]]] <<- rows_[[i]]))
+data_tbl <- merge(data_tbl,annoframe[annoframe$Plate==file_info$Plate,],by="DWell", all.x = T)
+
+# positive and negative controls without outliers
+pos_ctrl <- outlier_remove(data_tbl$rawIntensity[data_tbl$Content %in% "POS"])
+neg_ctrl <- outlier_remove(data_tbl$rawIntensity[data_tbl$Content %in% "DMSO"])
+    
+#Calculate percent inhibition and activation
+avg_low <- mean(pos_ctrl,na.rm=T); avg_high <- mean(neg_ctrl,na.rm=T)
+data_tbl$inhibition_percent <- ((avg_high-data_tbl$rawIntensity)/(avg_high-avg_low))*100
 
 
-dimnames(rawdatamat) <- list(LETTERS[1:16], 1:24); data_tbl <- reshape2::melt(as.matrix(rawdatamat))
-colnames(data_tbl) <- c("Row","Column","rawIntensity")
+
 
 
 
