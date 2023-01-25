@@ -31,7 +31,8 @@ outlier_remove <- compiler::cmpfun(function(x){
 #######################################################################
 
 
-
+setwd('/home/mats.dahlberg/assayLoader/backend/R')
+load(file='qcstat.rda')
 
 
 #screen_table <- read.csv(file = 'D:\\chemreg\\assayLoader\\backend\\R\\t.csv', sep='\t')
@@ -48,7 +49,9 @@ data_tbl <- read.csv(file = 'data_tbl.csv', sep='\t')
 #colnames(data_tbl) <- c("Row","Column","rawIntensity")
 
 cols_ <- list("Barcode", "read_date", "screen_id", "readout", "DWell"); 
-rows_ <- list(barcode, read_date, file_info$screen_id, file_info$Readout, paste0(data_tbl$Row, data_tbl$Column))
+print('hi')
+rows_ <- list(barcode, read_date, file_info$screen_id,
+              file_info$Readout, paste0(data_tbl$Row, data_tbl$Column))
 invisible(lapply(1:length(cols_), function(i) data_tbl[, cols_[[i]]] <<- rows_[[i]]))
 data_tbl <- merge(data_tbl,annoframe[annoframe$Plate==file_info$Plate,],by="DWell", all.x = T)
 
