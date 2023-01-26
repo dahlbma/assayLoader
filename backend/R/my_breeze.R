@@ -44,7 +44,7 @@ print(head(data_))
 print(head(screen_table))
 
 #dimnames(rawdatamat) <- list(LETTERS[1:16], 1:24); data_tbl <- reshape2::melt(as.matrix(rawdatamat))
-data_tbl <- read.csv(file = 'data_tbl.csv', sep='\t')
+data_tbl <- read.csv(file = 'Holmgren_test_breeze.csv', sep='\t')
 
 #colnames(data_tbl) <- c("Row","Column","rawIntensity")
 
