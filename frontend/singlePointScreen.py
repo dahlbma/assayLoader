@@ -139,7 +139,6 @@ class SinglePointScreen(QMainWindow):
         saCompIds = dbInterface.getBatchCompound(self.token,
                                                  self.spVerifyColInfo['verifyDbCol'])
         errorColor = QtGui.QColor(255, 0, 0)
-        iRow = 0
 
         sDimensions = workSheet.calculate_dimension(force=True)
         iSheetLength = getNumberOfRows(sDimensions)
@@ -156,6 +155,7 @@ class SinglePointScreen(QMainWindow):
         iTicks = 0
         QApplication.processEvents()
 
+        iRow = 0
         for row in workSheet.values:
             if iRow == 0: # Skip header row
                 iRow +=1
