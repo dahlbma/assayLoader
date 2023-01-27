@@ -29,7 +29,6 @@ class SinglePointScreen(QMainWindow):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
 
-
         self.spGenerateBreezeInput_btn.clicked.connect(self.createBreezeFile)
         
         self.testDate.setCalendarPopup(True)
@@ -78,18 +77,26 @@ class SinglePointScreen(QMainWindow):
         self.sp_table.setHorizontalHeaderLabels(sp_header)
 
     def loadAssayFile(self):
+        self.sp_table.setRowCount(0)
+        QApplication.processEvents()
         fname = QFileDialog.getOpenFileName(self, 'Import Assay Data', 
                                             '.', "")
         if fname[0] == '':
             return
         
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        workBook = openpyxl.load_workbook(fname[0], read_only=True)
+        try:
+            workBook = openpyxl.load_workbook(fname[0], read_only=True)
+        except Exception as e:
+            print('Failed to open Breeze file')
+            print(str(e))
+            QApplication.restoreOverrideCursor()
+            return
+
         workSheet = workBook[workBook.sheetnames[0]]
-
         workSheet.reset_dimensions()
-        workSheet.calculate_dimension(force=True)
-
+        sDimensions = workSheet.calculate_dimension(force=True)
+        
         iRow = 0
         saSheetHeader = []
         for row in workSheet.rows:
@@ -107,6 +114,10 @@ class SinglePointScreen(QMainWindow):
         iCount = 0
         lAllOK = True
         for item in confHeader:
+            if iCount >= len(xlHeader):
+                print('To many columns in input file')
+                lAllOK = False
+                break
             if item == xlHeader[iCount]:
                 pass
             else:
@@ -119,24 +130,55 @@ class SinglePointScreen(QMainWindow):
 
 
     def populateAssayTable(self, workSheet):
+
+        def getNumberOfRows(sDimensions):
+            firstRow, lastRow = sDimensions.split(':')
+            iLen = re.findall(r'\d+', lastRow)
+            return int(iLen[0])
+        
         saCompIds = dbInterface.getBatchCompound(self.token,
                                                  self.spVerifyColInfo['verifyDbCol'])
         errorColor = QtGui.QColor(255, 0, 0)
         iRow = 0
+
+        sDimensions = workSheet.calculate_dimension(force=True)
+        iSheetLength = getNumberOfRows(sDimensions)
+
+        # set up progress bar
+        iTickInterval = int(iSheetLength / 100)
+        progress = 0
+        self.popup = PopUpProgress(f'Processing {iSheetLength} rows')
+        self.popup.setFocus(True)
+        self.popup.raise_()
+        self.popup.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.popup.show()
+        
+        iTicks = 0
+        QApplication.processEvents()
+
         for row in workSheet.values:
             if iRow == 0: # Skip header row
                 iRow +=1
                 continue
             iRow += 1
+            if iRow % iTickInterval == 0:
+                QApplication.processEvents()
+                iTicks +=1
+            self.popup.obj.proc_counter(iTicks)
             rowPosition = self.sp_table.rowCount()
             self.sp_table.insertRow(rowPosition)
             iCol = 0
             lError = False
+            
             for value in row:
                 self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(value)))
-                if iCol == self.spVerifyColInfo['verifyCol'] and value not in ('POS', 'DMSO', 'empty'):
+                if iCol == self.spVerifyColInfo['verifyCol'] and value.upper() not in ('NEG',
+                                                                                       'POS',
+                                                                                       'DMSO',
+                                                                                       'EMPTY'):
                     if iCol == self.spVerifyColInfo['verifyCol'] and value not in saCompIds:
-                        self.sp_table.item(rowPosition, self.spVerifyColInfo['verifyCol']).setBackground(errorColor)
+                        self.sp_table.item(rowPosition,
+                                           self.spVerifyColInfo['verifyCol']).setBackground(errorColor)
                         lError = True
                 iCol += 1
                 
@@ -146,6 +188,10 @@ class SinglePointScreen(QMainWindow):
                 self.sp_table.setItem(rowPosition, iCol, QTableWidgetItem(str(0)))
 
         self.sp_table.setSortingEnabled(True)
+        QApplication.restoreOverrideCursor()
+        self.popup.obj.proc_counter(100)
+        self.popup.close()
+
         
     def loadPlates(self):
         fname = QFileDialog.getOpenFileName(self, 'Import plates', '.', "")
