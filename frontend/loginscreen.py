@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QMessageBox
 
 from assaylib import *
-from loaderscreen import LoaderScreen
+from singlePointScreen import SinglePointScreen
+from doseResponseScreen import DoseResponseScreen
 
 class LoginScreen(QMainWindow):
     def __init__(self, appName):
@@ -61,25 +62,10 @@ class LoginScreen(QMainWindow):
         self.window().setWindowTitle(f"{self.appName} {db}")
 
         #init
-        loader = LoaderScreen(self.jwt_token, test)
-        '''
-        search = SearchScreen(self.jwt_token, test)
-        vials = VialsScreen(self.jwt_token, test)
-        boxes = BoxesScreen(self.jwt_token, test)
-        microtubes = MicrotubesScreen(self.jwt_token, test)
-        plates = PlatesScreen(self.jwt_token, test)
-        '''
+        singlePoint = SinglePointScreen(self.jwt_token, test)
+        doseResponse = DoseResponseScreen(self.jwt_token, test)
         
         #add screens to stackedwidget
-        self.window().addWidget(loader)
-        '''
-        self.window().addWidget(search)
-        self.window().addWidget(vials)
-        self.window().addWidget(boxes)
-        self.window().addWidget(microtubes)
-        self.window().addWidget(plates)
-
-        #first screen
-        gotoSearch(self)
-        '''
-        gotoLoader(self)
+        self.window().addWidget(singlePoint)
+        self.window().addWidget(doseResponse)
+        gotoSP(self)

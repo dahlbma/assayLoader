@@ -23,6 +23,11 @@ def res2json():
     result = [list(i) for i in cur.fetchall()]
     return json.dumps(result)
 
+def res_to_json(response, cursor):
+    columns = cursor.description()
+    to_js = [{columns[index][0]:column for index, column in enumerate(value)} for value in response]
+    return to_js
+
 def getDatabase(parent):
     data = parent.request.headers['Token']
     jsonData = json.loads(data)
@@ -46,68 +51,68 @@ class GetSinglePointConfig(tornado.web.RequestHandler):
 	"DWell": {
 	    "upload": true,
 	    "db_col": "well",
-                "verify_id": false
+        "verify_id": false
 	},
 	"rawIntensity": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"screen_id": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Plate": {
 		"upload": true,
 		"db_col": "plate_id",
-                "verify_id": false
+        "verify_id": false
 	},
 	"ProductName": {
 		"upload": true,
-		"db_col": "compound_id",
-                "verify_id": true,
-                "verify_name": "compound"
+		"db_col": "compound_batch",
+        "verify_id": true,
+        "verify_name": "batch"
 	},
 	"Concentration": {
 		"upload": true,
 		"db_col": "concentration",
-                "verify_id": false
+        "verify_id": false
 	},
 	"DCol": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Column": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"DRow": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Row": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"readout": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"Content": {
 		"upload": false,
 		"db_col": "",
-                "verify_id": false
+        "verify_id": false
 	},
 	"inhibition_percent": {
 		"upload": true,
 		"db_col": "inhibition",
-                "verify_id": false
+        "verify_id": false
 	}
 }
         '''
@@ -125,7 +130,7 @@ class GetDoseResponseConfig(tornado.web.RequestHandler):
 class GetProjects(tornado.web.RequestHandler):
     def get(self):
         assayDB = getDatabase(self)
-        sSql = f'select distinct(project) project from {assayDB}.lcb_sp'
+        sSql = f'select project_name project from hive.project_details where terminated_date is null'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -165,17 +170,42 @@ class GetDetectionTypes(tornado.web.RequestHandler):
 class GetOperators(tornado.web.RequestHandler):
     def get(self):
         assayDB = getDatabase(self)
-        sSql = f'select distinct(operator) detection_type from {assayDB}.lcb_sp'
+        sSql = f'''select userid from hive.user_details where organization = 'screen' '''
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
 
 
 @jwtauth
+class GetPlate(tornado.web.RequestHandler):
+    def get(self, sPlate):
+        sSql = f'''select p.plate_id PLATE,
+        c.well WELL,
+        IF(c.notebook_ref='CTRL', 'POS', c.notebook_ref) DRUG_NAME,
+        c.CONC CONCENTRATION
+        from cool.config c, cool.plate p
+        where p.plate_id = '{sPlate}' and p.config_id = c.config_id
+        '''
+        cur.execute(sSql)
+        tRes = cur.fetchall()
+        if len(tRes) > 0:
+            try:
+                self.finish(json.dumps(res_to_json(tRes, cur), indent=4))
+            except Exception as e:
+                print(str(e))
+        else:
+            sError = f"Plate not found {sPlate}"
+            logging.error(sError)
+            self.set_status(400)
+            self.finish(sError)
+
+
+@jwtauth
 class GetBatchCompound(tornado.web.RequestHandler):
     def get(self, sBatchCompound):
         if sBatchCompound == 'batch':
-            sSql = f'select notebook_ref detection_type from bcpvs.batch'
+            #sSql = f'select notebook_ref detection_type from bcpvs.batch'
+            sSql = f'select notebook_ref from bcpvs.batch'
         elif sBatchCompound == 'compound':
             sSql = f'select compound_id from bcpvs.compound'
         else:
