@@ -9,7 +9,6 @@ dist/
 *.sdf
 *.mol
 error_msg.txt
-*.csv
 log_assayLoader.txt
 
 # Byte-compiled / optimized / DLL files
