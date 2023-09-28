@@ -58,7 +58,8 @@ def calcData(df, ws):
                    'meanPosCtrl': meanPosCtrl,
                    'stdPosCtrl': stdPosCtrl,
                    'Z-factor': Z}
-        df_summary = df_summary.append(new_row, ignore_index=True)
+        df_summary.loc[len(df_summary)] = new_row
+        #df_summary = df_summary.append(new_row, ignore_index=True)
 
         print(f'Z for plate {plate} = {Z}')
 
