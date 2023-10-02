@@ -6,11 +6,18 @@ import openpyxl
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.drawing.image import Image
-
+from openpyxl.styles import NamedStyle
+from openpyxl.styles import Font
 
 import io
 
 pd.set_option('mode.chained_assignment', None)
+
+decimal_style = NamedStyle(name='two_decimals')
+decimal_style.number_format = '0.00'
+# Define a custom font (Calibri 10pt)
+custom_font = Font(name='Calibri', size=10)
+
 
 
 excel_file_path = 'screenresults.xlsx'
@@ -166,6 +173,12 @@ for column in ws.columns:
             pass
     adjusted_width = max(max_length + 2, 10)  # Minimum width of 10 characters
     ws.column_dimensions[column_letter].width = adjusted_width
+
+for row in ws.iter_rows():
+    for cell in row:
+        cell.style = decimal_style
+        cell.font = custom_font
+
 
 
 wb.save(excel_file_path)
