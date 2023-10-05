@@ -13,6 +13,7 @@ def create_plate_frame(ws, plate_id, top_left_cell, num_columns, num_rows):
     Create an Excel sheet with plate_id, letters A-Z, and numbers 1-num_columns.
 
     Parameters:
+    - ws: The Excel worksheet.
     - plate_id: The text to write in the top_left_cell.
     - top_left_cell: The top-left cell (e.g., 'A1').
     - num_columns: The number of columns for numbers (1-num_columns).
@@ -81,7 +82,7 @@ def create_outer_thick_border(ws, top_left_cell, num_columns, num_rows):
     )
 
     # Convert the top-left cell to row and column indices
-    start_row, start_col = ws[top_left_cell].row, ws[top_left_cell].column
+    start_row, start_col = ws[top_left_cell].row + 3, ws[top_left_cell].column + 1
 
     top_l_cell = ws.cell(row=start_row, column=start_col)
     top_r_cell = ws.cell(row=start_row, column=start_col+num_columns-1)
@@ -166,18 +167,17 @@ worksheet['A1'].font = custom_font
 worksheet.sheet_view.zoomScale = 85
 
 # Specify the top-left cell and block dimensions
-start_cell = 'C4'
+start_cell = 'B1'
 num_columns = 24
 num_rows = 16
 
 # Call the function to create the thick border
 create_outer_thick_border(worksheet, start_cell, num_columns, num_rows)
+create_plate_frame(worksheet, '1', start_cell, num_columns, num_rows)
+
 start_cell = 'C26'
 create_outer_thick_border(worksheet, start_cell, num_columns, num_rows)
-
-
-create_plate_frame(worksheet, '1', 'B1', num_columns, num_rows)
-create_plate_frame(worksheet, '2', 'B23', num_columns, num_rows)
+create_plate_frame(worksheet, '2', start_cell, num_columns, num_rows)
 
 
 
