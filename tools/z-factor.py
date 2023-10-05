@@ -288,8 +288,9 @@ def generate_gradient(end_color, start_color, num_steps):
 def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
+    plateDf['Raw_data'].fillna(0, inplace=True)
     plateDf['ptile'] = plateDf['Raw_data'].apply(lambda x: percentileofscore(plateDf['Raw_data'], x))
-
+    
     for _, row in plateDf.iterrows():
         well = row['well']
         raw_data = row['Raw_data']
