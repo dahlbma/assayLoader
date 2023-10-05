@@ -180,10 +180,6 @@ create_outer_thick_border(worksheet, start_cell, num_columns, num_rows)
 create_plate_frame(worksheet, '2', start_cell, num_columns, num_rows)
 
 
-
-# Create a blue-to-red gradient fill for cells
-gradient_fill = PatternFill(start_color="0000FF", end_color="FF0000", fill_type="solid")
-
 # Iterate through the cells in the 'Values' column
 for row_idx, row in enumerate(worksheet.iter_rows(min_row=2, max_row=len(df) + 1, min_col=1, max_col=1)):
     cell = row[0]
