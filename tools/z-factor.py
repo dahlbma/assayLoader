@@ -9,7 +9,7 @@ from openpyxl.drawing.image import Image
 from openpyxl.styles import NamedStyle, PatternFill, Alignment, Border, Side, Font
 from openpyxl.styles import Font
 import io
-
+from scipy.stats import percentileofscore
 
 def addPlotToSheet(ws, cell, plt):
     plt.seek(0)
@@ -147,7 +147,7 @@ def calcData(df, ws, heatMapWs):
             cell = ws.cell(row=r_idx, column=c_idx + ord(start_column) - ord('A'))
             cell.value = value
 
-    return listOfDfPlates
+    return listOfDfPlates, meanInhibition, stdInhibition
 
 def create_plate_frame(ws, plate_id, top_left_cell, num_columns, num_rows):
     """
@@ -279,7 +279,7 @@ def generate_gradient(end_color, start_color, num_steps):
         r = int(start_r + i * r_step)
         g = int(start_g + i * g_step)
         b = int(start_b + i * b_step)
-        color_hex = "{:02X}{:02X}{:02X}".format(r, g, b)
+        color_hex = "40{:02X}{:02X}{:02X}".format(r, g, b)
         gradient.append(color_hex)
 
     return gradient
@@ -288,11 +288,17 @@ def generate_gradient(end_color, start_color, num_steps):
 def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
+    plateDf['ptile'] = plateDf['Raw_data'].apply(lambda x: percentileofscore(plateDf['Raw_data'], x))
 
     for _, row in plateDf.iterrows():
         well = row['well']
         raw_data = row['Raw_data']
 
+        try:
+            percentile = int(row['ptile'])
+        except Exception as e:
+            percentile = 50
+        
         # Split the well into row and column components (e.g., 'A01' -> 'A' and '01')
         well_row, well_col = well[0], int(well[1:])
 
@@ -302,8 +308,10 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
 
         # Insert the Raw_data value into the corresponding cell
         #heatMapsWs.cell(row=excel_row + current_row - 1, column=excel_col + current_col - 1, value=raw_data)
-        heatMapsWs.cell(row=current_row, column=current_col , value=raw_data)
-        print(well, current_row, current_col, raw_data)
+        cell = heatMapsWs.cell(row=current_row, column=current_col , value=raw_data)
+        cell.fill = PatternFill(start_color=color_list[percentile], end_color=color_list[percentile], fill_type="solid")
+
+        #print(well, current_row, current_col, raw_data)
         # Move to the next column
         current_col += 1
 
@@ -326,13 +334,14 @@ df = pd.read_csv("plate_Raw_data.csv", delimiter='\t')
 
 
 
-# Generate the gradient from white to blue in 10 steps
-gradient_white_to_blue = generate_gradient(start_color="#0000FF", end_color="#FFFFFF", num_steps=10)
-
 # Generate the gradient from white to red in 10 steps
-gradient_white_to_red = generate_gradient(start_color="#FF0000", end_color="#FFFFFF", num_steps=10)
+gradient_white_to_red = generate_gradient(start_color="#FF0000", end_color="#FFFFFF", num_steps=20)
 
+# Generate the gradient from white to blue in 10 steps
+gradient_white_to_blue = generate_gradient(start_color="#0000FF", end_color="#FFFFFF", num_steps=20)
 
+white_list = ['FFFFFF'] * 60
+color_list = gradient_white_to_red + white_list + gradient_white_to_blue
 
 wb = Workbook()
 screenDataWs = wb.active
@@ -356,7 +365,7 @@ iPlateRows = 21
 # End Heat map data
 #########################################################
 
-listOfPlatesDf = calcData(df, screenDataWs, heatMapsWs)
+listOfPlatesDf, meanInhibition, stdInhibition = calcData(df, screenDataWs, heatMapsWs)
 
 for column in screenDataWs.columns:
     max_length = 0
