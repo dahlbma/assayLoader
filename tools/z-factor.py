@@ -279,26 +279,25 @@ def generate_gradient(end_color, start_color, num_steps):
         r = int(start_r + i * r_step)
         g = int(start_g + i * g_step)
         b = int(start_b + i * b_step)
-        color_hex = "40{:02X}{:02X}{:02X}".format(r, g, b)
+        color_hex = "{:02X}{:02X}{:02X}".format(r, g, b)
         gradient.append(color_hex)
 
+    gradient.reverse()
     return gradient
 
 
 def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
+    whiteFont = Font(color="FFFFFF")
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
     plateDf['Raw_data'].fillna(0, inplace=True)
-    plateDf['ptile'] = plateDf['Raw_data'].apply(lambda x: percentileofscore(plateDf['Raw_data'], x))
-    
+    plateDf['ptile'] = plateDf['Raw_data'].apply(lambda x: int(percentileofscore(plateDf['Raw_data'], x)))
+
     for _, row in plateDf.iterrows():
         well = row['well']
         raw_data = row['Raw_data']
+        percentile = min(row['ptile'], 99)
 
-        try:
-            percentile = int(row['ptile'])
-        except Exception as e:
-            percentile = 50
         
         # Split the well into row and column components (e.g., 'A01' -> 'A' and '01')
         well_row, well_col = well[0], int(well[1:])
@@ -308,11 +307,11 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
         excel_col = well_col
 
         # Insert the Raw_data value into the corresponding cell
-        #heatMapsWs.cell(row=excel_row + current_row - 1, column=excel_col + current_col - 1, value=raw_data)
         cell = heatMapsWs.cell(row=current_row, column=current_col , value=raw_data)
         cell.fill = PatternFill(start_color=color_list[percentile], end_color=color_list[percentile], fill_type="solid")
-
-        #print(well, current_row, current_col, raw_data)
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        if percentile < 10 or percentile > 90:
+            cell.font = whiteFont
         # Move to the next column
         current_col += 1
 
@@ -336,26 +335,28 @@ df = pd.read_csv("plate_Raw_data.csv", delimiter='\t')
 
 
 # Generate the gradient from white to red in 10 steps
-gradient_white_to_red = generate_gradient(start_color="#FF0000", end_color="#FFFFFF", num_steps=20)
+#gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#AF0000", num_steps=24)
+gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#C0504D", num_steps=29)
 
 # Generate the gradient from white to blue in 10 steps
-gradient_white_to_blue = generate_gradient(start_color="#0000FF", end_color="#FFFFFF", num_steps=20)
+#gradient_white_to_blue = generate_gradient(start_color="#0000AF", end_color="#FFFFFF", num_steps=24)
+gradient_white_to_blue = generate_gradient(start_color="#1F497D", end_color="#FFFFFF", num_steps=29)
 
-white_list = ['FFFFFF'] * 60
+white_list = ['FFFFFF'] * 40
 color_list = gradient_white_to_red + white_list + gradient_white_to_blue
-
 wb = Workbook()
+
 screenDataWs = wb.active
 screenDataWs.title = 'ScreenDataAnalysis'
-# Set the zoom factor to 85% (0.85)
-screenDataWs.sheet_view.zoomScale = 85
+# Set the zoom factor to 80% (0.80)
+screenDataWs.sheet_view.zoomScale = 80
 
 
 #########################################################
 # Add a new sheet named "Heat maps"
 heatMapsWs = 'Heat maps'
 heatMapsWs = wb.create_sheet(title=heatMapsWs)
-heatMapsWs.sheet_view.zoomScale = 85
+heatMapsWs.sheet_view.zoomScale = 80
 
 start_col = 'A'
 start_row = 1
