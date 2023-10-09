@@ -50,11 +50,11 @@ def calculatePlateData(df, plate, ws):
 def plotData(values, stds, sHeader):
     x_values = range(1, len(values) + 1 )
     plt.errorbar(x_values, values, yerr=stds, fmt='o', capsize=5,
-                 label='Value with Std Dev')
+                 label='Mean value with Std Dev')
 
     # Add labels and title
     plt.xlabel('Plate')
-    plt.ylabel('Value')
+    plt.ylabel('Mean')
     plt.title(sHeader)
     
     # Add a legend
@@ -120,11 +120,11 @@ def calcData(df, ws, heatMapWs):
     for row in dataframe_to_rows(df_inhibition_calculated, index=False, header=True):
         ws.append(row)
 
-    ws['I1'] = f' Hit limit: {hitLimit}'
-    ws['I2'] = f'Min inhib: {minInhib}'
-    ws['I3'] = f'Max inhib: {maxInhib}'
-    ws['I4'] = f'Mean inhib: {meanInhibition}'
-    ws['I5'] = f'STD inhib: {stdInhibition}'
+    ws['I1'] = ' Hit limit: {:.2f}'.format(hitLimit)
+    ws['I2'] = 'Min inhib: {:.2f}'.format(minInhib)
+    ws['I3'] = 'Max inhib: {:.2f}'.format(maxInhib)
+    ws['I4'] = 'Mean inhib: {:.2f}'.format(meanInhibition)
+    ws['I5'] = 'STD inhib: {:.2f}'.format(stdInhibition)
     '''
     print(minInhib)
     print(maxInhib)
@@ -146,7 +146,9 @@ def calcData(df, ws, heatMapWs):
         for c_idx, value in enumerate(row, 1):
             cell = ws.cell(row=r_idx, column=c_idx + ord(start_column) - ord('A'))
             cell.value = value
-
+            cell.font = custom_font
+            cell.style = decimal_style
+            
     return listOfDfPlates, meanInhibition, stdInhibition
 
 def create_plate_frame(ws, plate_id, top_left_cell, num_columns, num_rows):
@@ -287,7 +289,7 @@ def generate_gradient(end_color, start_color, num_steps):
 
 
 def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
-    whiteFont = Font(color="FFFFFF")
+    whiteFont = Font(name='Calibri', color="FFFFFF")
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
     plateDf['Raw_data'].fillna(0, inplace=True)
@@ -319,7 +321,6 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
         if current_col > 25:
             current_row += 1
             current_col = 2
-    #quit()
 
 
 pd.set_option('mode.chained_assignment', None)
@@ -333,16 +334,15 @@ excel_file_path = 'screenresults.xlsx'
 df = pd.read_csv("plate_Raw_data.csv", delimiter='\t')
 
 
-
 # Generate the gradient from white to red in 10 steps
 #gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#AF0000", num_steps=24)
-gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#C0504D", num_steps=29)
+gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#C0504D", num_steps=34)
 
 # Generate the gradient from white to blue in 10 steps
 #gradient_white_to_blue = generate_gradient(start_color="#0000AF", end_color="#FFFFFF", num_steps=24)
-gradient_white_to_blue = generate_gradient(start_color="#1F497D", end_color="#FFFFFF", num_steps=29)
+gradient_white_to_blue = generate_gradient(start_color="#1F497D", end_color="#FFFFFF", num_steps=34)
 
-white_list = ['FFFFFF'] * 40
+white_list = ['FFFFFF'] * 30
 color_list = gradient_white_to_red + white_list + gradient_white_to_blue
 wb = Workbook()
 

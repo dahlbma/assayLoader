@@ -1,8 +1,50 @@
 import pandas as pd
 from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Alignment, Border, Side, Font
+from openpyxl.styles import PatternFill, Alignment, Border, Side, Font, NamedStyle
 import openpyxl
 from openpyxl.utils import get_column_letter
+from openpyxl.utils.dataframe import dataframe_to_rows
+
+
+# Create a sample DataFrame
+data = {'Column1': [1.2345678, 2.3456789, 3.4567890],
+        'Column2': [4.5678901, 5.6789012, 6.7890123]}
+
+df = pd.DataFrame(data)
+
+# Create a new Excel workbook
+wb = Workbook()
+ws = wb.active
+
+# Define a NamedStyle for 'Calibri' font and 2 decimal places
+style = NamedStyle(name='custom_style')
+style.font = Font(name='Calibri')
+style.number_format = '0.00'
+
+for col in 'AB':
+     ws._styles[col] = style
+
+
+
+# Apply the style to the whole worksheet
+for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+    for cell in row:
+        cell.style = style
+
+# Write the DataFrame to the Excel sheet
+for row_data in dataframe_to_rows(df, index=False, header=True):
+    ws.append(row_data)
+
+# Save the workbook to a file
+excel_file_path = 'output.xlsx'  # Change this to your desired file path
+wb.save(excel_file_path)
+
+print(f'DataFrame written to Excel sheet with "Calibri" font and 2 decimal places: {excel_file_path}')
+
+quit()
+
+
+
 
 outFile = 'colored_cells.xlsx'
 # Define a custom font (Calibri 10pt)
