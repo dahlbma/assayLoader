@@ -46,8 +46,60 @@ def calculatePlateData(df, plate, ws):
 
     return df, Z, meanPosCtrl, stdPosCtrl, meanNegCtrl, stdNegCtrl, meanInhib, stdInhib
 
+def plotZfactor(df):
+    # Create a bar plot for the 'Z-factor' column
+    plt.bar(df['Plate'], df['Z-factor'], tick_label=df['Plate'])
+    
+    # Set labels and title
+    plt.xlabel('Plate')
+    plt.ylabel('Z-factor')
+    plt.title('Bar Plot of Z-factor')
+    plt.xticks(fontsize=6)
+    plt.xticks(range(1, len(df) +1, 2), fontsize=6)
 
-def plotData(values, stds, sHeader):
+    image_buffer = io.BytesIO()
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
+    plt.close()
+    return image_buffer
+
+
+def InhibitionScatterPlot(df_inhibition, hitLimit):
+    # Create a scatterplot of the "inhibition" column
+    plt.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2)
+
+    # Draw a horizontal line at the hit limit
+    plt.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
+
+    # Set labels and title
+    plt.xlabel('Data Points')
+    plt.ylabel('Inhibition')
+    plt.title('Inhibition scatterplot')
+    
+    # Add a legend
+    plt.legend()
+    
+    image_buffer = io.BytesIO()
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
+    plt.close()
+    return image_buffer
+
+
+def plotInhibitionHistogram(df_inhibition):
+    max_value = int(df_inhibition['inhibition'].max())
+    min_value = int(df_inhibition['inhibition'].min())
+    
+    plt.hist(df_inhibition['inhibition'], bins=max_value - min_value, edgecolor='black')
+    plt.xlabel('Inhibition')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Inhibition')
+
+    image_buffer = io.BytesIO()
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
+    plt.close()
+    return image_buffer
+
+
+def plotMeanStd(values, stds, sHeader):
     x_values = range(1, len(values) + 1 )
     plt.errorbar(x_values, values, yerr=stds, fmt='o', capsize=5,
                  label='Mean value with Std Dev')
@@ -119,26 +171,26 @@ def calcData(df, ws, heatMapWs):
     df_inhibition_calculated['hit'] = df_inhibition_calculated.apply(calculate_hit, axis=1)
     for row in dataframe_to_rows(df_inhibition_calculated, index=False, header=True):
         ws.append(row)
-
+    
     ws['I1'] = ' Hit limit: {:.2f}'.format(hitLimit)
     ws['I2'] = 'Min inhib: {:.2f}'.format(minInhib)
     ws['I3'] = 'Max inhib: {:.2f}'.format(maxInhib)
     ws['I4'] = 'Mean inhib: {:.2f}'.format(meanInhibition)
     ws['I5'] = 'STD inhib: {:.2f}'.format(stdInhibition)
-    '''
-    print(minInhib)
-    print(maxInhib)
-    print(hitLimit)
-    print(stdInhibition)
-    print(meanInhibition)
-    '''
-    inhibPlt = plotData(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
-    negPlt = plotData(df_summary['meanNegCtrl'], df_summary['stdNegCtrl'], 'NegCtrl')
-    posPlt = plotData(df_summary['meanPosCtrl'], df_summary['stdPosCtrl'], 'PosCtrl')
 
+    inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
+    negPlt = plotMeanStd(df_summary['meanNegCtrl'], df_summary['stdNegCtrl'], 'NegCtrl')
+    posPlt = plotMeanStd(df_summary['meanPosCtrl'], df_summary['stdPosCtrl'], 'PosCtrl')
+    zFactorPlt = plotZfactor(df_summary)
+    inhibitionHistogramPlt = plotInhibitionHistogram(df_inhibition)
+    inhibitionScatterPlt = InhibitionScatterPlot(df_inhibition, hitLimit)
+    
     addPlotToSheet(ws, 'S1', inhibPlt)
     addPlotToSheet(ws, 'S40', negPlt)
     addPlotToSheet(ws, 'S80', posPlt)
+    addPlotToSheet(ws, 'S120', inhibitionHistogramPlt)
+    addPlotToSheet(ws, 'S160', inhibitionScatterPlt)
+    addPlotToSheet(ws, 'S200', zFactorPlt)
     
     start_column = 'J'
     # Convert the DataFrame to rows and write them to the Excel sheet
@@ -149,9 +201,9 @@ def calcData(df, ws, heatMapWs):
             cell.font = custom_font
             cell.style = decimal_style
             
-    return listOfDfPlates, meanInhibition, stdInhibition
+    return listOfDfPlates, meanInhibition, stdInhibition, df_inhibition_calculated
 
-def create_plate_frame(ws, plate_id, top_left_cell, num_columns, num_rows):
+def create_plate_frame(ws, sHeading, plate_id, top_left_cell, num_columns, num_rows):
     """
     Create an Excel sheet with plate_id, letters A-Z, and numbers 1-num_columns.
 
@@ -167,7 +219,7 @@ def create_plate_frame(ws, plate_id, top_left_cell, num_columns, num_rows):
     start_row, start_col = ws[top_left_cell].row, ws[top_left_cell].column
     
     # Write the plate_id to the specified cell
-    ws[top_left_cell] = "Plate"
+    ws[top_left_cell] = sHeading
     cell = ws.cell(row=start_row, column=start_col+1)
     cell.value = plate_id
 
@@ -288,19 +340,19 @@ def generate_gradient(end_color, start_color, num_steps):
     return gradient
 
 
-def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
+def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col):
     whiteFont = Font(name='Calibri', color="FFFFFF")
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
-    plateDf['Raw_data'].fillna(0, inplace=True)
-    plateDf['ptile'] = plateDf['Raw_data'].apply(lambda x: int(percentileofscore(plateDf['Raw_data'], x)))
+    start_col = current_col
+    plateDf[data_col].fillna(0, inplace=True)
+    plateDf['ptile'] = plateDf[data_col].apply(lambda x: int(percentileofscore(plateDf[data_col], x)))
 
     for _, row in plateDf.iterrows():
         well = row['well']
-        raw_data = row['Raw_data']
+        raw_data = row[data_col]
         percentile = min(row['ptile'], 99)
 
-        
         # Split the well into row and column components (e.g., 'A01' -> 'A' and '01')
         well_row, well_col = well[0], int(well[1:])
 
@@ -318,9 +370,9 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell):
         current_col += 1
 
         # If we've reached the 24th column, move to the next row and reset the column counter
-        if current_col > 25:
+        if current_col > start_col + 23:
             current_row += 1
-            current_col = 2
+            current_col = start_col
 
 
 pd.set_option('mode.chained_assignment', None)
@@ -367,7 +419,7 @@ iPlateRows = 21
 # End Heat map data
 #########################################################
 
-listOfPlatesDf, meanInhibition, stdInhibition = calcData(df, screenDataWs, heatMapsWs)
+listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData = calcData(df, screenDataWs, heatMapsWs)
 
 for column in screenDataWs.columns:
     max_length = 0
@@ -394,12 +446,20 @@ for plateDf in listOfPlatesDf:
     iRow = start_row + ((plate-1) * iPlateRows)
     start_cell = start_col + str(iRow)
     create_outer_thick_border(heatMapsWs, start_cell, num_columns, num_rows)
-    create_plate_frame(heatMapsWs, plate, start_cell, num_columns, num_rows)
-    populate_plate_data(heatMapsWs, plate, plateDf, start_cell)
+    create_plate_frame(heatMapsWs, 'Plate', plate, start_cell, num_columns, num_rows)
+    populate_plate_data(heatMapsWs, plate, plateDf, start_cell, 'Raw_data')
 
 
+# Group by 'well' and sum the 'hit' column to count occurrences of '1'
+df_hit_distr = dfCalcData.groupby('well')['hit'].sum().reset_index()
+# Rename the 'hit' column to 'count'
+df_hit_distr = df_hit_distr.rename(columns={'hit': 'count'})
 
 
+start_cell = 'S240'
+create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
+create_plate_frame(screenDataWs, 'Hit Distr', 1, start_cell, num_columns, num_rows)
+populate_plate_data(screenDataWs, 1, df_hit_distr, start_cell, 'count')
 
 
 

@@ -4,7 +4,26 @@ from openpyxl.styles import PatternFill, Alignment, Border, Side, Font, NamedSty
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows
+import matplotlib.pyplot as plt
 
+
+
+
+# Create a sample Pandas DataFrame (replace this with your actual DataFrame)
+data = {'inhibition': [-2.5, 1.2, 2.3, 1.8, 3.5, 4.2, 2.7, 1.5, 3.8, 4.0, 3.2, 2.0, -1]}
+df = pd.DataFrame(data)
+
+# Convert the "inhibition" column to integers (rounded)
+df['inhibition'] = df['inhibition'].round().astype(int)
+
+# Plot a histogram of the "inhibition" column
+plt.hist(df['inhibition'], bins=10, edgecolor='black')
+plt.xlabel('Inhibition (integer)')
+plt.ylabel('Frequency')
+plt.title('Distribution of Inhibition as Integers')
+plt.show()
+
+quit()
 
 # Create a sample DataFrame
 data = {'Column1': [1.2345678, 2.3456789, 3.4567890],
