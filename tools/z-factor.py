@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.utils import get_column_letter
 from openpyxl.drawing.image import Image
 from openpyxl.styles import NamedStyle, PatternFill, Alignment, Border, Side, Font
 from openpyxl.styles import Font
@@ -18,7 +19,32 @@ def addPlotToSheet(ws, cell, plt):
     img.height = 700  # Set the height of the image in Excel
     ws.add_image(img, cell)
 
-    
+def setBackgroundColor(ws, color, start_cell, end_cell):
+    """
+    Set the background color of a range of cells in an Excel worksheet.
+
+    Parameters:
+    - ws: Excel worksheet (openpyxl worksheet object)
+    - color: Hex value of the background color (e.g., '#FF5050')
+    - start_cell: Upper left corner of the block to color (e.g., 'A1')
+    - end_cell: Lower right corner of the block to color (e.g., 'B4')
+    """
+
+    # Create a PatternFill object with the specified color
+    fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
+
+    # Get the column and row indices of the start and end cells
+    start_col, start_row = openpyxl.utils.cell.coordinate_from_string(start_cell)
+    end_col, end_row = openpyxl.utils.cell.coordinate_from_string(end_cell)
+
+    # Loop through the range of cells and set the background color
+    for row in ws.iter_rows(min_row=start_row,
+                            max_row=end_row,
+                            min_col=openpyxl.utils.column_index_from_string(start_col),
+                            max_col=openpyxl.utils.column_index_from_string(end_col)):
+        for cell in row:
+            cell.fill = fill
+
 def calculatePlateData(df, plate, ws):
     dataDf = df.loc[df['Type'].isna()]
     posDf = df.loc[df['Type'] == 'Pos']
@@ -64,8 +90,10 @@ def plotZfactor(df):
 
 
 def InhibitionScatterPlot(df_inhibition, hitLimit):
-    # Create a scatterplot of the "inhibition" column
-    plt.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2)
+    # Create a scatterplot of the "inhibition" columns
+    plt.scatter(range(len(df_inhibition)), df_inhibition['posCtrlInhibition'], label='PosCtrl', marker='.', s=1, c='green')
+    plt.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2, c='blue')
+    plt.scatter(range(len(df_inhibition)), df_inhibition['negCtrlInhibition'], label='NegCtrl', marker='.', s=1, c='red')
 
     # Draw a horizontal line at the hit limit
     plt.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
@@ -173,17 +201,18 @@ def calcData(df, ws, heatMapWs):
         ws.append(row)
     
     ws['I1'] = ' Hit limit: {:.2f}'.format(hitLimit)
-    ws['I2'] = 'Min inhib: {:.2f}'.format(minInhib)
-    ws['I3'] = 'Max inhib: {:.2f}'.format(maxInhib)
-    ws['I4'] = 'Mean inhib: {:.2f}'.format(meanInhibition)
-    ws['I5'] = 'STD inhib: {:.2f}'.format(stdInhibition)
+    ws['I2'] = ' Min inhib: {:.2f}'.format(minInhib)
+    ws['I3'] = ' Max inhib: {:.2f}'.format(maxInhib)
+    ws['I4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
+    ws['I5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
 
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     negPlt = plotMeanStd(df_summary['meanNegCtrl'], df_summary['stdNegCtrl'], 'NegCtrl')
     posPlt = plotMeanStd(df_summary['meanPosCtrl'], df_summary['stdPosCtrl'], 'PosCtrl')
     zFactorPlt = plotZfactor(df_summary)
     inhibitionHistogramPlt = plotInhibitionHistogram(df_inhibition)
-    inhibitionScatterPlt = InhibitionScatterPlot(df_inhibition, hitLimit)
+    #inhibitionScatterPlt = InhibitionScatterPlot(df_inhibition, hitLimit)
+    inhibitionScatterPlt = InhibitionScatterPlot(df_inhibition_calculated, hitLimit)
     
     addPlotToSheet(ws, 'S1', inhibPlt)
     addPlotToSheet(ws, 'S40', negPlt)
@@ -193,6 +222,8 @@ def calcData(df, ws, heatMapWs):
     addPlotToSheet(ws, 'S200', zFactorPlt)
     
     start_column = 'J'
+    #light_red_3_fill = PatternFill(start_color="FF5050", end_color="FF5050", fill_type="solid")
+    light_red_3_fill = PatternFill(start_color="11FF5050", end_color="11FF5050", fill_type="solid")
     # Convert the DataFrame to rows and write them to the Excel sheet
     for r_idx, row in enumerate(dataframe_to_rows(df_summary, index=False, header=True), 1):
         for c_idx, value in enumerate(row, 1):
@@ -462,9 +493,8 @@ create_plate_frame(screenDataWs, 'Hit Distr', 1, start_cell, num_columns, num_ro
 populate_plate_data(screenDataWs, 1, df_hit_distr, start_cell, 'count')
 
 
-
-
-
+setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='I1', end_cell='I5')
+setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q62')
 
 
 wb.save(excel_file_path)
@@ -494,20 +524,5 @@ StdDev(NegCtrl): H24
 G24 = Avg(NegCtrl)
 J216 = AVG(PosCtrl)
 K216 = STD(PosCtrl)
-
-# Create a new workbook and select the active sheet
-workbook = openpyxl.Workbook()
-sheet = workbook.active
-sheet.title = "Heatmap"
-
-
-# Set the background color of cell A1 to red
-cell = sheet['A1']
-red_fill = PatternFill(start_color='FFFF0000', end_color='FFFF0000', fill_type='solid')
-cell.fill = red_fill
-
-# Save the workbook to a file
-workbook.save('screenresults.xlsx')
-
 
 '''

@@ -5,7 +5,35 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows
 import matplotlib.pyplot as plt
+import numpy as np
 
+
+# Sample DataFrame (replace with your data)
+data = {
+    "inhibition": [0.5, None, 0.7, 0.8, 0.9],
+    "negCtrlInhibition": [0.4, 0.5, 0.6, 0.7, 0.8],
+    "posCtrlInhibition": [0.6, 0.7, 0.8, 0.9, 1.0],
+}
+
+df = pd.DataFrame(data)
+
+# Create a scatter plot
+plt.scatter(df.index, df["inhibition"], c='blue', label='inhibition')
+plt.scatter(df.index, df["negCtrlInhibition"], c='red', label='negCtrlInhibition')
+plt.scatter(df.index, df["posCtrlInhibition"], c='red', label='posCtrlInhibition')
+
+# Add labels and legend
+plt.xlabel("Index")
+plt.ylabel("Inhibition Values")
+plt.title("Scatter Plot of Inhibition")
+plt.legend()
+
+# Show the plot
+plt.show()
+
+
+
+quit()
 
 
 
