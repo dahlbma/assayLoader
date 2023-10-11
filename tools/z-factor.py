@@ -557,15 +557,11 @@ start_cell = "S286"
 addLineOfDataToSheet(screenDataWs, "STD", start_cell, std_columns, 'Std_Column')
 
 
-
-
 # Calculate average for each row (A-P)
 avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "mean"}).reset_index()
 avg_rows.rename(columns={"avgValue": "Avg_Row"}, inplace=True)
 start_cell = "AR268"
 addColumnOfDataToSheet(screenDataWs, "Average", start_cell, avg_rows, 'Avg_Row')
-
-
 
 # Calculate standard deviation for each row (A-P)
 std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "std"}).reset_index()
