@@ -19,6 +19,35 @@ def addPlotToSheet(ws, cell, plt):
     img.height = 700  # Set the height of the image in Excel
     ws.add_image(img, cell)
 
+
+def addLineOfDataToSheet(ws, sText, start_cell, df_data, data_column):
+    # Insert sText into the start_cell
+    ws[start_cell] = sText
+
+    # Get the row number from the start_cell
+    row_number, col_number = openpyxl.utils.coordinate_to_tuple(start_cell)
+    # Convert the DataFrame to a list of rows
+
+    data_list = df_data[data_column].tolist()
+    for point in data_list:
+        col_number += 1
+        ws.cell(row=row_number, column=col_number, value=point)
+
+
+def addColumnOfDataToSheet(ws, sText, start_cell, df_data, data_column):
+    # Insert sText into the start_cell
+    ws[start_cell] = sText
+
+    # Get the row number from the start_cell
+    row_number, col_number = openpyxl.utils.coordinate_to_tuple(start_cell)
+    # Convert the DataFrame to a list of rows
+
+    data_list = df_data[data_column].tolist()
+    for point in data_list:
+        row_number += 1
+        ws.cell(row=row_number, column=col_number, value=point)
+
+
 def setBackgroundColor(ws, color, start_cell, end_cell):
     """
     Set the background color of a range of cells in an Excel worksheet.
@@ -89,7 +118,7 @@ def plotZfactor(df):
     return image_buffer
 
 
-def InhibitionScatterPlot(df_inhibition, hitLimit):
+def inhibitionScatterPlot(df_inhibition, hitLimit):
     # Create a scatterplot of the "inhibition" columns
     plt.scatter(range(len(df_inhibition)), df_inhibition['posCtrlInhibition'], label='PosCtrl', marker='.', s=1, c='green')
     plt.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2, c='blue')
@@ -211,8 +240,7 @@ def calcData(df, ws, heatMapWs):
     posPlt = plotMeanStd(df_summary['meanPosCtrl'], df_summary['stdPosCtrl'], 'PosCtrl')
     zFactorPlt = plotZfactor(df_summary)
     inhibitionHistogramPlt = plotInhibitionHistogram(df_inhibition)
-    #inhibitionScatterPlt = InhibitionScatterPlot(df_inhibition, hitLimit)
-    inhibitionScatterPlt = InhibitionScatterPlot(df_inhibition_calculated, hitLimit)
+    inhibitionScatterPlt = inhibitionScatterPlot(df_inhibition_calculated, hitLimit)
     
     addPlotToSheet(ws, 'S1', inhibPlt)
     addPlotToSheet(ws, 'S40', negPlt)
@@ -487,10 +515,72 @@ df_hit_distr = dfCalcData.groupby('well')['hit'].sum().reset_index()
 df_hit_distr = df_hit_distr.rename(columns={'hit': 'count'})
 
 
+
+
+######################################################
+##  Hit count per well
 start_cell = 'S240'
 create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
-create_plate_frame(screenDataWs, 'Hit Distr', 1, start_cell, num_columns, num_rows)
+create_plate_frame(screenDataWs, 'Hit Distr', "", start_cell, num_columns, num_rows)
 populate_plate_data(screenDataWs, 1, df_hit_distr, start_cell, 'count')
+##
+######################################################
+
+
+
+
+######################################################
+##  Average raw_data value for each well
+df_avg_well = df.groupby("well")["Raw_data"].mean().reset_index()
+df_avg_well.rename(columns={"Raw_data": "avgValue"}, inplace=True)
+
+# Ensure that the new DataFrame has all 384 well values (A01-P24)
+all_wells = [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)]
+df_avg_well = df_avg_well.reindex(columns=["well", "avgValue"])
+df_avg_well["well"] = all_wells
+
+start_cell = 'S266'
+create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
+create_plate_frame(screenDataWs, 'Well Avg', "", start_cell, num_columns, num_rows)
+populate_plate_data(screenDataWs, 1, df_avg_well, start_cell, 'avgValue')
+
+# Calculate average for each column (1-24)
+avg_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgValue": "mean"}).reset_index()
+avg_columns.rename(columns={"avgValue": "Avg_Column"}, inplace=True)
+start_cell = "S285"
+addLineOfDataToSheet(screenDataWs, "Average", start_cell, avg_columns, 'Avg_Column')
+
+# Calculate standard deviation for each column (1-24)
+std_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgValue": "std"}).reset_index()
+std_columns.rename(columns={"avgValue": "Std_Column"}, inplace=True)
+start_cell = "S286"
+addLineOfDataToSheet(screenDataWs, "STD", start_cell, std_columns, 'Std_Column')
+
+
+
+
+# Calculate average for each row (A-P)
+avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "mean"}).reset_index()
+avg_rows.rename(columns={"avgValue": "Avg_Row"}, inplace=True)
+start_cell = "AR268"
+addColumnOfDataToSheet(screenDataWs, "Average", start_cell, avg_rows, 'Avg_Row')
+
+
+
+# Calculate standard deviation for each row (A-P)
+std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "std"}).reset_index()
+std_rows.rename(columns={"avgValue": "Std_Row"}, inplace=True)
+start_cell = "AS268"
+addColumnOfDataToSheet(screenDataWs, "STD", start_cell, std_rows, 'Std_Row')
+
+
+
+##
+######################################################
+
+
+
+
 
 
 setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='I1', end_cell='I5')

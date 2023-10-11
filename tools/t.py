@@ -8,6 +8,51 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+
+
+# Sample DataFrame (replace with your data)
+data = {
+    "well": [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)],
+    "avgValue": [3.5, 4.2, 2.8, 2.0, 2.5, 2.9, 3.7, 4.4, 2.1, 1.8, 2.9, 2.5, 3.2, 3.9, 2.2, 1.9, 2.7, 3.1, 3.3, 2.7, 2.3, 3.1, 2.9, 1.8] * 16
+}
+
+df_avg_well = pd.DataFrame(data)
+
+# Calculate average for each column (1-24)
+avg_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgValue": "mean"}).reset_index()
+avg_columns.rename(columns={"avgValue": "Avg_Column"}, inplace=True)
+
+# Calculate average for each row (A-P)
+avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "mean"}).reset_index()
+avg_rows.rename(columns={"avgValue": "Avg_Row"}, inplace=True)
+
+# Calculate standard deviation for each column (1-24)
+std_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgValue": "std"}).reset_index()
+std_columns.rename(columns={"avgValue": "Std_Column"}, inplace=True)
+
+# Calculate standard deviation for each row (A-P)
+std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "std"}).reset_index()
+std_rows.rename(columns={"avgValue": "Std_Row"}, inplace=True)
+
+# Display the resulting DataFrames
+print("Average for each column (1-24):")
+print(avg_columns)
+
+print("\nAverage for each row (A-P):")
+print(avg_rows)
+
+print("\nStandard deviation for each column (1-24):")
+print(std_columns)
+
+print("\nStandard deviation for each row (A-P):")
+print(std_rows)
+
+
+quit()
+
+
+
+
 # Sample DataFrame (replace with your data)
 data = {
     "inhibition": [0.5, None, 0.7, 0.8, 0.9],
