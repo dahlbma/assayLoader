@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
-import numpy
 import matplotlib.pyplot as plt
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl.utils import get_column_letter
+from openpyxl.utils import get_column_letter, coordinate_to_tuple
 from openpyxl.drawing.image import Image
 from openpyxl.styles import NamedStyle, PatternFill, Alignment, Border, Side, Font
-from openpyxl.styles import Font
 import io
 from scipy.stats import percentileofscore
 
@@ -25,7 +23,7 @@ def addLineOfDataToSheet(ws, sText, start_cell, df_data, data_column):
     ws[start_cell] = sText
 
     # Get the row number from the start_cell
-    row_number, col_number = openpyxl.utils.coordinate_to_tuple(start_cell)
+    row_number, col_number = coordinate_to_tuple(start_cell)
     # Convert the DataFrame to a list of rows
 
     data_list = df_data[data_column].tolist()
@@ -39,7 +37,7 @@ def addColumnOfDataToSheet(ws, sText, start_cell, df_data, data_column):
     ws[start_cell] = sText
 
     # Get the row number from the start_cell
-    row_number, col_number = openpyxl.utils.coordinate_to_tuple(start_cell)
+    row_number, col_number = coordinate_to_tuple(start_cell)
     # Convert the DataFrame to a list of rows
 
     data_list = df_data[data_column].tolist()
@@ -75,7 +73,7 @@ def setBackgroundColor(ws, color, start_cell, end_cell):
             cell.fill = fill
 
 def calculatePlateData(df, plate, ws):
-    dataDf = df.loc[df['Type'].isna()]
+    dataDf = df.loc[df['Type'] == 'Data']
     posDf = df.loc[df['Type'] == 'Pos']
     negDf = df.loc[df['Type'] == 'Neg']
 
@@ -399,7 +397,7 @@ def generate_gradient(end_color, start_color, num_steps):
     return gradient
 
 
-def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col):
+def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col, lDebug=False):
     whiteFont = Font(name='Calibri', color="FFFFFF")
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
@@ -410,6 +408,8 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col):
     for _, row in plateDf.iterrows():
         well = row['well']
         raw_data = row[data_col]
+        if lDebug:
+            print("##########################\n", row, raw_data, "\n##########################")
         percentile = min(row['ptile'], 99)
 
         # Split the well into row and column components (e.g., 'A01' -> 'A' and '01')
@@ -418,7 +418,7 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col):
         # Calculate the Excel row and column indices based on the well format
         excel_row = ord(well_row) - ord('A') + 1
         excel_col = well_col
-
+        
         # Insert the Raw_data value into the corresponding cell
         cell = heatMapsWs.cell(row=current_row, column=current_col , value=raw_data)
         cell.fill = PatternFill(start_color=color_list[percentile], end_color=color_list[percentile], fill_type="solid")
@@ -533,42 +533,60 @@ populate_plate_data(screenDataWs, 1, df_hit_distr, start_cell, 'count')
 ##  Average raw_data value for each well
 df_avg_well = df.groupby("well")["Raw_data"].mean().reset_index()
 df_avg_well.rename(columns={"Raw_data": "avgValue"}, inplace=True)
+#print(df_avg_well)
+
+
+new_data = {
+    "well": [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)]
+}
+
+for type_value in ["Data", "Neg", "Pos"]:
+    avg_values = df[df["Type"] == type_value].groupby("well")["Raw_data"].mean()
+    new_data[f"avg{type_value}Value"] = [avg_values.get(well, None) for well in new_data["well"]]
+
+df_avg_well = pd.DataFrame(new_data)
+
+# Display the new DataFrame
+#print(df_avg_well)
+#quit()
+
+
 
 # Ensure that the new DataFrame has all 384 well values (A01-P24)
 all_wells = [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)]
-df_avg_well = df_avg_well.reindex(columns=["well", "avgValue"])
+df_avg_well = df_avg_well.reindex(columns=["well", "avgDataValue"])
 df_avg_well["well"] = all_wells
+
+print(df_avg_well)
 
 start_cell = 'S266'
 create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
 create_plate_frame(screenDataWs, 'Well Avg', "", start_cell, num_columns, num_rows)
-populate_plate_data(screenDataWs, 1, df_avg_well, start_cell, 'avgValue')
+populate_plate_data(screenDataWs, 1, df_avg_well, start_cell, 'avgDataValue', lDebug=True)
 
 # Calculate average for each column (1-24)
-avg_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgValue": "mean"}).reset_index()
-avg_columns.rename(columns={"avgValue": "Avg_Column"}, inplace=True)
+avg_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgDataValue": "mean"}).reset_index()
+avg_columns.rename(columns={"avgDataValue": "Avg_Column"}, inplace=True)
 start_cell = "S285"
 addLineOfDataToSheet(screenDataWs, "Average", start_cell, avg_columns, 'Avg_Column')
 
 # Calculate standard deviation for each column (1-24)
-std_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgValue": "std"}).reset_index()
-std_columns.rename(columns={"avgValue": "Std_Column"}, inplace=True)
+std_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgDataValue": "std"}).reset_index()
+std_columns.rename(columns={"avgDataValue": "Std_Column"}, inplace=True)
 start_cell = "S286"
 addLineOfDataToSheet(screenDataWs, "STD", start_cell, std_columns, 'Std_Column')
 
-
 # Calculate average for each row (A-P)
-avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "mean"}).reset_index()
-avg_rows.rename(columns={"avgValue": "Avg_Row"}, inplace=True)
+avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgDataValue": "mean"}).reset_index()
+avg_rows.rename(columns={"avgDataValue": "Avg_Row"}, inplace=True)
 start_cell = "AR268"
 addColumnOfDataToSheet(screenDataWs, "Average", start_cell, avg_rows, 'Avg_Row')
 
 # Calculate standard deviation for each row (A-P)
-std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgValue": "std"}).reset_index()
-std_rows.rename(columns={"avgValue": "Std_Row"}, inplace=True)
+std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgDataValue": "std"}).reset_index()
+std_rows.rename(columns={"avgDataValue": "Std_Row"}, inplace=True)
 start_cell = "AS268"
 addColumnOfDataToSheet(screenDataWs, "STD", start_cell, std_rows, 'Std_Row')
-
 
 
 ##
@@ -584,11 +602,6 @@ setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q
 
 
 wb.save(excel_file_path)
-
-
-
-
-
 
 
 

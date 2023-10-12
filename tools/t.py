@@ -9,6 +9,34 @@ import numpy as np
 
 
 
+# Sample DataFrame (replace with your data)
+data = {
+    "plate": [1] * 384,  # Replace with your plate values
+    "well": [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)],
+    "Raw_data": [i for i in range(1, 385)],  # Sample Raw_data values
+    "Type": ["Neg", None, "Neg", "Pos", "Neg", None] * 64  # Sample Type values
+}
+
+df = pd.DataFrame(data)
+print(df)
+# Create a new DataFrame with 384 rows and columns for well, avgNaNValue, avgNegValue, and avgPosValue
+new_data = {
+    "well": [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)]
+}
+
+for type_value in [None, "Neg", "Pos"]:
+    avg_values = df[df["Type"] == type_value].groupby("well")["Raw_data"].mean()
+    new_data[f"avg{type_value}Value"] = [avg_values.get(well, None) for well in new_data["well"]]
+
+new_df = pd.DataFrame(new_data)
+
+# Display the new DataFrame
+print(new_df)
+
+
+
+quit()
+
 
 # Sample DataFrame (replace with your data)
 data = {
