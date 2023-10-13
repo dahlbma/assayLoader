@@ -402,14 +402,44 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col, lDebug
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
     start_col = current_col
-    plateDf[data_col].fillna(0, inplace=True)
-    plateDf['ptile'] = plateDf[data_col].apply(lambda x: int(percentileofscore(plateDf[data_col], x)))
+    start_row = current_row
+    
 
+    # Extract the numeric part as "col" and the letter part as "row"
+    plateDf['col'] = plateDf['well'].str.extract('(\d+)').astype(int)
+    plateDf['row'] = plateDf['well'].str.extract('([A-Z])').iloc[:, 0].apply(lambda x: ord(x[0]) - ord('A') + 1)
+
+    if(lDebug):
+        pass
+
+    plateDf = plateDf.dropna(subset=[data_col])
+
+    # Define a function to calculate the percentile, handling null values
+    def calculate_percentile(x):
+        if x is not None:
+            return percentileofscore(plateDf[data_col].dropna(), x)
+        else:
+            return None
+
+    # Apply the function to the 'data_col' and create the 'ptile' column
+    plateDf['ptile'] = plateDf[data_col].apply(calculate_percentile)
+    try:
+        plateDf['ptile'] = plateDf['ptile'].astype(int)
+    except Exception as e:
+        print(plateDf)
+        print(plateDf.iloc[118])
+        print(plateDf.iloc[119])
+        quit()
+        # Catch the exception and print the error message
+        print(f"An error occurred: {e}")
+
+
+    
+    
+        
     for _, row in plateDf.iterrows():
         well = row['well']
         raw_data = row[data_col]
-        if lDebug:
-            print("##########################\n", row, raw_data, "\n##########################")
         percentile = min(row['ptile'], 99)
 
         # Split the well into row and column components (e.g., 'A01' -> 'A' and '01')
@@ -420,19 +450,11 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col, lDebug
         excel_col = well_col
         
         # Insert the Raw_data value into the corresponding cell
-        cell = heatMapsWs.cell(row=current_row, column=current_col , value=raw_data)
+        cell = heatMapsWs.cell(row=start_row + row['row'] -1, column=start_col + row['col'] -1, value=raw_data)
         cell.fill = PatternFill(start_color=color_list[percentile], end_color=color_list[percentile], fill_type="solid")
         cell.alignment = Alignment(horizontal='center', vertical='center')
         if percentile < 10 or percentile > 90:
             cell.font = whiteFont
-        # Move to the next column
-        current_col += 1
-
-        # If we've reached the 24th column, move to the next row and reset the column counter
-        if current_col > start_col + 23:
-            current_row += 1
-            current_col = start_col
-
 
 pd.set_option('mode.chained_assignment', None)
 
@@ -546,18 +568,10 @@ for type_value in ["Data", "Neg", "Pos"]:
 
 df_avg_well = pd.DataFrame(new_data)
 
-# Display the new DataFrame
-#print(df_avg_well)
-#quit()
-
-
-
 # Ensure that the new DataFrame has all 384 well values (A01-P24)
 all_wells = [f"{row}{col:02d}" for row in "ABCDEFGHIJKLMNOP" for col in range(1, 25)]
 df_avg_well = df_avg_well.reindex(columns=["well", "avgDataValue"])
 df_avg_well["well"] = all_wells
-
-print(df_avg_well)
 
 start_cell = 'S266'
 create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)

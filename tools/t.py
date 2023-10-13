@@ -6,6 +6,38 @@ from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import percentileofscore
+
+
+
+
+# Sample DataFrame (replace with your actual DataFrame)
+data = {'well': ['A01', 'B02', 'C03', 'P24']}
+plateDf = pd.DataFrame(data)
+
+# Extract the numeric part as "col"
+plateDf['col'] = plateDf['well'].str.extract('(\d+)').astype(int)
+
+# Extract the letter part as "row" and map it to integer values
+letter_to_int = {letter: ord(letter) - ord('A') + 1 for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}
+
+#print(plateDf['well'].str.extract('([A-Z])').iloc[:, 0].apply(lambda x: x[0]))
+ss = plateDf['well'].str.extract('([A-Z])').iloc[:, 0].apply(lambda x: ord(x[0])- ord('A') + 1)
+print(ss)
+quit()
+#print(plateDf['well'].str.extract('([A-Z])').iloc[:, 0].map(letter_to_int))
+
+#plateDf['row'] = plateDf['well'].str.extract('([A-Z])')['well'].map(letter_to_int)
+plateDf['row'] = plateDf['well'].str.extract('([A-Z])').iloc[:, 0].map(letter_to_int)
+
+# Display the modified DataFrame
+print(plateDf)
+
+
+
+quit()
+
+
 
 
 
