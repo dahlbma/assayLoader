@@ -73,29 +73,29 @@ def setBackgroundColor(ws, color, start_cell, end_cell):
             cell.fill = fill
 
 def calculatePlateData(df, plate, ws):
-    dataDf = df.loc[df['Type'] == 'Data']
-    posDf = df.loc[df['Type'] == 'Pos']
-    negDf = df.loc[df['Type'] == 'Neg']
+    dataDf = df.loc[df['type'] == 'Data']
+    posDf = df.loc[df['type'] == 'Pos']
+    negDf = df.loc[df['type'] == 'Neg']
 
-    meanInhib = dataDf['Raw_data'].mean()
-    stdInhib = dataDf['Raw_data'].std()
+    meanInhib = dataDf['raw_data'].mean()
+    stdInhib = dataDf['raw_data'].std()
 
-    meanPosCtrl = posDf['Raw_data'].mean()
-    stdPosCtrl = posDf['Raw_data'].std()
+    meanPosCtrl = posDf['raw_data'].mean()
+    stdPosCtrl = posDf['raw_data'].std()
 
-    meanNegCtrl = negDf['Raw_data'].mean()
-    stdNegCtrl = negDf['Raw_data'].std()
+    meanNegCtrl = negDf['raw_data'].mean()
+    stdNegCtrl = negDf['raw_data'].std()
 
     pos3SD = 3 * stdPosCtrl
     neg3SD = 3 * stdNegCtrl
 
     Z = 1 - (pos3SD + neg3SD)/abs(meanPosCtrl - meanNegCtrl)
     
-    condition = (df['Type'] == 'Neg') | (df['Type'] == 'Pos')
-    df['inhibition'] = np.where(condition, None, 100*(1-(df['Raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)))
+    condition = (df['type'] == 'Neg') | (df['type'] == 'Pos')
+    df['inhibition'] = np.where(condition, None, 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)))
 
-    df['negCtrlInhibition'] = np.where(df['Type'] == 'Neg', 100*(1-(df['Raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
-    df['posCtrlInhibition'] = np.where(df['Type'] == 'Pos', 100*(1-(df['Raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
+    df['negCtrlInhibition'] = np.where(df['type'] == 'Neg', 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
+    df['posCtrlInhibition'] = np.where(df['type'] == 'Pos', 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
 
     return df, Z, meanPosCtrl, stdPosCtrl, meanNegCtrl, stdNegCtrl, meanInhib, stdInhib
 
@@ -205,7 +205,7 @@ def calcData(df, ws, heatMapWs):
                    'Z-factor': Z}
         df_summary.loc[len(df_summary)] = new_row
         
-        df_plate_inhibition = df_plate[(df_plate['Type'] != 'Neg') & (df_plate['Type'] != 'Pos')]
+        df_plate_inhibition = df_plate[(df_plate['type'] != 'Neg') & (df_plate['type'] != 'Pos')]
         df_inhibition = pd.concat([df_inhibition, df_plate_inhibition])
         df_inhibition_calculated = pd.concat([df_inhibition_calculated, df_plate])
 
@@ -449,7 +449,7 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col, lDebug
         excel_row = ord(well_row) - ord('A') + 1
         excel_col = well_col
         
-        # Insert the Raw_data value into the corresponding cell
+        # Insert the raw_data value into the corresponding cell
         cell = heatMapsWs.cell(row=start_row + row['row'] -1, column=start_col + row['col'] -1, value=raw_data)
         cell.fill = PatternFill(start_color=color_list[percentile], end_color=color_list[percentile], fill_type="solid")
         cell.alignment = Alignment(horizontal='center', vertical='center')
@@ -464,7 +464,7 @@ decimal_style.number_format = '0.00'
 custom_font = Font(name='Calibri', size=10)
 
 excel_file_path = 'screenresults.xlsx'
-df = pd.read_csv("plate_Raw_data.csv", delimiter='\t')
+df = pd.read_csv("plate_raw_data.csv", delimiter='\t')
 
 
 # Generate the gradient from white to red in 10 steps
@@ -528,7 +528,7 @@ for plateDf in listOfPlatesDf:
     start_cell = start_col + str(iRow)
     create_outer_thick_border(heatMapsWs, start_cell, num_columns, num_rows)
     create_plate_frame(heatMapsWs, 'Plate', plate, start_cell, num_columns, num_rows)
-    populate_plate_data(heatMapsWs, plate, plateDf, start_cell, 'Raw_data')
+    populate_plate_data(heatMapsWs, plate, plateDf, start_cell, 'raw_data')
 
 
 # Group by 'well' and sum the 'hit' column to count occurrences of '1'
@@ -553,8 +553,8 @@ populate_plate_data(screenDataWs, 1, df_hit_distr, start_cell, 'count')
 
 ######################################################
 ##  Average raw_data value for each well
-df_avg_well = df.groupby("well")["Raw_data"].mean().reset_index()
-df_avg_well.rename(columns={"Raw_data": "avgValue"}, inplace=True)
+df_avg_well = df.groupby("well")["raw_data"].mean().reset_index()
+df_avg_well.rename(columns={"raw_data": "avgValue"}, inplace=True)
 #print(df_avg_well)
 
 
@@ -563,7 +563,7 @@ new_data = {
 }
 
 for type_value in ["Data", "Neg", "Pos"]:
-    avg_values = df[df["Type"] == type_value].groupby("well")["Raw_data"].mean()
+    avg_values = df[df["type"] == type_value].groupby("well")["raw_data"].mean()
     new_data[f"avg{type_value}Value"] = [avg_values.get(well, None) for well in new_data["well"]]
 
 df_avg_well = pd.DataFrame(new_data)
