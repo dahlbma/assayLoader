@@ -564,8 +564,13 @@ new_data = {
 
 for type_value in ["Data", "Neg", "Pos"]:
     avg_values = df[df["type"] == type_value].groupby("well")["raw_data"].mean()
-    new_data[f"avg{type_value}Value"] = [avg_values.get(well, None) for well in new_data["well"]]
+    
+    for index, value in avg_values.items():
+        print(f"Index: {index}, Data: {value}")
 
+    print('')
+    new_data[f"avg{type_value}Value"] = [avg_values.get(well, None) for well in new_data["well"]]
+quit()
 df_avg_well = pd.DataFrame(new_data)
 
 # Ensure that the new DataFrame has all 384 well values (A01-P24)
