@@ -10,6 +10,9 @@ from openpyxl.styles import NamedStyle, PatternFill, Alignment, Border, Side, Fo
 import io
 from scipy.stats import percentileofscore
 
+
+# 1536-well plate (32 rows and 48 columns) would span from well "A01" to well "AF48".
+
 def addPlotToSheet(ws, cell, plt):
     plt.seek(0)
     img = Image(plt)
@@ -436,7 +439,7 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col, lDebug
 
     
     
-        
+
     for _, row in plateDf.iterrows():
         well = row['well']
         raw_data = row[data_col]
@@ -555,7 +558,6 @@ populate_plate_data(screenDataWs, 1, df_hit_distr, start_cell, 'count')
 ##  Average raw_data value for each well
 df_avg_well = df.groupby("well")["raw_data"].mean().reset_index()
 df_avg_well.rename(columns={"raw_data": "avgValue"}, inplace=True)
-#print(df_avg_well)
 
 
 new_data = {
@@ -563,14 +565,9 @@ new_data = {
 }
 
 for type_value in ["Data", "Neg", "Pos"]:
-    avg_values = df[df["type"] == type_value].groupby("well")["raw_data"].mean()
-    
-    for index, value in avg_values.items():
-        print(f"Index: {index}, Data: {value}")
-
-    print('')
+    avg_values = df[df["type"] == type_value].groupby("well")["raw_data"].mean()    
     new_data[f"avg{type_value}Value"] = [avg_values.get(well, None) for well in new_data["well"]]
-quit()
+
 df_avg_well = pd.DataFrame(new_data)
 
 # Ensure that the new DataFrame has all 384 well values (A01-P24)
@@ -595,17 +592,57 @@ std_columns.rename(columns={"avgDataValue": "Std_Column"}, inplace=True)
 start_cell = "S286"
 addLineOfDataToSheet(screenDataWs, "STD", start_cell, std_columns, 'Std_Column')
 
+
+
+
+
+
+
+
+
+
+
 # Calculate average for each row (A-P)
 avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgDataValue": "mean"}).reset_index()
 avg_rows.rename(columns={"avgDataValue": "Avg_Row"}, inplace=True)
 start_cell = "AR268"
-addColumnOfDataToSheet(screenDataWs, "Average", start_cell, avg_rows, 'Avg_Row')
+
+#######
+
+# Calculate the mean values of 'raw_data' for each row 'A' to 'P', this does not work for 1536 plates
+mean_values = df[df['type'] == 'Data'].groupby(df['well'].str[0])['raw_data'].mean()
+df_mean_row = mean_values.to_frame()
+
+#######
+
+addColumnOfDataToSheet(screenDataWs, "Average", start_cell, df_mean_row, 'raw_data')
+
+
+
+
+
+
+
+
+
+
 
 # Calculate standard deviation for each row (A-P)
 std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgDataValue": "std"}).reset_index()
 std_rows.rename(columns={"avgDataValue": "Std_Row"}, inplace=True)
 start_cell = "AS268"
-addColumnOfDataToSheet(screenDataWs, "STD", start_cell, std_rows, 'Std_Row')
+
+####
+
+std_values = df[df['type'] == 'Data'].groupby(df['well'].str[0])['raw_data'].std()
+df_std_row = std_values.to_frame()
+
+####
+
+
+
+#addColumnOfDataToSheet(screenDataWs, "STD", start_cell, std_rows, 'Std_Row')
+addColumnOfDataToSheet(screenDataWs, "STD", start_cell, df_std_row, 'raw_data')
 
 
 ##

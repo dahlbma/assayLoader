@@ -9,6 +9,42 @@ import numpy as np
 from scipy.stats import percentileofscore
 
 
+# Sample DataFrame (replace with your actual DataFrame)
+data = {
+    'well': [f"{row}{col:02d}" for row in 'ABCDEFGHIJKLMNOP' for col in range(1, 25)],
+    'raw_data': range(1, 385),  # Example data, replace with your actual data
+    'type': ['Data'] * 384  # Example data, replace with your actual data
+}
+print(data)
+df = pd.DataFrame(data)
+
+# Calculate the mean values of 'raw_data' for each column (1 to 24)
+mean_values = df[df['type'] == 'Data'].groupby(df['well'].str.extract('(\d+)')[0])['raw_data'].mean()
+
+# Display the mean values
+print(mean_values)
+
+
+
+quit()
+
+# Sample DataFrame (replace with your actual DataFrame)
+data = {
+    'well': [f"{row}{col:02d}" for row in 'ABCDEFGHIJKLMNOP' for col in range(1, 25)],
+    'raw_data': range(1, 385),  # Example data, replace with your actual data
+    'type': ['Data'] * 384  # Example data, replace with your actual data
+}
+df = pd.DataFrame(data)
+
+# Calculate the mean values of 'raw_data' for each row 'A' to 'P'
+mean_values = df[df['type'] == 'Data'].groupby(df['well'].str[0])['raw_data'].mean()
+
+# Display the mean values
+print(mean_values)
+
+quit()
+
+
 
 
 # Sample DataFrame (replace with your actual DataFrame)
