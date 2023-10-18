@@ -1,0 +1,527 @@
+Plate information 
+Plate,Repeat,Barcode,Measured height,Chamber temperature at start,Chamber temperature at end,Humidity at start,Humidity at end,Ambient temperature at start,Ambient temperature at end,Measurement date,
+1,1,,14.94,22.61,22.35,24.7,24.8,22.81,22.83,12/13/2021 12:31:20 PM,
+
+
+Background information
+Plate,Label,Result,Signal,Flashes/Time,Meastime,MeasInfo,
+1,LUM 01sec,0,0,0.1,00:00:00.000,De=1st Ex=N/A Em=Top Wdw=N/A,
+
+PlateNumber,PlateRepeat,Barcode,Group,Well,Sample,Label,Kinetic,ScanX,ScanY,MeasInfo,MeasTime,Signal,Flashes/Time,Result,Formula,
+1,1,,1,A01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:00.000,8300,0.1,83000,,
+1,1,,1,A02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:00.192,8628,0.1,86280,,
+1,1,,1,A03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:00.384,8868,0.1,88680,,
+1,1,,1,A04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:00.575,9060,0.1,90600,,
+1,1,,1,A05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:00.766,8616,0.1,86160,,
+1,1,,1,A06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:00.959,8504,0.1,85040,,
+1,1,,1,A07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:01.151,8676,0.1,86760,,
+1,1,,1,A08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:01.343,9184,0.1,91840,,
+1,1,,1,A09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:01.535,8368,0.1,83680,,
+1,1,,1,A10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:01.727,8944,0.1,89440,,
+1,1,,1,A11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:01.918,8440,0.1,84400,,
+1,1,,1,A12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:02.110,8948,0.1,89480,,
+1,1,,1,A13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:02.302,8264,0.1,82640,,
+1,1,,1,A14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:02.493,8944,0.1,89440,,
+1,1,,1,A15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:02.685,8816,0.1,88160,,
+1,1,,1,A16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:02.877,8584,0.1,85840,,
+1,1,,1,A17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:03.069,9348,0.1,93480,,
+1,1,,1,A18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:03.260,9096,0.1,90960,,
+1,1,,1,A19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:03.452,8780,0.1,87800,,
+1,1,,1,A20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:03.644,8648,0.1,86480,,
+1,1,,1,A21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:03.835,9692,0.1,96920,,
+1,1,,1,A22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:04.025,9276,0.1,92760,,
+1,1,,1,A23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:04.216,68,0.1,680,,
+1,1,,1,A24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:04.408,8804,0.1,88040,,
+1,1,,1,B01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:09.075,8016,0.1,80160,,
+1,1,,1,B02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:08.883,8280,0.1,82800,,
+1,1,,1,B03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:08.692,7616,0.1,76160,,
+1,1,,1,B04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:08.500,8928,0.1,89280,,
+1,1,,1,B05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:08.308,7608,0.1,76080,,
+1,1,,1,B06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:08.116,8108,0.1,81080,,
+1,1,,1,B07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:07.924,8540,0.1,85400,,
+1,1,,1,B08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:07.733,8900,0.1,89000,,
+1,1,,1,B09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:07.542,9028,0.1,90280,,
+1,1,,1,B10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:07.351,8644,0.1,86440,,
+1,1,,1,B11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:07.160,8208,0.1,82080,,
+1,1,,1,B12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:06.969,8596,0.1,85960,,
+1,1,,1,B13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:06.777,8408,0.1,84080,,
+1,1,,1,B14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:06.585,8472,0.1,84720,,
+1,1,,1,B15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:06.393,9208,0.1,92080,,
+1,1,,1,B16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:06.202,8928,0.1,89280,,
+1,1,,1,B17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:06.010,9344,0.1,93440,,
+1,1,,1,B18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:05.818,9840,0.1,98400,,
+1,1,,1,B19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:05.626,8728,0.1,87280,,
+1,1,,1,B20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:05.434,9344,0.1,93440,,
+1,1,,1,B21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:05.243,9356,0.1,93560,,
+1,1,,1,B22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:05.051,9064,0.1,90640,,
+1,1,,1,B23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:04.858,80,0.1,800,,
+1,1,,1,B24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:04.666,9280,0.1,92800,,
+1,1,,1,C01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:09.329,9512,0.1,95120,,
+1,1,,1,C02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:09.521,9980,0.1,99800,,
+1,1,,1,C03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:09.713,8984,0.1,89840,,
+1,1,,1,C04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:09.905,9580,0.1,95800,,
+1,1,,1,C05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:10.096,9796,0.1,97960,,
+1,1,,1,C06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:10.288,9620,0.1,96200,,
+1,1,,1,C07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:10.479,9732,0.1,97320,,
+1,1,,1,C08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:10.672,9668,0.1,96680,,
+1,1,,1,C09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:10.864,9712,0.1,97120,,
+1,1,,1,C10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:11.056,9156,0.1,91560,,
+1,1,,1,C11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:11.248,9324,0.1,93240,,
+1,1,,1,C12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:11.441,9344,0.1,93440,,
+1,1,,1,C13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:11.632,9380,0.1,93800,,
+1,1,,1,C14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:11.824,8324,0.1,83240,,
+1,1,,1,C15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:12.016,9464,0.1,94640,,
+1,1,,1,C16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:12.208,9348,0.1,93480,,
+1,1,,1,C17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:12.400,8924,0.1,89240,,
+1,1,,1,C18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:12.592,9140,0.1,91400,,
+1,1,,1,C19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:12.784,9348,0.1,93480,,
+1,1,,1,C20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:12.976,8812,0.1,88120,,
+1,1,,1,C21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:13.167,9228,0.1,92280,,
+1,1,,1,C22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:13.359,8928,0.1,89280,,
+1,1,,1,C23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:13.550,88,0.1,880,,
+1,1,,1,C24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:13.741,8708,0.1,87080,,
+1,1,,1,D01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:18.405,7828,0.1,78280,,
+1,1,,1,D02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:18.214,8468,0.1,84680,,
+1,1,,1,D03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:18.023,8140,0.1,81400,,
+1,1,,1,D04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:17.831,8044,0.1,80440,,
+1,1,,1,D05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:17.639,7424,0.1,74240,,
+1,1,,1,D06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:17.447,8344,0.1,83440,,
+1,1,,1,D07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:17.255,8908,0.1,89080,,
+1,1,,1,D08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:17.063,9704,0.1,97040,,
+1,1,,1,D09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:16.871,9520,0.1,95200,,
+1,1,,1,D10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:16.680,9080,0.1,90800,,
+1,1,,1,D11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:16.489,8644,0.1,86440,,
+1,1,,1,D12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:16.298,8360,0.1,83600,,
+1,1,,1,D13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:16.106,8672,0.1,86720,,
+1,1,,1,D14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:15.915,8064,0.1,80640,,
+1,1,,1,D15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:15.723,9124,0.1,91240,,
+1,1,,1,D16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:15.531,8964,0.1,89640,,
+1,1,,1,D17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:15.339,8532,0.1,85320,,
+1,1,,1,D18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:15.147,8608,0.1,86080,,
+1,1,,1,D19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:14.955,8884,0.1,88840,,
+1,1,,1,D20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:14.764,9720,0.1,97200,,
+1,1,,1,D21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:14.572,9312,0.1,93120,,
+1,1,,1,D22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:14.380,9256,0.1,92560,,
+1,1,,1,D23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:14.188,92,0.1,920,,
+1,1,,1,D24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:13.996,9728,0.1,97280,,
+1,1,,1,E01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:18.660,8700,0.1,87000,,
+1,1,,1,E02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:18.852,9572,0.1,95720,,
+1,1,,1,E03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:19.043,9180,0.1,91800,,
+1,1,,1,E04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:19.235,8632,0.1,86320,,
+1,1,,1,E05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:19.427,8864,0.1,88640,,
+1,1,,1,E06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:19.618,9188,0.1,91880,,
+1,1,,1,E07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:19.810,8480,0.1,84800,,
+1,1,,1,E08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:20.001,9476,0.1,94760,,
+1,1,,1,E09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:20.193,9324,0.1,93240,,
+1,1,,1,E10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:20.385,9032,0.1,90320,,
+1,1,,1,E11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:20.577,8828,0.1,88280,,
+1,1,,1,E12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:20.770,8884,0.1,88840,,
+1,1,,1,E13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:20.962,8632,0.1,86320,,
+1,1,,1,E14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:21.153,8168,0.1,81680,,
+1,1,,1,E15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:21.345,8500,0.1,85000,,
+1,1,,1,E16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:21.537,9408,0.1,94080,,
+1,1,,1,E17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:21.729,8688,0.1,86880,,
+1,1,,1,E18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:21.921,8896,0.1,88960,,
+1,1,,1,E19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:22.112,8644,0.1,86440,,
+1,1,,1,E20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:22.304,8456,0.1,84560,,
+1,1,,1,E21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:22.496,8988,0.1,89880,,
+1,1,,1,E22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:22.688,8784,0.1,87840,,
+1,1,,1,E23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:22.880,72,0.1,720,,
+1,1,,1,E24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:23.071,8684,0.1,86840,,
+1,1,,1,F01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:27.735,8580,0.1,85800,,
+1,1,,1,F02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:27.542,8340,0.1,83400,,
+1,1,,1,F03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:27.351,7732,0.1,77320,,
+1,1,,1,F04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:27.160,8484,0.1,84840,,
+1,1,,1,F05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:26.968,8808,0.1,88080,,
+1,1,,1,F06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:26.776,8300,0.1,83000,,
+1,1,,1,F07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:26.584,8728,0.1,87280,,
+1,1,,1,F08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:26.392,8572,0.1,85720,,
+1,1,,1,F09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:26.200,9084,0.1,90840,,
+1,1,,1,F10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:26.008,8960,0.1,89600,,
+1,1,,1,F11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:25.816,7892,0.1,78920,,
+1,1,,1,F12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:25.625,8232,0.1,82320,,
+1,1,,1,F13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:25.434,8796,0.1,87960,,
+1,1,,1,F14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:25.243,9256,0.1,92560,,
+1,1,,1,F15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:25.051,8336,0.1,83360,,
+1,1,,1,F16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:24.859,8976,0.1,89760,,
+1,1,,1,F17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:24.668,9240,0.1,92400,,
+1,1,,1,F18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:24.476,9348,0.1,93480,,
+1,1,,1,F19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:24.284,8564,0.1,85640,,
+1,1,,1,F20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:24.092,9396,0.1,93960,,
+1,1,,1,F21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:23.900,9316,0.1,93160,,
+1,1,,1,F22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:23.709,9296,0.1,92960,,
+1,1,,1,F23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:23.517,100,0.1,1000,,
+1,1,,1,F24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:23.325,9104,0.1,91040,,
+1,1,,1,G01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:27.990,9404,0.1,94040,,
+1,1,,1,G02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:28.181,8720,0.1,87200,,
+1,1,,1,G03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:28.373,9160,0.1,91600,,
+1,1,,1,G04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:28.565,8776,0.1,87760,,
+1,1,,1,G05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:28.757,9716,0.1,97160,,
+1,1,,1,G06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:28.949,9012,0.1,90120,,
+1,1,,1,G07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:29.140,8832,0.1,88320,,
+1,1,,1,G08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:29.332,7748,0.1,77480,,
+1,1,,1,G09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:29.523,8596,0.1,85960,,
+1,1,,1,G10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:29.715,8760,0.1,87600,,
+1,1,,1,G11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:29.906,8256,0.1,82560,,
+1,1,,1,G12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:30.099,9068,0.1,90680,,
+1,1,,1,G13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:30.291,8756,0.1,87560,,
+1,1,,1,G14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:30.483,8452,0.1,84520,,
+1,1,,1,G15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:30.675,9408,0.1,94080,,
+1,1,,1,G16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:30.867,8568,0.1,85680,,
+1,1,,1,G17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:31.059,9164,0.1,91640,,
+1,1,,1,G18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:31.251,8432,0.1,84320,,
+1,1,,1,G19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:31.442,8388,0.1,83880,,
+1,1,,1,G20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:31.634,8716,0.1,87160,,
+1,1,,1,G21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:31.826,9108,0.1,91080,,
+1,1,,1,G22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:32.018,9200,0.1,92000,,
+1,1,,1,G23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:32.210,92,0.1,920,,
+1,1,,1,G24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:32.402,7916,0.1,79160,,
+1,1,,1,H01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:37.068,8736,0.1,87360,,
+1,1,,1,H02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:36.876,7596,0.1,75960,,
+1,1,,1,H03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:36.683,8524,0.1,85240,,
+1,1,,1,H04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:36.492,8672,0.1,86720,,
+1,1,,1,H05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:36.301,8592,0.1,85920,,
+1,1,,1,H06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:36.109,7840,0.1,78400,,
+1,1,,1,H07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:35.917,9120,0.1,91200,,
+1,1,,1,H08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:35.725,8956,0.1,89560,,
+1,1,,1,H09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:35.533,8420,0.1,84200,,
+1,1,,1,H10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:35.341,8036,0.1,80360,,
+1,1,,1,H11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:35.149,7636,0.1,76360,,
+1,1,,1,H12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:34.957,7748,0.1,77480,,
+1,1,,1,H13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:34.765,8068,0.1,80680,,
+1,1,,1,H14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:34.574,9360,0.1,93600,,
+1,1,,1,H15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:34.383,8200,0.1,82000,,
+1,1,,1,H16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:34.192,8700,0.1,87000,,
+1,1,,1,H17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:34.000,9288,0.1,92880,,
+1,1,,1,H18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:33.808,8904,0.1,89040,,
+1,1,,1,H19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:33.617,8276,0.1,82760,,
+1,1,,1,H20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:33.425,8928,0.1,89280,,
+1,1,,1,H21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:33.233,9108,0.1,91080,,
+1,1,,1,H22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:33.041,9428,0.1,94280,,
+1,1,,1,H23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:32.850,76,0.1,760,,
+1,1,,1,H24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:32.658,9032,0.1,90320,,
+1,1,,1,I01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:37.323,9232,0.1,92320,,
+1,1,,1,I02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:37.514,8764,0.1,87640,,
+1,1,,1,I03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:37.705,9592,0.1,95920,,
+1,1,,1,I04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:37.897,9180,0.1,91800,,
+1,1,,1,I05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:38.088,9188,0.1,91880,,
+1,1,,1,I06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:38.281,8228,0.1,82280,,
+1,1,,1,I07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:38.473,9188,0.1,91880,,
+1,1,,1,I08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:38.665,8972,0.1,89720,,
+1,1,,1,I09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:38.856,9256,0.1,92560,,
+1,1,,1,I10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:39.048,8256,0.1,82560,,
+1,1,,1,I11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:39.239,8844,0.1,88440,,
+1,1,,1,I12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:39.431,8528,0.1,85280,,
+1,1,,1,I13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:39.623,8480,0.1,84800,,
+1,1,,1,I14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:39.815,8880,0.1,88800,,
+1,1,,1,I15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:40.007,9144,0.1,91440,,
+1,1,,1,I16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:40.200,8416,0.1,84160,,
+1,1,,1,I17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:40.392,8188,0.1,81880,,
+1,1,,1,I18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:40.583,8568,0.1,85680,,
+1,1,,1,I19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:40.775,8452,0.1,84520,,
+1,1,,1,I20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:40.967,8052,0.1,80520,,
+1,1,,1,I21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:41.159,8156,0.1,81560,,
+1,1,,1,I22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:41.351,9040,0.1,90400,,
+1,1,,1,I23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:41.542,68,0.1,680,,
+1,1,,1,I24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:41.734,9152,0.1,91520,,
+1,1,,1,J01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:46.399,8508,0.1,85080,,
+1,1,,1,J02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:46.207,9056,0.1,90560,,
+1,1,,1,J03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:46.015,8620,0.1,86200,,
+1,1,,1,J04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:45.823,9196,0.1,91960,,
+1,1,,1,J05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:45.631,8040,0.1,80400,,
+1,1,,1,J06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:45.439,9084,0.1,90840,,
+1,1,,1,J07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:45.247,8912,0.1,89120,,
+1,1,,1,J08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:45.055,9024,0.1,90240,,
+1,1,,1,J09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:44.864,8616,0.1,86160,,
+1,1,,1,J10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:44.672,7480,0.1,74800,,
+1,1,,1,J11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:44.480,8208,0.1,82080,,
+1,1,,1,J12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:44.288,8532,0.1,85320,,
+1,1,,1,J13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:44.096,8344,0.1,83440,,
+1,1,,1,J14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:43.904,8536,0.1,85360,,
+1,1,,1,J15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:43.713,7388,0.1,73880,,
+1,1,,1,J16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:43.522,7652,0.1,76520,,
+1,1,,1,J17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:43.331,8636,0.1,86360,,
+1,1,,1,J18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:43.140,8492,0.1,84920,,
+1,1,,1,J19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:42.948,8788,0.1,87880,,
+1,1,,1,J20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:42.757,8472,0.1,84720,,
+1,1,,1,J21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:42.565,8944,0.1,89440,,
+1,1,,1,J22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:42.373,7276,0.1,72760,,
+1,1,,1,J23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:42.181,80,0.1,800,,
+1,1,,1,J24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:41.989,8688,0.1,86880,,
+1,1,,1,K01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:46.657,8464,0.1,84640,,
+1,1,,1,K02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:46.848,8664,0.1,86640,,
+1,1,,1,K03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:47.039,9332,0.1,93320,,
+1,1,,1,K04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:47.231,8952,0.1,89520,,
+1,1,,1,K05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:47.423,8632,0.1,86320,,
+1,1,,1,K06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:47.615,8800,0.1,88000,,
+1,1,,1,K07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:47.807,8928,0.1,89280,,
+1,1,,1,K08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:47.999,8500,0.1,85000,,
+1,1,,1,K09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:48.191,7144,0.1,71440,,
+1,1,,1,K10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:48.383,8648,0.1,86480,,
+1,1,,1,K11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:48.574,8644,0.1,86440,,
+1,1,,1,K12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:48.766,8964,0.1,89640,,
+1,1,,1,K13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:48.957,8532,0.1,85320,,
+1,1,,1,K14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:49.149,9176,0.1,91760,,
+1,1,,1,K15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:49.341,8948,0.1,89480,,
+1,1,,1,K16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:49.533,9060,0.1,90600,,
+1,1,,1,K17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:49.725,9024,0.1,90240,,
+1,1,,1,K18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:49.918,8664,0.1,86640,,
+1,1,,1,K19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:50.110,9392,0.1,93920,,
+1,1,,1,K20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:50.302,8636,0.1,86360,,
+1,1,,1,K21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:50.493,8668,0.1,86680,,
+1,1,,1,K22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:50.685,9704,0.1,97040,,
+1,1,,1,K23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:50.877,96,0.1,960,,
+1,1,,1,K24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:51.069,8832,0.1,88320,,
+1,1,,1,L01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:55.735,7228,0.1,72280,,
+1,1,,1,L02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:55.543,8492,0.1,84920,,
+1,1,,1,L03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:55.351,5644,0.1,56440,,
+1,1,,1,L04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:55.159,5860,0.1,58600,,
+1,1,,1,L05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:54.967,8624,0.1,86240,,
+1,1,,1,L06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:54.776,8716,0.1,87160,,
+1,1,,1,L07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:54.585,8960,0.1,89600,,
+1,1,,1,L08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:54.393,8732,0.1,87320,,
+1,1,,1,L09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:54.201,8260,0.1,82600,,
+1,1,,1,L10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:54.009,8732,0.1,87320,,
+1,1,,1,L11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:53.817,8000,0.1,80000,,
+1,1,,1,L12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:53.625,8288,0.1,82880,,
+1,1,,1,L13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:53.433,8840,0.1,88400,,
+1,1,,1,L14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:53.241,8848,0.1,88480,,
+1,1,,1,L15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:53.049,8332,0.1,83320,,
+1,1,,1,L16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:52.857,8316,0.1,83160,,
+1,1,,1,L17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:52.666,8668,0.1,86680,,
+1,1,,1,L18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:52.475,8168,0.1,81680,,
+1,1,,1,L19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:52.284,9140,0.1,91400,,
+1,1,,1,L20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:52.093,8720,0.1,87200,,
+1,1,,1,L21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:51.902,9156,0.1,91560,,
+1,1,,1,L22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:51.710,8844,0.1,88440,,
+1,1,,1,L23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:51.518,92,0.1,920,,
+1,1,,1,L24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:51.327,8368,0.1,83680,,
+1,1,,1,M01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:55.990,8668,0.1,86680,,
+1,1,,1,M02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:56.182,9100,0.1,91000,,
+1,1,,1,M03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:56.374,8720,0.1,87200,,
+1,1,,1,M04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:56.566,8976,0.1,89760,,
+1,1,,1,M05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:56.758,9064,0.1,90640,,
+1,1,,1,M06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:56.950,8200,0.1,82000,,
+1,1,,1,M07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:57.142,9492,0.1,94920,,
+1,1,,1,M08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:57.334,8340,0.1,83400,,
+1,1,,1,M09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:57.526,9228,0.1,92280,,
+1,1,,1,M10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:57.718,8696,0.1,86960,,
+1,1,,1,M11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:57.910,9184,0.1,91840,,
+1,1,,1,M12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:58.102,8324,0.1,83240,,
+1,1,,1,M13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:58.293,9088,0.1,90880,,
+1,1,,1,M14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:58.485,8832,0.1,88320,,
+1,1,,1,M15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:58.676,7432,0.1,74320,,
+1,1,,1,M16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:58.868,8980,0.1,89800,,
+1,1,,1,M17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:59.060,8784,0.1,87840,,
+1,1,,1,M18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:59.252,8912,0.1,89120,,
+1,1,,1,M19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:59.445,8920,0.1,89200,,
+1,1,,1,M20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:59.637,8684,0.1,86840,,
+1,1,,1,M21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:00:59.829,8960,0.1,89600,,
+1,1,,1,M22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:00.021,8328,0.1,83280,,
+1,1,,1,M23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:00.213,112,0.1,1120,,
+1,1,,1,M24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:00.404,9076,0.1,90760,,
+1,1,,1,N01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:05.067,8768,0.1,87680,,
+1,1,,1,N02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:04.876,7976,0.1,79760,,
+1,1,,1,N03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:04.684,7828,0.1,78280,,
+1,1,,1,N04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:04.492,8216,0.1,82160,,
+1,1,,1,N05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:04.300,8292,0.1,82920,,
+1,1,,1,N06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:04.109,8564,0.1,85640,,
+1,1,,1,N07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:03.917,9440,0.1,94400,,
+1,1,,1,N08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:03.726,8748,0.1,87480,,
+1,1,,1,N09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:03.535,9472,0.1,94720,,
+1,1,,1,N10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:03.343,8556,0.1,85560,,
+1,1,,1,N11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:03.151,7888,0.1,78880,,
+1,1,,1,N12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:02.959,8260,0.1,82600,,
+1,1,,1,N13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:02.767,8688,0.1,86880,,
+1,1,,1,N14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:02.575,8144,0.1,81440,,
+1,1,,1,N15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:02.383,7968,0.1,79680,,
+1,1,,1,N16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:02.191,8736,0.1,87360,,
+1,1,,1,N17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:01.999,9132,0.1,91320,,
+1,1,,1,N18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:01.808,8800,0.1,88000,,
+1,1,,1,N19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:01.617,8596,0.1,85960,,
+1,1,,1,N20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:01.426,7772,0.1,77720,,
+1,1,,1,N21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:01.235,8476,0.1,84760,,
+1,1,,1,N22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:01.043,8664,0.1,86640,,
+1,1,,1,N23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:00.851,76,0.1,760,,
+1,1,,1,N24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:00.659,7904,0.1,79040,,
+1,1,,1,O01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:05.322,9016,0.1,90160,,
+1,1,,1,O02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:05.514,7940,0.1,79400,,
+1,1,,1,O03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:05.706,9104,0.1,91040,,
+1,1,,1,O04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:05.898,8104,0.1,81040,,
+1,1,,1,O05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:06.090,9248,0.1,92480,,
+1,1,,1,O06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:06.281,9000,0.1,90000,,
+1,1,,1,O07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:06.473,8004,0.1,80040,,
+1,1,,1,O08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:06.665,6528,0.1,65280,,
+1,1,,1,O09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:06.857,8776,0.1,87760,,
+1,1,,1,O10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:07.049,8856,0.1,88560,,
+1,1,,1,O11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:07.241,8788,0.1,87880,,
+1,1,,1,O12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:07.433,8056,0.1,80560,,
+1,1,,1,O13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:07.625,8472,0.1,84720,,
+1,1,,1,O14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:07.816,8856,0.1,88560,,
+1,1,,1,O15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:08.008,8612,0.1,86120,,
+1,1,,1,O16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:08.199,7836,0.1,78360,,
+1,1,,1,O17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:08.391,7172,0.1,71720,,
+1,1,,1,O18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:08.582,8012,0.1,80120,,
+1,1,,1,O19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:08.775,6876,0.1,68760,,
+1,1,,1,O20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:08.967,8344,0.1,83440,,
+1,1,,1,O21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:09.159,7980,0.1,79800,,
+1,1,,1,O22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:09.351,8916,0.1,89160,,
+1,1,,1,O23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:09.543,80,0.1,800,,
+1,1,,1,O24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:09.735,8596,0.1,85960,,
+1,1,,1,P01,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:14.399,7328,0.1,73280,,
+1,1,,1,P02,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:14.208,8308,0.1,83080,,
+1,1,,1,P03,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:14.016,7780,0.1,77800,,
+1,1,,1,P04,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:13.824,8080,0.1,80800,,
+1,1,,1,P05,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:13.632,8404,0.1,84040,,
+1,1,,1,P06,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:13.440,7484,0.1,74840,,
+1,1,,1,P07,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:13.248,7808,0.1,78080,,
+1,1,,1,P08,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:13.057,8912,0.1,89120,,
+1,1,,1,P09,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:12.865,6984,0.1,69840,,
+1,1,,1,P10,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:12.674,7964,0.1,79640,,
+1,1,,1,P11,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:12.482,5356,0.1,53560,,
+1,1,,1,P12,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:12.290,8232,0.1,82320,,
+1,1,,1,P13,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:12.098,8872,0.1,88720,,
+1,1,,1,P14,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:11.906,7596,0.1,75960,,
+1,1,,1,P15,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:11.714,8596,0.1,85960,,
+1,1,,1,P16,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:11.522,4912,0.1,49120,,
+1,1,,1,P17,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:11.330,8664,0.1,86640,,
+1,1,,1,P18,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:11.139,7032,0.1,70320,,
+1,1,,1,P19,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:10.947,8052,0.1,80520,,
+1,1,,1,P20,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:10.755,8792,0.1,87920,,
+1,1,,1,P21,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:10.564,9240,0.1,92400,,
+1,1,,1,P22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:10.373,8016,0.1,80160,,
+1,1,,1,P23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:10.182,56,0.1,560,,
+1,1,,1,P24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,00:01:09.990,8864,0.1,88640,,
+
+Basic assay information 
+Assay ID: ,,,,4522
+Assay Started: ,,,,12/13/2021 12:30:02 PM
+Assay Finished: ,,,,12/13/2021 12:31:27 PM
+Assay Exported: ,,,,12/13/2021 12:31:28 PM
+Protocol ID: ,,,,100289
+Protocol Name: ,,,,Cell Titer Glo
+Serial#: ,,,,1040940
+
+
+
+Protocol information
+Protocol:
+Protocol name,,,,Cell Titer Glo
+Number of assay repeats,,,,1
+Start assay repeat each,,,,N/A
+Number of plate repeats,,,,1
+Start plate repeat each,,,,N/A
+Is label meas. height used,,,,Yes
+Height of measurement,,,,Defined in label
+Is gripper height used,,,,No
+Mode of measurement,,,,By Rows  bi-directional
+Rotated plate,,,,No
+Soft move,,,,No
+Protocol notes,,,, 
+
+Plate type:
+Name of the plate type,,,,384 CulturePlate PerkinElmer
+Number of rows,,,,16
+Number of columns,,,,24
+Number of the wells in the plate,,,,384
+Height of the plate,,,,14.61 mm
+
+Coordinates of corners:
+384 CulturePlate PerkinElmer
+12.15 mm x------------------------------------------------------ x 115.65 mm
+9.07 mm                                                            9.07 mm
+
+12.15 mm x------------------------------------------------------ x 115.65 mm
+76.57 mm                                                           76.57 mm
+
+Platemap:
+Plate,,,,1
+Group,,,,1
+
+,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
+A,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+B,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+C,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+D,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+E,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+F,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+G,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+H,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+I,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+J,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+K,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+L,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+M,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+N,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+O,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+P,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- ,- 
+
+ - - Undefined
+
+Calculations:
+No calculations.
+
+Auto export parameters:
+Export format,,,,ListA
+Include basic assay information,,,,Yes
+Place assay information at,,,,End of file
+Include basic plate information,,,,Yes
+Place plate information at,,,,Beginning of plate
+Include protocol information,,,,Yes
+Protocol info level,,,,Large
+Include error and warning information,,,,Yes
+Include background information,,,,Yes
+Add plate number to the file name,,,,Yes
+Each plate to separate file,,,,No
+Field separator to use,,,,System
+File name format,,,,C:\Documents and Settings\EnVision User\Desktop\CTG_Results\<ProtocolName>_Batch4_<AssayID>.csv
+Columns (ListA),,,,PlateNumber PlateRepeat Barcode Group Well Sample Label Kinetic ScanX ScanY MeasInfo MeasTime Signal Flashes/Time Result Formula
+
+Operations:
+Plate 1
+  Group 1
+    Measurement
+      Label,,,,LUM 01sec(1)
+
+Labels:
+LUM 01sec,,,,1000004
+Mirror,,,,Luminescence
+Ems. filter,,,,Luminescence 700
+2nd ems. filter,,,,N/A
+Measurement height,,,,6.5 mm
+Measurement time,,,,0.1 s
+Last edited,,,,4/1/2021 11:39:39 AM
+Last edited by,,,,EnVision
+Factory preset,,,,No
+
+Filters:
+Luminescence 700,,,,212
+Filter type,,,,Emission
+Description,,,,LUM WL=400-700nm Tmin=65%
+Used with,,,,Luminescence Fluorescence Intensity
+Last edited,,,,2/27/2018 11:01:46 AM
+Last edited by,,,,EnVision
+Factory preset,,,,Yes
+
+Mirror modules:
+Luminescence,,,,404
+Used by,,,,Top
+Dual,,,,No
+Bias,,,,No
+Description,,,,LUM
+Used with,,,,Luminescence Fluorescence Intensity
+Last edited,,,,3/9/2018 10:14:26 AM
+Last edited by,,,,EnVision
+Factory preset,,,,Yes
+
+Instrument:
+Serial number,,,,1040940
+Nickname,,,,EnVision
+
+Normalization:
+
+
+
+
+
+Exported with EnVision Workstation version 1.12
