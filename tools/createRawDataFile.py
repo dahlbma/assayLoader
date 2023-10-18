@@ -5,15 +5,39 @@ import openpyxl
 from openpyxl import Workbook
 
 
-def getDataStart(file, sDataColumn):
-    lines = file.readlines()
-    for line in lines:
-        saLine = line.split(',')
+def getData(file, sDataColumn):
 
-        if sDataColumn in saLine:
-            if 'PlateNumber' in saLine:
-                dataPosition = saLine.index(sDataColumn)
-                print(dataPosition)
+    def getDataLines(saInData, iDataCol, iWellCol):
+        columns = ['plate', 'well', 'raw_data']
+        df = pd.DataFrame(columns=columns)
+        
+        for line in saInData:
+            if line.isspace():
+                return df
+            else:
+                saValues = line.split(',')
+                data = {'plate': 1, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol]}
+                df.loc[len(df.index)] = data
+            
+    
+    def getDataStart(file, sDataColumn):
+        saLines = file.readlines()
+        iLineNumber = 0
+        saRes = ''
+        for line in saLines:
+            saLine = line.split(',')
+            iLineNumber += 1
+            if sDataColumn in saLine:
+                if 'PlateNumber' in saLine:
+                    iDataColPosition = saLine.index(sDataColumn)
+                    iWellColPosition = saLine.index('Well')
+                    #saRes.append(line)
+                    return saLines[iLineNumber:], iDataColPosition, iWellColPosition
+
+    saData, iResultColumn, iWellColumn = getDataStart(file, sDataColumn)
+    dfData = getDataLines(saData, iResultColumn, iWellColumn)
+    print(dfData)
+    quit()
 
 
 # Directory path where your CSV files are located
@@ -25,5 +49,7 @@ file_list = [file for file in os.listdir(directory_path) if file.endswith('.csv'
 # Read each CSV file and store it in the list
 for csv_file in file_list:
     file_path = os.path.join(directory_path, csv_file)
+    print(file_path)
+
     with open(file_path, 'r') as file:
-        getDataStart(file, 'Signal')
+        getData(file, 'Signal')
