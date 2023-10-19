@@ -70,7 +70,7 @@ for csv_file in file_list:
 
 resDf = pd.concat(frames)
 # Save the DataFrame to a CSV file
-resDf.to_csv("raw.csv", sep='\t', index=False)  # Set index=False to exclude the index column
+resDf.to_csv("rawEnvision.csv", sep='\t', index=False)  # Set index=False to exclude the index column
 
 print(resDf)
 

@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -459,6 +460,15 @@ def populate_plate_data(heatMapsWs, plate, plateDf, start_cell, data_col, lDebug
         if percentile < 10 or percentile > 90:
             cell.font = whiteFont
 
+
+# Check if at least one command-line argument is provided
+if len(sys.argv) < 2:
+    print("Usage: python script.py <input_file>")
+    sys.exit(1)
+
+# Get the first command-line argument as the input file
+input_file = sys.argv[1]
+
 pd.set_option('mode.chained_assignment', None)
 
 decimal_style = NamedStyle(name='two_decimals')
@@ -467,8 +477,7 @@ decimal_style.number_format = '0.00'
 custom_font = Font(name='Calibri', size=10)
 
 excel_file_path = 'screenresults.xlsx'
-#df = pd.read_csv("plate_raw_data.csv", delimiter='\t')
-df = pd.read_csv("raw.csv", delimiter='\t')
+df = pd.read_csv(input_file, delimiter='\t')
 
 
 # Generate the gradient from white to red in 10 steps
@@ -648,8 +657,6 @@ addColumnOfDataToSheet(screenDataWs, "STD", start_cell, df_std_row, 'raw_data')
 
 ##
 ######################################################
-
-
 
 
 

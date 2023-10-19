@@ -4,13 +4,14 @@ import pandas as pd
 import openpyxl
 from openpyxl import Workbook
 import re
+import fnmatch
 
 def getData(file, sDataColumn, plateId):
 
     def getDataLines(plateId, saInData, iDataCol, iWellCol):
         columns = ['plate', 'well', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
-        
+
         for line in saInData:
             if line.isspace():
                 return df
@@ -29,6 +30,7 @@ def getData(file, sDataColumn, plateId):
                     sType = 'Neg'
                 data = {'plate': plateId, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
                 df.loc[len(df.index)] = data
+        return df
 
     def getDataStart(file, sDataColumn):
         saLines = file.readlines()
@@ -38,7 +40,7 @@ def getData(file, sDataColumn, plateId):
             saLine = line.split(',')
             iLineNumber += 1
             if sDataColumn in saLine:
-                if 'PlateNumber' in saLine:
+                if 'Well' in saLine:
                     iDataColPosition = saLine.index(sDataColumn)
                     iWellColPosition = saLine.index('Well')
                     return saLines[iLineNumber:], iDataColPosition, iWellColPosition
@@ -49,10 +51,11 @@ def getData(file, sDataColumn, plateId):
 
 
 # Directory path where your CSV files are located
-directory_path = 'screen_raw_data'
+directory_path = 'ume'
 
-# List all files in the directory
-file_list = [file for file in os.listdir(directory_path) if file.endswith('.csv')]
+all_files = os.listdir(directory_path)
+# Filter the files that end with "csv" (case-insensitive)
+file_list = [file for file in all_files if fnmatch.fnmatch(file.lower(), '*.csv')]
 
 frames = []
 plateId = 0
@@ -70,7 +73,5 @@ for csv_file in file_list:
 
 resDf = pd.concat(frames)
 # Save the DataFrame to a CSV file
-resDf.to_csv("raw.csv", sep='\t', index=False)  # Set index=False to exclude the index column
-
-print(resDf)
+resDf.to_csv("rawUme.csv", sep='\t', index=False)  # Set index=False to exclude the index column
 
