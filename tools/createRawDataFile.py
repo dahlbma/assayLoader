@@ -6,9 +6,9 @@ from openpyxl import Workbook
 import re
 
 
-def getData(file, sDataColumn):
+def getData(file, sDataColumn, plateId):
 
-    def getDataLines(saInData, iDataCol, iWellCol):
+    def getDataLines(plateId, saInData, iDataCol, iWellCol):
         columns = ['plate', 'well', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
         
@@ -28,7 +28,7 @@ def getData(file, sDataColumn):
                     sType = 'Pos'
                 elif iCol == 24:
                     sType = 'Neg'
-                data = {'plate': 1, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
+                data = {'plate': plateId, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
                 df.loc[len(df.index)] = data
             
     
@@ -46,10 +46,10 @@ def getData(file, sDataColumn):
                     #saRes.append(line)
                     return saLines[iLineNumber:], iDataColPosition, iWellColPosition
 
+
     saData, iResultColumn, iWellColumn = getDataStart(file, sDataColumn)
-    dfData = getDataLines(saData, iResultColumn, iWellColumn)
-    print(dfData)
-    #quit()
+    dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn)
+    return dfData
 
 
 # Directory path where your CSV files are located
@@ -58,10 +58,23 @@ directory_path = 'screen_raw_data'
 # List all files in the directory
 file_list = [file for file in os.listdir(directory_path) if file.endswith('.csv')]
 
+frames = []
+plateId = 0
 # Read each CSV file and store it in the list
 for csv_file in file_list:
+    plateId += 1
     file_path = os.path.join(directory_path, csv_file)
     print(file_path)
 
+    #columns = ['plate', 'well', 'raw_data', 'type']
+    #resDf = pd.DataFrame(columns=columns)
     with open(file_path, 'r') as file:
-        getData(file, 'Signal')
+        tmpDf = getData(file, 'Signal', plateId)
+        frames.append(tmpDf)
+
+resDf = pd.concat(frames)
+# Save the DataFrame to a CSV file
+resDf.to_csv("raw.csv", sep='\t', index=False)  # Set index=False to exclude the index column
+
+print(resDf)
+

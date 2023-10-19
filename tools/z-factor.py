@@ -467,7 +467,8 @@ decimal_style.number_format = '0.00'
 custom_font = Font(name='Calibri', size=10)
 
 excel_file_path = 'screenresults.xlsx'
-df = pd.read_csv("plate_raw_data.csv", delimiter='\t')
+#df = pd.read_csv("plate_raw_data.csv", delimiter='\t')
+df = pd.read_csv("raw.csv", delimiter='\t')
 
 
 # Generate the gradient from white to red in 10 steps
@@ -654,7 +655,7 @@ addColumnOfDataToSheet(screenDataWs, "STD", start_cell, df_std_row, 'raw_data')
 
 
 setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='I1', end_cell='I5')
-setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q62')
+setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q108')
 
 
 wb.save(excel_file_path)
