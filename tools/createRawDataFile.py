@@ -3,12 +3,13 @@ import numpy as np
 import pandas as pd
 import openpyxl
 from openpyxl import Workbook
+import re
 
 
 def getData(file, sDataColumn):
 
     def getDataLines(saInData, iDataCol, iWellCol):
-        columns = ['plate', 'well', 'raw_data']
+        columns = ['plate', 'well', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
         
         for line in saInData:
@@ -16,7 +17,18 @@ def getData(file, sDataColumn):
                 return df
             else:
                 saValues = line.split(',')
-                data = {'plate': 1, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol]}
+                try:
+                    iCol = int(re.search(r'\d+', saValues[iWellCol]).group())
+                except:
+                    print(line)
+                    print(saValues[iWellCol])
+                    continue
+                sType = 'Data'
+                if iCol == 23:
+                    sType = 'Pos'
+                elif iCol == 24:
+                    sType = 'Neg'
+                data = {'plate': 1, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
                 df.loc[len(df.index)] = data
             
     
@@ -37,7 +49,7 @@ def getData(file, sDataColumn):
     saData, iResultColumn, iWellColumn = getDataStart(file, sDataColumn)
     dfData = getDataLines(saData, iResultColumn, iWellColumn)
     print(dfData)
-    quit()
+    #quit()
 
 
 # Directory path where your CSV files are located

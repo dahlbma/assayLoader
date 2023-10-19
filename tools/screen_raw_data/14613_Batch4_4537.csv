@@ -392,6 +392,7 @@ PlateNumber,PlateRepeat,Barcode,Group,Well,Sample,Label,Kinetic,ScanX,ScanY,Meas
 1,1,,1,P22,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,01:10.4,8908,0.1,89080,89080,,,,,,,,,
 1,1,,1,P23,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,01:10.2,56,0.1,560,78680,,,,,,,,,
 1,1,,1,P24,-,LUM 01sec(1),0,0,0,De=1st Ex=N/A Em=Top Wdw=N/A,01:10.0,7868,0.1,78680,560,,,,,,,,,
+
 ,,,,,,,,,,,,,,,,,,,,,,,,
 Basic assay information ,,,,,,,,,,,,,,,,,,,,,,,,
 Assay ID: ,,,,4537,,,,,,,,,,,,,,,,,,,,
