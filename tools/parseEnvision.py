@@ -5,7 +5,6 @@ import openpyxl
 from openpyxl import Workbook
 import re
 
-
 def getData(file, sDataColumn, plateId):
 
     def getDataLines(plateId, saInData, iDataCol, iWellCol):
@@ -30,8 +29,7 @@ def getData(file, sDataColumn, plateId):
                     sType = 'Neg'
                 data = {'plate': plateId, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
                 df.loc[len(df.index)] = data
-            
-    
+
     def getDataStart(file, sDataColumn):
         saLines = file.readlines()
         iLineNumber = 0
@@ -43,9 +41,7 @@ def getData(file, sDataColumn, plateId):
                 if 'PlateNumber' in saLine:
                     iDataColPosition = saLine.index(sDataColumn)
                     iWellColPosition = saLine.index('Well')
-                    #saRes.append(line)
                     return saLines[iLineNumber:], iDataColPosition, iWellColPosition
-
 
     saData, iResultColumn, iWellColumn = getDataStart(file, sDataColumn)
     dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn)
