@@ -199,7 +199,7 @@ def calcData(df, ws, heatMapWs):
          meanRaw,
          stdRaw) = calculatePlateData(plate_df, plate, ws)
         listOfDfPlates.append(df_plate)
-        new_row = {'Plate': int(plate),
+        new_row = {'Plate': plate,
                    'meanRaw': meanRaw,
                    'stdRaw': stdRaw,
                    'meanNegCtrl': meanNegCtrl,
@@ -532,17 +532,18 @@ for row in screenDataWs.iter_rows():
         cell.style = decimal_style
         cell.font = custom_font
 
-
+iPlate = 0
 for plateDf in listOfPlatesDf:
     # Call the function to create the thick border
     plate = plateDf.iloc[0]['plate']
 
-    iRow = start_row + ((plate-1) * iPlateRows)
+    iRow = start_row + ((iPlate) * iPlateRows)
+    
     start_cell = start_col + str(iRow)
     create_outer_thick_border(heatMapsWs, start_cell, num_columns, num_rows)
     create_plate_frame(heatMapsWs, 'Plate', plate, start_cell, num_columns, num_rows)
     populate_plate_data(heatMapsWs, plate, plateDf, start_cell, 'raw_data')
-
+    iPlate += 1
 
 # Group by 'well' and sum the 'hit' column to count occurrences of '1'
 df_hit_distr = dfCalcData.groupby('well')['hit'].sum().reset_index()
@@ -660,9 +661,8 @@ addColumnOfDataToSheet(screenDataWs, "STD", start_cell, df_std_row, 'raw_data')
 
 
 
-
 setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='I1', end_cell='I5')
-setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q108')
+setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q' + str(len(listOfPlatesDf) + 1))
 
 
 wb.save(excel_file_path)

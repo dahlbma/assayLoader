@@ -6,30 +6,50 @@ from openpyxl import Workbook
 import re
 import fnmatch
 
-def getData(file, sDataColumn, plateId):
 
-    def getDataLines(plateId, saInData, iDataCol, iWellCol):
+
+def getPlateMap(sPlateId, dfPlatemap):
+    new_df = dfPlatemap[dfPlatemap.iloc[:, 0] == sPlateId]
+    return new_df
+
+
+def getData(file, dfPlatemap, sDataColumn, plateId):
+
+    def getDataLines(plateId, saInData, iDataCol, iWellCol, dfPlatemap):
         columns = ['plate', 'well', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
 
         for line in saInData:
             if line.isspace():
                 return df
-            else:
-                saValues = line.split(',')
-                try:
-                    iCol = int(re.search(r'\d+', saValues[iWellCol]).group())
-                except:
-                    print(line)
-                    print(saValues[iWellCol])
-                    continue
+            
+            saValues = line.split(',')
+            try:
+                iCol = int(re.search(r'\d+', saValues[iWellCol]).group())
+            except:
+                print(line)
+                print(saValues[iWellCol])
+                continue
+
+            
+            sType = 'Data'
+            selected_row = dfPlatemap[dfPlatemap['Well'] == saValues[iWellCol]].copy()
+            selected_row = selected_row.reset_index(drop=True)
+
+            if selected_row.loc[0, 'Compound ID'] == 'CTRL1':
+                sType = 'Pos'
+            elif selected_row['Compound ID'][0] == 'DMSO':
+                sType = 'Neg'
+            elif selected_row['Compound ID'][0] in ('EXCEPTION', 'CTRL2'):
+                continue
+            elif selected_row['Compound ID'][0].startswith('CBK'):
                 sType = 'Data'
-                if iCol == 23:
-                    sType = 'Pos'
-                elif iCol == 24:
-                    sType = 'Neg'
-                data = {'plate': plateId, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
-                df.loc[len(df.index)] = data
+
+            data = {'plate': plateId,
+                    'well': saValues[iWellCol],
+                    'raw_data': saValues[iDataCol],
+                    'type': sType}
+            df.loc[len(df.index)] = data
         return df
 
     def getDataStart(file, sDataColumn):
@@ -46,29 +66,43 @@ def getData(file, sDataColumn, plateId):
                     return saLines[iLineNumber:], iDataColPosition, iWellColPosition
 
     saData, iResultColumn, iWellColumn = getDataStart(file, sDataColumn)
-    dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn)
+    dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn, dfPlatemap)
     return dfData
 
 
 # Directory path where your CSV files are located
 directory_path = 'ume'
-
 all_files = os.listdir(directory_path)
 # Filter the files that end with "csv" (case-insensitive)
 file_list = [file for file in all_files if fnmatch.fnmatch(file.lower(), '*.csv')]
 
+
+# Read platemap
+platemap_file = directory_path + '/platemap.xlsx'  # Replace 'your_file.xlsx' with the actual file path
+# Read the Excel file into a DataFrame
+platemapDf = pd.read_excel(platemap_file)
+
+print(platemapDf)
+# Get all plate names from the first column of the platemap
+saPlates = platemapDf.iloc[:, 0].unique()
+
+
 frames = []
-plateId = 0
+plateIndex = 0
 # Read each CSV file and store it in the list
 for csv_file in file_list:
-    plateId += 1
+    plateId = saPlates[plateIndex]
+    plateIndex += 1
+
     file_path = os.path.join(directory_path, csv_file)
     print(file_path)
 
+    dfThisPlateMap = getPlateMap(plateId, platemapDf)
+    
     #columns = ['plate', 'well', 'raw_data', 'type']
     #resDf = pd.DataFrame(columns=columns)
     with open(file_path, 'r') as file:
-        tmpDf = getData(file, 'Signal', plateId)
+        tmpDf = getData(file, dfThisPlateMap, 'Signal', plateId)
         frames.append(tmpDf)
 
 resDf = pd.concat(frames)
