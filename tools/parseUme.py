@@ -1,3 +1,4 @@
+import sys
 import os
 import numpy as np
 import pandas as pd
@@ -13,9 +14,9 @@ def getPlateMap(sPlateId, dfPlatemap):
     return new_df
 
 
-def getData(file, dfPlatemap, sDataColumn, plateId):
+def getData(file, dfPlatemap, sDataColumn, plateId, sCtrl):
 
-    def getDataLines(plateId, saInData, iDataCol, iWellCol, dfPlatemap):
+    def getDataLines(plateId, saInData, iDataCol, iWellCol, dfPlatemap, sCtrl):
         columns = ['plate', 'well', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
 
@@ -36,14 +37,15 @@ def getData(file, dfPlatemap, sDataColumn, plateId):
             selected_row = dfPlatemap[dfPlatemap['Well'] == saValues[iWellCol]].copy()
             selected_row = selected_row.reset_index(drop=True)
 
-            if selected_row.loc[0, 'Compound ID'] == 'CTRL1':
+            if selected_row.loc[0, 'Compound ID'] == sCtrl:
                 sType = 'Pos'
             elif selected_row['Compound ID'][0] == 'DMSO':
                 sType = 'Neg'
-            elif selected_row['Compound ID'][0] in ('EXCEPTION', 'CTRL2'):
-                continue
             elif selected_row['Compound ID'][0].startswith('CBK'):
                 sType = 'Data'
+            else:
+                print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
+                continue
 
             data = {'plate': plateId,
                     'well': saValues[iWellCol],
@@ -66,8 +68,17 @@ def getData(file, dfPlatemap, sDataColumn, plateId):
                     return saLines[iLineNumber:], iDataColPosition, iWellColPosition
 
     saData, iResultColumn, iWellColumn = getDataStart(file, sDataColumn)
-    dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn, dfPlatemap)
+    dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn, dfPlatemap, sCtrl)
     return dfData
+
+
+# Check if at least one command-line argument is provided
+if len(sys.argv) < 2:
+    print("Usage: python parseUme.py posCtrlName")
+    sys.exit(1)
+
+# Get the first command-line argument as the input file
+sCtrl = sys.argv[1]
 
 
 # Directory path where your CSV files are located
@@ -82,7 +93,6 @@ platemap_file = directory_path + '/platemap.xlsx'  # Replace 'your_file.xlsx' wi
 # Read the Excel file into a DataFrame
 platemapDf = pd.read_excel(platemap_file)
 
-print(platemapDf)
 # Get all plate names from the first column of the platemap
 saPlates = platemapDf.iloc[:, 0].unique()
 
@@ -102,7 +112,7 @@ for csv_file in file_list:
     #columns = ['plate', 'well', 'raw_data', 'type']
     #resDf = pd.DataFrame(columns=columns)
     with open(file_path, 'r') as file:
-        tmpDf = getData(file, dfThisPlateMap, 'Signal', plateId)
+        tmpDf = getData(file, dfThisPlateMap, 'Signal', plateId, sCtrl)
         frames.append(tmpDf)
 
 resDf = pd.concat(frames)
