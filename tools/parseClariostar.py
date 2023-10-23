@@ -74,7 +74,7 @@ def getData(file, dfPlatemap, sDataColumn, plateId, sCtrl):
 
 # Check if at least one command-line argument is provided
 if len(sys.argv) < 2:
-    print("Usage: python parseUme.py posCtrlName")
+    print("Usage: python parseClariostar.py posCtrlName")
     sys.exit(1)
 
 # Get the first command-line argument as the input file
@@ -82,7 +82,7 @@ sCtrl = sys.argv[1]
 
 
 # Directory path where your CSV files are located
-directory_path = 'ume'
+directory_path = 'clariostar'
 all_files = os.listdir(directory_path)
 # Filter the files that end with "csv" (case-insensitive)
 file_list = [file for file in all_files if fnmatch.fnmatch(file.lower(), '*.csv')]
@@ -117,5 +117,5 @@ for csv_file in file_list:
 
 resDf = pd.concat(frames)
 # Save the DataFrame to a CSV file
-resDf.to_csv("rawUme.csv", sep='\t', index=False)  # Set index=False to exclude the index column
+resDf.to_csv("rawClariostar.csv", sep='\t', index=False)  # Set index=False to exclude the index column
 
