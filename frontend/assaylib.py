@@ -7,19 +7,19 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidge
 from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
-
 def gotoSP(self):
     resize_window(self)
     self.window().setCurrentIndex(1)
-    self.window().widget(1).spPlateIdFile_btn.setFocus()
+    self.window().widget(1).instrument_cb.setFocus()
     return
 
+'''
 def gotoDR(self):
     resize_window(self)
     self.window().setCurrentIndex(2)
     self.window().widget(2).drPlateIdFile_btn.setFocus()
     return
-
+'''
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(int)

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from assaylib import *
 from singlePointScreen import SinglePointScreen
-from doseResponseScreen import DoseResponseScreen
+
 
 class LoginScreen(QMainWindow):
     def __init__(self, appName):
@@ -63,9 +63,9 @@ class LoginScreen(QMainWindow):
 
         #init
         singlePoint = SinglePointScreen(self.jwt_token, test)
-        doseResponse = DoseResponseScreen(self.jwt_token, test)
+        #doseResponse = DoseResponseScreen(self.jwt_token, test)
         
         #add screens to stackedwidget
         self.window().addWidget(singlePoint)
-        self.window().addWidget(doseResponse)
+        #self.window().addWidget(doseResponse)
         gotoSP(self)
