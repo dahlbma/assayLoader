@@ -6,6 +6,7 @@ from PyQt5 import QtGui
 import openpyxl
 import csv
 from pathlib import Path
+from instruments import parseEnvision
 
 from assaylib import *
 
@@ -25,6 +26,15 @@ class SinglePointScreen(QMainWindow):
 
         self.rawDataDir_btn.clicked.connect(self.selectRawDataDir)
 
+        self.runQc_btn.setDisabled(True)
+
+        self.outputFile_eb.editingFinished.connect(self.checkDataColumn)
+        self.posCtrl_eb.editingFinished.connect(self.checkDataColumn)
+        self.negCtrl_eb.editingFinished.connect(self.checkDataColumn)
+        self.platemapFile_btn.clicked.connect(self.selectPlatemap)
+        self.platemapFile_lab.setText('')
+        
+        
 
     def checkDataColumn(self):
         # Read a csv file from the inputFiles_te text box and see of the datacolumn in this eb is present
@@ -46,3 +56,4 @@ class SinglePointScreen(QMainWindow):
         self.inputFiles_te.setText(sFiles.lstrip())
 
     
+        parseEnvision.generateIndata(directory)
