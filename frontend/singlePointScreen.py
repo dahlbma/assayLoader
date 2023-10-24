@@ -17,5 +17,8 @@ class SinglePointScreen(QMainWindow):
         logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/sp.ui"), self)
         
-        
         self.inputFiles_te.setReadOnly(True)
+        saInstruments = dbInterface.getInstruments(self.token)
+
+        print(type(saInstruments))
+        self.instrument_cb.addItems(saInstruments)

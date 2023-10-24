@@ -124,3 +124,10 @@ def getDoseResponseConfig(token):
         return r.content.decode()
     except:
         return r.content
+
+def getInstruments(token):
+    r = requests.get(f'{baseUrl}getInstruments',
+            headers={'token':token})
+
+    cleanList = listify(r, False)
+    return cleanList
