@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1085</width>
-    <height>711</height>
+    <width>1528</width>
+    <height>1026</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -208,9 +208,38 @@
                     <item>
                      <widget class="QPushButton" name="spPlateIdFile_btn">
                       <property name="text">
-                       <string>Get plate id file</string>
+                       <string>Platemap file</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_12">
+                      <property name="spacing">
+                       <number>7</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label_5">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="layoutDirection">
+                         <enum>Qt::LeftToRight</enum>
+                        </property>
+                        <property name="text">
+                         <string>Instrument</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QComboBox" name="instrumentCb"/>
+                      </item>
+                     </layout>
                     </item>
                     <item>
                      <widget class="QLabel" name="label_10">
@@ -222,7 +251,7 @@
                     <item>
                      <widget class="QLineEdit" name="screenName_eb">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -353,7 +382,7 @@
                     <item>
                      <widget class="QTableWidget" name="rawDataFiles_table">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -372,12 +401,41 @@
                       </attribute>
                       <column>
                        <property name="text">
-                        <string>RawDataFile</string>
+                        <string>Plate</string>
                        </property>
                       </column>
                       <column>
                        <property name="text">
-                        <string>Status</string>
+                        <string>Well</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Signal</string>
+                       </property>
+                      </column>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTableWidget" name="tableWidget">
+                      <column>
+                       <property name="text">
+                        <string>plate</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>well</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>raw_data</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>type</string>
                        </property>
                       </column>
                      </widget>
@@ -1082,8 +1140,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1085</width>
-     <height>22</height>
+     <width>1528</width>
+     <height>23</height>
     </rect>
    </property>
   </widget>
