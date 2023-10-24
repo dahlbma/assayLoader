@@ -289,3 +289,12 @@ class UploadLauncher(tornado.web.RequestHandler):
         output_file = open(bin_file, 'wb')
         output_file.write(file1['body'])
         output_file.close()
+
+
+@jwtauth
+class GetInstruments(tornado.web.RequestHandler):
+    def get(self):
+        sSql = f'select instrument_name from assayloader.instrument'
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
