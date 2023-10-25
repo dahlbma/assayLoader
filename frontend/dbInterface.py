@@ -6,6 +6,7 @@ baseUrl = 'http://esox3.scilifelab.se:8084/'
 def listify(data, addBlank=True):
     res = data.content.decode()
     res = json.loads(res)
+
     cleanList = list()
     if addBlank:
         cleanList.append(' ')
@@ -131,3 +132,17 @@ def getInstruments(token):
 
     cleanList = listify(r, False)
     return cleanList
+
+
+def getInstrument(token, sInstrument):
+    r = requests.get(f'{baseUrl}getInstrument/{sInstrument}',
+            headers={'token':token})
+
+    if r.status_code != 200:
+        return r.content.decode(), False
+    else:
+        res = r.content.decode()
+        res = json.loads(res)
+        print(res)
+        return res, True
+
