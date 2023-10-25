@@ -298,3 +298,19 @@ class GetInstruments(tornado.web.RequestHandler):
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
+
+@jwtauth
+class GetInstrument(tornado.web.RequestHandler):
+    def get(self, sInstrument):
+        sSql = f'''select pre_data,
+        post_data,
+        well_col,
+        plate_col,
+        data_col from assayloader.instrument
+        where instrument_name = '{sInstrument}' '''
+        cur.execute(sSql)
+        tRes = cur.fetchall()
+        res = res_to_json(tRes, cur)
+
+        
+        self.finish(json.dumps(res))

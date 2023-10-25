@@ -126,6 +126,7 @@ def make_app():
         (r"/getDoseResponseConfig", application.GetDoseResponseConfig),
         (r"/getAssayTypes", application.GetAssayTypes),
         (r"/getInstruments", application.GetInstruments),
+        (r"/getInstrument/(?P<sInstrument>[^\/]+)", application.GetInstrument),
         (r"/getDetectionTypes", application.GetDetectionTypes),
         (r"/getOperators", application.GetOperators),
         (r"/getProjects", application.GetProjects),
