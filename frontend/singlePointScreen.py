@@ -18,7 +18,7 @@ class SinglePointScreen(QMainWindow):
         logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/sp.ui"), self)
 
-        self.inputFiles_te.setReadOnly(True)
+        #self.inputFiles_tab.setReadOnly(True)
 
         saInstruments = dbInterface.getInstruments(self.token)
         saInstruments = [""] + saInstruments
@@ -27,14 +27,22 @@ class SinglePointScreen(QMainWindow):
         
         self.dataColumn_eb.editingFinished.connect(self.checkDataColumn)
         self.rawDataDir_btn.clicked.connect(self.selectRawDataDir)
+
         self.runQc_btn.setDisabled(True)
+        self.runQc_btn.setEnabled(True)
+        self.runQc_btn.clicked.connect(self.runQc)
+
         self.outputFile_eb.editingFinished.connect(self.checkDataColumn)
+
         self.posCtrl_eb.editingFinished.connect(self.checkDataColumn)
         self.posCtrl_eb.setText('CTRL')
+
         self.negCtrl_eb.editingFinished.connect(self.checkDataColumn)
         self.negCtrl_eb.setText('DMSO')
+
         self.platemapFile_btn.clicked.connect(self.selectPlatemap)
         self.platemapFile_lab.setText('')
+
         self.rawDataDir_lab.setText('')
         self.outputFile_lab.setText('')
         self.generateQCinput_btn.setDisabled(True)
@@ -53,16 +61,39 @@ class SinglePointScreen(QMainWindow):
     def checkForm(self):
         #print(self.form_values)
         if all(self.form_values.values()):
-            self.runQc_btn.setEanbled(True)
+            self.runQc_btn.setEnabled(True)
         else:
             self.runQc_btn.setDisabled(True)
+            self.runQc_btn.setEnabled(True)
 
     def checkDataColumn(self):
         self.checkForm()
-        # Read a csv file from the inputFiles_te text box and see of the datacolumn in this eb is present
+        # Read a csv file from the inputFiles_tab text box and see of the datacolumn in this eb is present
         pass
 
+    
+    def getInputFilesFromTab(self):
+        saFiles = []
+
+        for row in range(self.inputFiles_tab.rowCount()):
+            item = self.inputFiles_tab.item(row, 0)  # Get item in the first column
+            if item is not None:
+                saFiles.append(item.text())
+        return saFiles
+
+
+    def addFileToTable(self, sFile):
+        row_position = self.inputFiles_tab.rowCount()  # Get the current row count
+        self.inputFiles_tab.insertRow(row_position)  # Insert a new row at the end
+
+        fileItem = QTableWidgetItem(sFile)
+        statusItem = QTableWidgetItem("Unknown")
+        self.inputFiles_tab.setItem(row_position, 0, fileItem)
+        self.inputFiles_tab.setItem(row_position, 1, statusItem)
+
+
     def selectRawDataDir(self):
+        self.inputFiles_tab.setRowCount(0)
         options = QFileDialog.Options()
         options |= QFileDialog.ShowDirsOnly  # Set the option to allow selecting directories only
 
@@ -74,10 +105,8 @@ class SinglePointScreen(QMainWindow):
 
         sFiles = ''
         for csv_file in csv_files:
-            sFiles += f'\n{os.path.basename(csv_file)}'
-        self.inputFiles_te.setText(sFiles.lstrip())
+            self.addFileToTable(os.path.basename(csv_file))
         self.form_values['raw_data_directory'] = True
-        #parseEnvision.generateIndata(directory)
         self.checkForm()
 
 
@@ -101,4 +130,10 @@ class SinglePointScreen(QMainWindow):
             self.dataColumn_eb.setText(saInstrument[0]['data_col'])
             #self.posCtrl_eb.setText()
             #self.negCtrl_eb.setText()
-            
+
+    def runQc(self):
+        print('running qc')
+        sDir = self.rawDataDir_lab.text()
+        saFiles = self.getInputFilesFromTab()
+        parseEnvision.generateIndata(sDir, saFiles)
+

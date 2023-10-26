@@ -27,7 +27,10 @@ def getData(file, sDataColumn, plateId):
                     sType = 'Pos'
                 elif iCol == 24:
                     sType = 'Neg'
-                data = {'plate': plateId, 'well': saValues[iWellCol], 'raw_data': saValues[iDataCol], 'type': sType}
+                data = {'plate': plateId,
+                        'well': saValues[iWellCol],
+                        'raw_data': saValues[iDataCol],
+                        'type': sType}
                 df.loc[len(df.index)] = data
 
     def getDataStart(file, sDataColumn):
@@ -47,14 +50,13 @@ def getData(file, sDataColumn, plateId):
     dfData = getDataLines(plateId, saData, iResultColumn, iWellColumn)
     return dfData
 
-def generateIndata(sDir):
+def generateIndata(sDir, saFiles):
     # List all files in the directory
-    file_list = [file for file in os.listdir(sDir) if file.endswith('.csv')]
-
+    print(saFiles)
     frames = []
     plateId = 0
     # Read each CSV file and store it in the list
-    for csv_file in file_list:
+    for csv_file in saFiles:
         plateId += 1
         file_path = os.path.join(sDir, csv_file)
         print(file_path)
