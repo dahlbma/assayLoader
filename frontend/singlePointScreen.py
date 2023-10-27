@@ -3,6 +3,7 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
+from PyQt5.QtGui import QIntValidator
 import openpyxl
 import csv
 from pathlib import Path
@@ -40,6 +41,9 @@ class SinglePointScreen(QMainWindow):
         self.negCtrl_eb.editingFinished.connect(self.checkDataColumn)
         self.negCtrl_eb.setText('DMSO')
 
+        int_validator = QIntValidator()
+        self.hitThreshold_eb.setValidator(int_validator)
+        
         self.platemapFile_btn.clicked.connect(self.selectPlatemap)
         self.platemapFile_lab.setText('')
 
