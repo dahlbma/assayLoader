@@ -311,6 +311,5 @@ class GetInstrument(tornado.web.RequestHandler):
         cur.execute(sSql)
         tRes = cur.fetchall()
         res = res_to_json(tRes, cur)
-
         
         self.finish(json.dumps(res))
