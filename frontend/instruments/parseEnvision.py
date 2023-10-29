@@ -33,7 +33,7 @@ def getData(file, sDataColumn, plateId):
                         'type': sType}
                 df.loc[len(df.index)] = data
 
-    def getDataStart(file, sDataColumn):
+    def getDataStart(self, file, sDataColumn):
         saLines = file.readlines()
         iLineNumber = 0
         saRes = ''

@@ -8,6 +8,8 @@ import openpyxl
 import csv
 from pathlib import Path
 from instruments import parseEnvision
+import pandas as pd
+
 
 from assaylib import *
 
@@ -27,8 +29,8 @@ class SinglePointScreen(QMainWindow):
         self.instrument_cb.currentIndexChanged.connect(self.instrumentChange)
         
         self.dataColumn_eb.editingFinished.connect(self.checkDataColumn)
-        self.rawDataDir_btn.clicked.connect(self.selectRawDataDir)
-
+        self.fileToPlateMap_btn.clicked.connect(self.selectFileToPlateMap)
+        
         self.runQc_btn.setDisabled(True)
         self.runQc_btn.setEnabled(True)
         self.runQc_btn.clicked.connect(self.runQc)
@@ -46,8 +48,9 @@ class SinglePointScreen(QMainWindow):
         
         self.platemapFile_btn.clicked.connect(self.selectPlatemap)
         self.platemapFile_lab.setText('')
+        self.platemapDf = None
 
-        self.rawDataDir_lab.setText('')
+        self.fileToPlate_lab.setText('')
         self.outputFile_lab.setText('')
         self.generateQCinput_btn.setDisabled(True)
 
@@ -96,20 +99,70 @@ class SinglePointScreen(QMainWindow):
         self.inputFiles_tab.setItem(row_position, 1, statusItem)
 
 
-    def selectRawDataDir(self):
+    def readPlateMap(sPlateId, dfPlatemap):
+        new_df = dfPlatemap[dfPlatemap.iloc[:, 0] == sPlateId]
+        return new_df
+
+        
+    def getDataStart(self, file, sDataColumn):
+        saLines = file.readlines()
+        iDataColPosition = None
+        iWellColPosition = None
+        saDataLines = None
+        iNrOfCols = 0
+        iLineNumber = 0
+        
+        for line in saLines:
+            saLine = line.split(',')
+            iLineNumber += 1
+            if 'Well' in saLine:
+                iNrOfCols = len(saLine)
+                iDataColPosition = saLine.index(sDataColumn)
+                iWellColPosition = saLine.index('Well')
+                saDataLines = saLines[iLineNumber:]
+                iLineNumber = 0
+                break
+
+        if saDataLines == None:
+            return iDataColPosition, iWellColPosition, saDataLines
+
+        for line in saDataLines:
+            iLineNumber += 1
+            saLine = line.split(',')
+            if len(saLine) != iNrOfCols:
+                saDataLines = saDataLines[:iLineNumber-1]
+                ii = 0
+                for i in saDataLines:
+                    ii += 1
+                    print(ii, i)
+                quit()
+            
+        return saLines[iLineNumber:], iDataColPosition, iWellColPosition
+
+
+    def selectFileToPlateMap(self):
         self.inputFiles_tab.setRowCount(0)
-        options = QFileDialog.Options()
-        options |= QFileDialog.ShowDirsOnly  # Set the option to allow selecting directories only
+        
+        file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")
+        df = pd.read_excel(file_path)
+        self.fileToPlate_lab.setText(file_path)
+        plate_file_dict = df.set_index('plate')['file'].to_dict()
 
-        directory = QFileDialog.getExistingDirectory(
-            None, "Select Directory", options=options
-        )
-        self.rawDataDir_lab.setText(directory)
-        csv_files = glob.glob(os.path.join(directory, '*.[cC][sS][vV]'))
-
+        path_to_data_dir = os.path.dirname(file_path)
+                
         sFiles = ''
-        for csv_file in csv_files:
-            self.addFileToTable(os.path.basename(csv_file))
+        for row, (plate, sFile) in enumerate(plate_file_dict.items()):
+            self.addFileToTable(sFile)
+            print(sFile)
+
+            full_path = os.path.join(path_to_data_dir, sFile)
+            with open(full_path, 'r') as file:
+                sDataLines = self.getDataStart(file, self.dataColumn_eb.text())
+                
+            print(self.dataColumn_eb.text())
+            print(sDataLines)
+            quit()
+        
         self.form_values['raw_data_directory'] = True
         self.checkForm()
 
@@ -121,6 +174,7 @@ class SinglePointScreen(QMainWindow):
         )
 
         if platemap:
+            self.platemapDf = pd.read_excel(platemap)
             print(f"Selected file: {platemap}")
             self.platemapFile_lab.setText(os.path.basename(platemap))
             self.form_values['platemap_file'] = True
@@ -137,7 +191,7 @@ class SinglePointScreen(QMainWindow):
 
     def runQc(self):
         print('running qc')
-        sDir = self.rawDataDir_lab.text()
+        sFileToPlate = self.fileToPlate_lab.text()
         saFiles = self.getInputFilesFromTab()
-        parseEnvision.generateIndata(sDir, saFiles)
+        parseEnvision.generateIndata(sFileToPlate, saFiles)
 

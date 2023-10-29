@@ -31,7 +31,6 @@ def getData(file, dfPlatemap, sDataColumn, plateId, sCtrl):
                 print(line)
                 print(saValues[iWellCol])
                 continue
-
             
             sType = 'Data'
             selected_row = dfPlatemap[dfPlatemap['Well'] == saValues[iWellCol]].copy()

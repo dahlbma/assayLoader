@@ -71,9 +71,9 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QPushButton" name="rawDataDir_btn">
+        <widget class="QPushButton" name="fileToPlateMap_btn">
          <property name="text">
-          <string>Raw data direcory</string>
+          <string>File to plate file</string>
          </property>
         </widget>
        </item>
@@ -93,7 +93,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="rawDataDir_lab">
+      <widget class="QLabel" name="fileToPlate_lab">
        <property name="text">
         <string>:</string>
        </property>
@@ -253,7 +253,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>81</x>
