@@ -3,7 +3,7 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QIntValidator, QBrush, QColor
 import openpyxl
 import csv
 from pathlib import Path
@@ -30,6 +30,7 @@ class SinglePointScreen(QMainWindow):
         
         self.dataColumn_eb.editingFinished.connect(self.checkDataColumn)
         self.fileToPlateMap_btn.clicked.connect(self.selectFileToPlateMap)
+        self.fileToPlateMap_btn.setDisabled(True)
         
         self.runQc_btn.setDisabled(True)
         self.runQc_btn.setEnabled(True)
@@ -88,6 +89,22 @@ class SinglePointScreen(QMainWindow):
         return saFiles
 
 
+    def updateRawdataStatus(self, sFile, sStatusMessage, sStatusState):
+
+        def color_row_red(row):
+            for col in range(self.inputFiles_tab.columnCount()):
+                item = self.inputFiles_tab.item(row-1, col)
+                item.setBackground(QBrush(QColor(255, 0, 0)))  # Set the background color to red
+
+        row_position = self.inputFiles_tab.rowCount()
+        if sStatusState == 'error':
+            color_row_red(row_position)
+        item = QTableWidgetItem(sStatusMessage)
+        print(sStatusMessage)
+        print(row_position)
+        self.inputFiles_tab.setItem(row_position-1, 1, item)
+
+        
     def addFileToTable(self, sFile):
         row_position = self.inputFiles_tab.rowCount()  # Get the current row count
         self.inputFiles_tab.insertRow(row_position)  # Insert a new row at the end
@@ -96,6 +113,8 @@ class SinglePointScreen(QMainWindow):
         statusItem = QTableWidgetItem("Unknown")
         self.inputFiles_tab.setItem(row_position, 0, fileItem)
         self.inputFiles_tab.setItem(row_position, 1, statusItem)
+        self.inputFiles_tab.scrollToItem(fileItem)
+        self.inputFiles_tab.resizeColumnsToContents()
         QApplication.processEvents()
 
 
@@ -122,7 +141,7 @@ class SinglePointScreen(QMainWindow):
             try:
                 slask = selected_row['Compound ID'][0]
             except:
-                print(f'Error, no platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
+                print(f'Warning, no platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
                 continue
             
             if selected_row['Compound ID'][0] == sPosCtrl:
@@ -166,6 +185,7 @@ class SinglePointScreen(QMainWindow):
                     iDataColPosition = saLine.index(sDataColumn)
                 except:
                     print(f'Error, data column {sDataColumn} not present in datafile {file}')
+                    self.updateRawdataStatus(file, f"Could not find column {sDataColumn} in file", 'error')
                 iWellColPosition = saLine.index('Well')
                 saDataLines = saLines[iLineNumber:]
                 iLineNumber = 0
@@ -224,6 +244,8 @@ class SinglePointScreen(QMainWindow):
             print(f"Selected file: {platemap}")
             self.platemapFile_lab.setText(os.path.basename(platemap))
             self.form_values['platemap_file'] = True
+            self.fileToPlateMap_btn.setEnabled(True)
+
         self.checkForm()
 
 
