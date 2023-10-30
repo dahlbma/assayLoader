@@ -66,7 +66,6 @@ class SinglePointScreen(QMainWindow):
 
 
     def checkForm(self):
-        #print(self.form_values)
         if all(self.form_values.values()):
             self.runQc_btn.setEnabled(True)
         else:
@@ -97,53 +96,103 @@ class SinglePointScreen(QMainWindow):
         statusItem = QTableWidgetItem("Unknown")
         self.inputFiles_tab.setItem(row_position, 0, fileItem)
         self.inputFiles_tab.setItem(row_position, 1, statusItem)
+        QApplication.processEvents()
 
 
-    def readPlateMap(sPlateId, dfPlatemap):
-        new_df = dfPlatemap[dfPlatemap.iloc[:, 0] == sPlateId]
+    def getPlateMapFromDf(self, sPlateId):
+        new_df = self.platemapDf[self.platemapDf['Platt ID'] == sPlateId]
+        #new_df = self.platemapDf[self.platemapDf.iloc[:, 0] == sPlateId]
         return new_df
 
+
+    def extractData(self, sPlate, saDataLines, iDataColPosition, iWellColPosition):
+        columns = ['plate', 'well', 'raw_data', 'type']
+        df = pd.DataFrame(columns=columns)
+        sPosCtrl = self.posCtrl_eb.text()
+        sNegCtrl = self.negCtrl_eb.text()
         
-    def getDataStart(self, file, sDataColumn):
+        dfPlatemap = self.getPlateMapFromDf(sPlate)
+        for line in saDataLines:
+            saLine = line.split(',')
+            sType = 'Data'
+
+            selected_row = dfPlatemap[dfPlatemap['Well'] == saLine[iWellColPosition]].copy()
+            selected_row = selected_row.reset_index(drop=True)
+
+            try:
+                slask = selected_row['Compound ID'][0]
+            except:
+                print(f'Error, no platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
+                continue
+            
+            if selected_row['Compound ID'][0] == sPosCtrl:
+                sType = 'Pos'
+            elif selected_row['Compound ID'][0] == sNegCtrl:
+                sType = 'Neg'
+            elif selected_row['Compound ID'][0].startswith('CBK'):
+                sType = 'Data'
+            else:
+                print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
+                continue
+
+            try:
+                raw_data = saLine[iDataColPosition]
+                well = saLine[iWellColPosition]
+            except:
+                return df
+            data = {'plate': sPlate,
+                    'well': well,
+                    'raw_data': raw_data,
+                    'type': sType}
+            df.loc[len(df.index)] = data
+        return df
+
+    
+    def digestPlate(self, sPlate, file, sDataColumn):
         saLines = file.readlines()
         iDataColPosition = None
         iWellColPosition = None
         saDataLines = None
         iNrOfCols = 0
         iLineNumber = 0
-        
+
+        # Skip all the lines in the start of the file, look for where the 'Well' appears
         for line in saLines:
             saLine = line.split(',')
             iLineNumber += 1
             if 'Well' in saLine:
                 iNrOfCols = len(saLine)
-                iDataColPosition = saLine.index(sDataColumn)
+                try:
+                    iDataColPosition = saLine.index(sDataColumn)
+                except:
+                    print(f'Error, data column {sDataColumn} not present in datafile {file}')
                 iWellColPosition = saLine.index('Well')
                 saDataLines = saLines[iLineNumber:]
                 iLineNumber = 0
                 break
 
+        # We did not find any datalines in this file, this is an error state.
+        # Here we should pop up a dialog and inform the user.
         if saDataLines == None:
-            return iDataColPosition, iWellColPosition, saDataLines
+            print(f'error, no Well found for plate {sPlate}')
+            return saDataLines, iDataColPosition, iWellColPosition
 
+        # Find the last data line and skip all lines below that line.
         for line in saDataLines:
             iLineNumber += 1
             saLine = line.split(',')
             if len(saLine) != iNrOfCols:
                 saDataLines = saDataLines[:iLineNumber-1]
-                ii = 0
-                for i in saDataLines:
-                    ii += 1
-                    print(ii, i)
-                quit()
             
-        return saLines[iLineNumber:], iDataColPosition, iWellColPosition
+        return saDataLines, iDataColPosition, iWellColPosition
 
 
     def selectFileToPlateMap(self):
         self.inputFiles_tab.setRowCount(0)
         
         file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")
+        if not file_path:
+            return
         df = pd.read_excel(file_path)
         self.fileToPlate_lab.setText(file_path)
         plate_file_dict = df.set_index('plate')['file'].to_dict()
@@ -151,17 +200,14 @@ class SinglePointScreen(QMainWindow):
         path_to_data_dir = os.path.dirname(file_path)
                 
         sFiles = ''
-        for row, (plate, sFile) in enumerate(plate_file_dict.items()):
+        for row, (sPlate, sFile) in enumerate(plate_file_dict.items()):
             self.addFileToTable(sFile)
             print(sFile)
 
             full_path = os.path.join(path_to_data_dir, sFile)
             with open(full_path, 'r') as file:
-                sDataLines = self.getDataStart(file, self.dataColumn_eb.text())
-                
-            print(self.dataColumn_eb.text())
-            print(sDataLines)
-            quit()
+                saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
+                dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
         
         self.form_values['raw_data_directory'] = True
         self.checkForm()
