@@ -9,8 +9,8 @@ import csv
 from pathlib import Path
 from instruments import parseEnvision
 import pandas as pd
-
-
+import subprocess
+from z_factor import *
 from assaylib import *
 
 class SinglePointScreen(QMainWindow):
@@ -33,10 +33,11 @@ class SinglePointScreen(QMainWindow):
         self.fileToPlateMap_btn.setDisabled(True)
         
         self.runQc_btn.setDisabled(True)
-        self.runQc_btn.setEnabled(True)
+        #self.runQc_btn.setEnabled(True)
         self.runQc_btn.clicked.connect(self.runQc)
 
         self.outputFile_eb.editingFinished.connect(self.checkDataColumn)
+        self.outputFile_eb.setText('screenQC.xlsx')
 
         self.posCtrl_eb.editingFinished.connect(self.checkDataColumn)
         self.posCtrl_eb.setText('CTRL')
@@ -52,8 +53,7 @@ class SinglePointScreen(QMainWindow):
         self.platemapDf = None
 
         self.fileToPlate_lab.setText('')
-        self.outputFile_lab.setText('')
-        self.generateQCinput_btn.setDisabled(True)
+        self.qcInputFile_lab.setText('')
 
         self.form_values = {
             "instrument": False,
@@ -71,7 +71,7 @@ class SinglePointScreen(QMainWindow):
             self.runQc_btn.setEnabled(True)
         else:
             self.runQc_btn.setDisabled(True)
-            self.runQc_btn.setEnabled(True)
+            #self.runQc_btn.setEnabled(True)
 
     def checkDataColumn(self):
         self.checkForm()
@@ -89,7 +89,7 @@ class SinglePointScreen(QMainWindow):
         return saFiles
 
 
-    def updateRawdataStatus(self, sFile, sStatusMessage, sStatusState):
+    def updateRawdataStatus(self, sStatusMessage, sStatusState):
 
         def color_row_red(row):
             for col in range(self.inputFiles_tab.columnCount()):
@@ -101,8 +101,8 @@ class SinglePointScreen(QMainWindow):
             color_row_red(row_position)
         item = QTableWidgetItem(sStatusMessage)
         print(sStatusMessage)
-        print(row_position)
         self.inputFiles_tab.setItem(row_position-1, 1, item)
+        self.inputFiles_tab.resizeColumnsToContents()
 
         
     def addFileToTable(self, sFile):
@@ -129,29 +129,42 @@ class SinglePointScreen(QMainWindow):
         df = pd.DataFrame(columns=columns)
         sPosCtrl = self.posCtrl_eb.text()
         sNegCtrl = self.negCtrl_eb.text()
+        iSkipped = 0
+        iPosCtrl = 0
+        iNegCtrl = 0
+        iData = 0
+        iNoPlatemapEntry = 0
         
         dfPlatemap = self.getPlateMapFromDf(sPlate)
         for line in saDataLines:
             saLine = line.split(',')
             sType = 'Data'
-
             selected_row = dfPlatemap[dfPlatemap['Well'] == saLine[iWellColPosition]].copy()
             selected_row = selected_row.reset_index(drop=True)
 
             try:
                 slask = selected_row['Compound ID'][0]
             except:
+                iNoPlatemapEntry += 1
                 print(f'Warning, no platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
                 continue
-            
+            try:
+                selected_row['Compound ID'][0].startswith('CBK')
+            except:
+                print(f'Warning,can not read {saLine[iWellColPosition]} in plate {sPlate}')
+                continue
             if selected_row['Compound ID'][0] == sPosCtrl:
                 sType = 'Pos'
+                iPosCtrl += 1
             elif selected_row['Compound ID'][0] == sNegCtrl:
                 sType = 'Neg'
+                iNegCtrl += 1
             elif selected_row['Compound ID'][0].startswith('CBK'):
                 sType = 'Data'
+                iData += 1
             else:
                 print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
+                iSkipped += 1
                 continue
 
             try:
@@ -164,6 +177,11 @@ class SinglePointScreen(QMainWindow):
                     'raw_data': raw_data,
                     'type': sType}
             df.loc[len(df.index)] = data
+        if iData == 0:
+            sStatus = 'error'
+        else:
+            sStatus = 'normal'
+        self.updateRawdataStatus(f'Data: {iData} PosCtrl: {iPosCtrl} NegCtrl: {iNegCtrl} Skipped: {iSkipped} NoPlateMap: {iNoPlatemapEntry}', sStatus)
         return df
 
     
@@ -185,7 +203,7 @@ class SinglePointScreen(QMainWindow):
                     iDataColPosition = saLine.index(sDataColumn)
                 except:
                     print(f'Error, data column {sDataColumn} not present in datafile {file}')
-                    self.updateRawdataStatus(file, f"Could not find column {sDataColumn} in file", 'error')
+                    self.updateRawdataStatus(f"Could not find column {sDataColumn} in file", 'error')
                 iWellColPosition = saLine.index('Well')
                 saDataLines = saLines[iLineNumber:]
                 iLineNumber = 0
@@ -214,12 +232,13 @@ class SinglePointScreen(QMainWindow):
         if not file_path:
             return
         df = pd.read_excel(file_path)
-        self.fileToPlate_lab.setText(file_path)
+        self.fileToPlate_lab.setText(os.path.basename(file_path))
         plate_file_dict = df.set_index('plate')['file'].to_dict()
 
         path_to_data_dir = os.path.dirname(file_path)
                 
         sFiles = ''
+        frames = []
         for row, (sPlate, sFile) in enumerate(plate_file_dict.items()):
             self.addFileToTable(sFile)
             print(sFile)
@@ -228,9 +247,14 @@ class SinglePointScreen(QMainWindow):
             with open(full_path, 'r') as file:
                 saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
                 dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
-        
+                frames.append(dfPlate)
+        resDf = pd.concat(frames)
+        resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
+        self.qcInputFile_lab.setText('preparedZinput.csv')
+        self.runQc_btn.setEnabled(True)
+
         self.form_values['raw_data_directory'] = True
-        self.checkForm()
+        #self.checkForm()
 
 
     def selectPlatemap(self):
@@ -259,7 +283,11 @@ class SinglePointScreen(QMainWindow):
 
     def runQc(self):
         print('running qc')
-        sFileToPlate = self.fileToPlate_lab.text()
-        saFiles = self.getInputFilesFromTab()
-        parseEnvision.generateIndata(sFileToPlate, saFiles)
+        sOutput = self.outputFile_eb.text()
+        calcQc("preparedZinput.csv", sOutput)
+        #subprocess.run(['open', sOutput], check=True)  # On macOS
+        #subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
+        subprocess.run(['xdg-open', sOutput], check=True) # Linux
+
+
 
