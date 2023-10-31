@@ -178,14 +178,14 @@ def plotMeanStd(values, stds, sHeader):
     return image_buffer
 
 
-def calcData(excelSettings, df, ws, heatMapWs):
+def calcData(excelSettings, df, ws, heatMapWs, iHitThreshold):
     columns = ['Plate', 'meanRaw', 'stdRaw', 'meanNegCtrl', 'stdNegCtrl', 'meanPosCtrl', 'stdPosCtrl', 'Z-factor']
     df_summary = pd.DataFrame(columns=columns)
     df_inhibition = pd.DataFrame(columns=['inhibition'])
     df_inhibition_calculated = pd.DataFrame(columns=df.columns)
 
     listOfDfPlates = list()
-
+    
     saPlates = list()
     for plate in df['plate'].unique():
         saPlates.append(plate)
@@ -215,7 +215,10 @@ def calcData(excelSettings, df, ws, heatMapWs):
 
     meanInhibition = df_inhibition['inhibition'].mean()
     stdInhibition = df_inhibition['inhibition'].std()
-    hitLimit = meanInhibition + 3*stdInhibition
+    if iHitThreshold == -1000:
+        hitLimit = meanInhibition + 3*stdInhibition
+    else:
+        hitLimit = float(iHitThreshold)
     minInhib = df_inhibition['inhibition'].min()
     maxInhib = df_inhibition['inhibition'].max()
 
@@ -457,8 +460,8 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
         if percentile < 10 or percentile > 90:
             cell.font = whiteFont
 
-def calcQc(input_file, output_file):
-
+def calcQc(input_file, output_file, iHitThreshold):
+        
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
 
@@ -501,7 +504,11 @@ def calcQc(input_file, output_file):
     # End Heat map data
     #########################################################
 
-    listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData = calcData(excelSettings, df, screenDataWs, heatMapsWs)
+    listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData = calcData(excelSettings,
+                                                                         df,
+                                                                         screenDataWs,
+                                                                         heatMapsWs,
+                                                                         iHitThreshold)
 
     for column in screenDataWs.columns:
         max_length = 0

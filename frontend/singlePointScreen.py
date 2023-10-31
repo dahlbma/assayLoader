@@ -284,7 +284,13 @@ class SinglePointScreen(QMainWindow):
     def runQc(self):
         print('running qc')
         sOutput = self.outputFile_eb.text()
-        calcQc("preparedZinput.csv", sOutput)
+        iHitThreshold = self.hitThreshold_eb.text()
+        try:
+            slask = int(iHitThreshold)
+        except:
+            iHitThreshold = float(-1000.0)
+        
+        calcQc("preparedZinput.csv", sOutput, iHitThreshold)
         #subprocess.run(['open', sOutput], check=True)  # On macOS
         subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
         #subprocess.run(['xdg-open', sOutput], check=True) # Linux
