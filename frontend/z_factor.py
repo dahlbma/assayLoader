@@ -16,8 +16,7 @@ from scipy.stats import percentileofscore
 
 def addPlotToSheet(ws, cell, plt):
     plt.seek(0)
-    #img = Image(plt)
-    img = Image('plot.png')
+    img = Image(plt)
     img.width = 1400  # Set the width of the image in Excel
     img.height = 700  # Set the height of the image in Excel
     ws.add_image(img, cell)
@@ -116,8 +115,7 @@ def plotZfactor(df):
     plt.xticks(range(1, len(df) +1, 2), fontsize=6)
 
     image_buffer = io.BytesIO()
-    #plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
-    plt.savefig("plot.png", format='png', dpi=300, bbox_inches='tight')
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
     plt.close()
     return image_buffer
 
@@ -140,8 +138,7 @@ def inhibitionScatterPlot(df_inhibition, hitLimit):
     plt.legend()
     
     image_buffer = io.BytesIO()
-    #plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
-    plt.savefig("plot.png", format='png', dpi=300, bbox_inches='tight')
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
     plt.close()
     return image_buffer
 
@@ -156,8 +153,7 @@ def plotInhibitionHistogram(df_inhibition):
     plt.title('Distribution of Inhibition')
 
     image_buffer = io.BytesIO()
-    #plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
-    plt.savefig("plot.png", format='png', dpi=300, bbox_inches='tight')
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
     plt.close()
     return image_buffer
 
@@ -177,8 +173,7 @@ def plotMeanStd(values, stds, sHeader):
     plt.grid()
 
     image_buffer = io.BytesIO()
-    #plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
-    plt.savefig("plot.png", format='png', dpi=300, bbox_inches='tight')
+    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
     plt.close()
     return image_buffer
 

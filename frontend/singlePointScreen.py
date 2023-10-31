@@ -286,8 +286,8 @@ class SinglePointScreen(QMainWindow):
         sOutput = self.outputFile_eb.text()
         calcQc("preparedZinput.csv", sOutput)
         #subprocess.run(['open', sOutput], check=True)  # On macOS
-        #subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
-        subprocess.run(['xdg-open', sOutput], check=True) # Linux
+        subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
+        #subprocess.run(['xdg-open', sOutput], check=True) # Linux
 
 
 
