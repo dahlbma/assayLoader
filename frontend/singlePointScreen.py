@@ -12,6 +12,10 @@ import pandas as pd
 import subprocess
 from z_factor import *
 from assaylib import *
+import platform
+
+# Get the operating system name
+os_name = platform.system()
 
 class SinglePointScreen(QMainWindow):
     def __init__(self, token, test):
@@ -291,9 +295,13 @@ class SinglePointScreen(QMainWindow):
             iHitThreshold = float(-1000.0)
         
         calcQc("preparedZinput.csv", sOutput, iHitThreshold)
-        #subprocess.run(['open', sOutput], check=True)  # On macOS
-        subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
-        #subprocess.run(['xdg-open', sOutput], check=True) # Linux
 
+
+        if os_name == "Windows":
+            subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
+        elif os_name == "Darwin":
+            subprocess.run(['open', sOutput], check=True)  # On macOS
+        elif os_name == "Linux":
+            subprocess.run(['xdg-open', sOutput], check=True) # Linux
 
 
