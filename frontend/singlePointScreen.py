@@ -105,19 +105,29 @@ class SinglePointScreen(QMainWindow):
         return saFiles
 
 
-    def updateRawdataStatus(self, sStatusMessage, sStatusState):
+    def updateRawdataStatus(self, sFile, sStatusMessage, sStatusState):
 
         def color_row_red(row):
             for col in range(self.inputFiles_tab.columnCount()):
                 item = self.inputFiles_tab.item(row-1, col)
                 item.setBackground(QBrush(QColor(255, 0, 0)))  # Set the background color to red
 
-        row_position = self.inputFiles_tab.rowCount()
+
+        row_position = -1
+        for row in range(self.inputFiles_tab.rowCount()):
+            item = self.inputFiles_tab.item(row, self.inputFiles_tab.horizontalHeader().logicalIndex(0))  # Assuming 'file' is in the first column (index 0)
+            if item is not None and item.text() == sFile:
+                row_position = row
+
+        if row_position == -1:
+            print(f'Error can not find {sFile}')
+            return
+        
         if sStatusState == 'error':
             color_row_red(row_position)
         item = QTableWidgetItem(sStatusMessage)
         print(sStatusMessage)
-        self.inputFiles_tab.setItem(row_position-1, 1, item)
+        self.inputFiles_tab.setItem(row_position, 1, item)
         self.inputFiles_tab.resizeColumnsToContents()
         self.inputFiles_tab.setColumnWidth(2, 0)
 
@@ -144,7 +154,7 @@ class SinglePointScreen(QMainWindow):
         return new_df
 
 
-    def extractData(self, sPlate, saDataLines, iDataColPosition, iWellColPosition):
+    def extractData(self, sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition):
         columns = ['plate', 'well', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
         sPosCtrl = self.posCtrl_eb.text()
@@ -202,7 +212,9 @@ class SinglePointScreen(QMainWindow):
             sStatus = 'error'
         else:
             sStatus = 'normal'
-        self.updateRawdataStatus(f'Data: {iData} PosCtrl: {iPosCtrl} NegCtrl: {iNegCtrl} Skipped: {iSkipped} NoPlateMap: {iNoPlatemapEntry}', sStatus)
+        self.updateRawdataStatus(sFile,
+                                 f'Data: {iData} PosCtrl: {iPosCtrl} NegCtrl: {iNegCtrl} Skipped: {iSkipped} NoPlateMap: {iNoPlatemapEntry}',
+                                 sStatus)
         return df
 
     
@@ -265,7 +277,7 @@ class SinglePointScreen(QMainWindow):
             full_path = os.path.join(path_to_data_dir, sFile)
             self.addFileToTable(sFile, full_path)
             print(sFile)
-
+        '''
             with open(full_path, 'r') as file:
                 saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
                 dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
@@ -273,6 +285,7 @@ class SinglePointScreen(QMainWindow):
         resDf = pd.concat(frames)
         resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
         self.qcInputFile_lab.setText('preparedZinput.csv')
+        '''
         self.generateQcInput_btn.setEnabled(True)
 
         self.form_values['raw_data_directory'] = True
@@ -312,7 +325,7 @@ class SinglePointScreen(QMainWindow):
 
             with open(full_path, 'r') as file:
                 saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
-                dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
+                dfPlate = self.extractData(sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition)
                 frames.append(dfPlate)
         resDf = pd.concat(frames)
         resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
@@ -320,6 +333,7 @@ class SinglePointScreen(QMainWindow):
         self.generateQcInput_btn.setEnabled(True)
 
         self.runQc_btn.setEnabled(True)
+
         
     def runQc(self):
         print('running qc')
@@ -331,7 +345,6 @@ class SinglePointScreen(QMainWindow):
             iHitThreshold = float(-1000.0)
         
         calcQc("preparedZinput.csv", sOutput, iHitThreshold)
-
 
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
