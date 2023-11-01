@@ -74,7 +74,7 @@ class SinglePointScreen(QMainWindow):
             #self.runQc_btn.setEnabled(True)
 
     def checkDataColumn(self):
-        self.checkForm()
+        #self.checkForm()
         # Read a csv file from the inputFiles_tab text box and see of the datacolumn in this eb is present
         pass
 
