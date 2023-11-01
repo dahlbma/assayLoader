@@ -26,6 +26,8 @@ class SinglePointScreen(QMainWindow):
         loadUi(resource_path("assets/sp.ui"), self)
 
         #self.inputFiles_tab.setReadOnly(True)
+        self.inputFiles_tab.setColumnWidth(2, 0)
+
 
         saInstruments = dbInterface.getInstruments(self.token)
         saInstruments = [""] + saInstruments
@@ -40,6 +42,9 @@ class SinglePointScreen(QMainWindow):
         #self.runQc_btn.setEnabled(True)
         self.runQc_btn.clicked.connect(self.runQc)
 
+        self.generateQcInput_btn.setDisabled(True)
+        self.generateQcInput_btn.clicked.connect(self.generateQcInput)
+        
         self.outputFile_eb.editingFinished.connect(self.checkDataColumn)
         self.outputFile_eb.setText('screenQC.xlsx')
 
@@ -54,8 +59,15 @@ class SinglePointScreen(QMainWindow):
         
         self.platemapFile_btn.clicked.connect(self.selectPlatemap)
         self.platemapFile_lab.setText('')
-        self.platemapDf = None
 
+        #############################################
+        ##### GLOBALS
+        self.platemapDf = None
+        self.plate_file_dict = None
+        self.fileToPlatemapFile = None
+        ##### END GLOBALS
+        #############################################
+        
         self.fileToPlate_lab.setText('')
         self.qcInputFile_lab.setText('')
 
@@ -107,18 +119,22 @@ class SinglePointScreen(QMainWindow):
         print(sStatusMessage)
         self.inputFiles_tab.setItem(row_position-1, 1, item)
         self.inputFiles_tab.resizeColumnsToContents()
+        self.inputFiles_tab.setColumnWidth(2, 0)
 
         
-    def addFileToTable(self, sFile):
+    def addFileToTable(self, sFile, full_path):
         row_position = self.inputFiles_tab.rowCount()  # Get the current row count
         self.inputFiles_tab.insertRow(row_position)  # Insert a new row at the end
 
         fileItem = QTableWidgetItem(sFile)
         statusItem = QTableWidgetItem("Unknown")
+        fullPathItem = QTableWidgetItem(full_path)
         self.inputFiles_tab.setItem(row_position, 0, fileItem)
         self.inputFiles_tab.setItem(row_position, 1, statusItem)
+        self.inputFiles_tab.setItem(row_position, 2, fullPathItem)
         self.inputFiles_tab.scrollToItem(fileItem)
         self.inputFiles_tab.resizeColumnsToContents()
+        self.inputFiles_tab.setColumnWidth(2, 0)
         QApplication.processEvents()
 
 
@@ -138,8 +154,9 @@ class SinglePointScreen(QMainWindow):
         iNegCtrl = 0
         iData = 0
         iNoPlatemapEntry = 0
-        
+
         dfPlatemap = self.getPlateMapFromDf(sPlate)
+
         for line in saDataLines:
             saLine = line.split(',')
             sType = 'Data'
@@ -235,19 +252,20 @@ class SinglePointScreen(QMainWindow):
         file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")
         if not file_path:
             return
+        self.fileToPlatemapFile = file_path
         df = pd.read_excel(file_path)
         self.fileToPlate_lab.setText(os.path.basename(file_path))
-        plate_file_dict = df.set_index('plate')['file'].to_dict()
+        self.plate_file_dict = df.set_index('plate')['file'].to_dict()
 
         path_to_data_dir = os.path.dirname(file_path)
-                
+        
         sFiles = ''
         frames = []
-        for row, (sPlate, sFile) in enumerate(plate_file_dict.items()):
-            self.addFileToTable(sFile)
+        for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
+            full_path = os.path.join(path_to_data_dir, sFile)
+            self.addFileToTable(sFile, full_path)
             print(sFile)
 
-            full_path = os.path.join(path_to_data_dir, sFile)
             with open(full_path, 'r') as file:
                 saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
                 dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
@@ -255,7 +273,7 @@ class SinglePointScreen(QMainWindow):
         resDf = pd.concat(frames)
         resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
         self.qcInputFile_lab.setText('preparedZinput.csv')
-        self.runQc_btn.setEnabled(True)
+        self.generateQcInput_btn.setEnabled(True)
 
         self.form_values['raw_data_directory'] = True
         #self.checkForm()
@@ -285,6 +303,24 @@ class SinglePointScreen(QMainWindow):
             #self.posCtrl_eb.setText()
             #self.negCtrl_eb.setText()
 
+    def generateQcInput(self):
+        frames = []
+        path_to_data_dir = os.path.dirname(self.fileToPlatemapFile)
+
+        for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
+            full_path = os.path.join(path_to_data_dir, sFile)
+
+            with open(full_path, 'r') as file:
+                saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
+                dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
+                frames.append(dfPlate)
+        resDf = pd.concat(frames)
+        resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
+        self.qcInputFile_lab.setText('preparedZinput.csv')
+        self.generateQcInput_btn.setEnabled(True)
+
+        self.runQc_btn.setEnabled(True)
+        
     def runQc(self):
         print('running qc')
         sOutput = self.outputFile_eb.text()
