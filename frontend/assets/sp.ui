@@ -87,11 +87,16 @@
          <string>Status</string>
         </property>
        </column>
+       <column>
+        <property name="text">
+         <string>fullPath</string>
+        </property>
+       </column>
       </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>52</x>
@@ -135,7 +140,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>52</x>
@@ -179,7 +184,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>570</x>
@@ -293,6 +298,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="generateQcInput_btn">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>190</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Generate input to QC</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
