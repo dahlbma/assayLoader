@@ -26,8 +26,6 @@ class SinglePointScreen(QMainWindow):
         loadUi(resource_path("assets/sp.ui"), self)
 
         #self.inputFiles_tab.setReadOnly(True)
-        self.inputFiles_tab.setColumnWidth(2, 0)
-
 
         saInstruments = dbInterface.getInstruments(self.token)
         saInstruments = [""] + saInstruments
@@ -107,15 +105,18 @@ class SinglePointScreen(QMainWindow):
 
     def updateRawdataStatus(self, sFile, sStatusMessage, sStatusState):
 
-        def color_row_red(row):
+        def color_row(row, sColor = "white"):
             for col in range(self.inputFiles_tab.columnCount()):
                 item = self.inputFiles_tab.item(row-1, col)
-                item.setBackground(QBrush(QColor(255, 0, 0)))  # Set the background color to red
-
+                if sColor == "red":
+                    item.setBackground(QBrush(QColor(255, 0, 0)))  # Set the background color to red
+                else:
+                    item.setBackground(QBrush(QColor(255, 255, 255)))  # Set the background color to rwhite
 
         row_position = -1
         for row in range(self.inputFiles_tab.rowCount()):
-            item = self.inputFiles_tab.item(row, self.inputFiles_tab.horizontalHeader().logicalIndex(0))  # Assuming 'file' is in the first column (index 0)
+            # Assuming 'file' is in the first column (index 0)
+            item = self.inputFiles_tab.item(row, self.inputFiles_tab.horizontalHeader().logicalIndex(0))
             if item is not None and item.text() == sFile:
                 row_position = row
 
@@ -124,12 +125,18 @@ class SinglePointScreen(QMainWindow):
             return
         
         if sStatusState == 'error':
-            color_row_red(row_position)
+            color_row(row_position + 1, "red")
+        else:
+            color_row(row_position + 1, "white")
         item = QTableWidgetItem(sStatusMessage)
         print(sStatusMessage)
         self.inputFiles_tab.setItem(row_position, 1, item)
         self.inputFiles_tab.resizeColumnsToContents()
-        self.inputFiles_tab.setColumnWidth(2, 0)
+
+        self.inputFiles_tab.scrollToItem(item)
+
+        
+        QApplication.processEvents()
 
         
     def addFileToTable(self, sFile, full_path):
@@ -138,13 +145,10 @@ class SinglePointScreen(QMainWindow):
 
         fileItem = QTableWidgetItem(sFile)
         statusItem = QTableWidgetItem("Unknown")
-        fullPathItem = QTableWidgetItem(full_path)
         self.inputFiles_tab.setItem(row_position, 0, fileItem)
         self.inputFiles_tab.setItem(row_position, 1, statusItem)
-        self.inputFiles_tab.setItem(row_position, 2, fullPathItem)
         self.inputFiles_tab.scrollToItem(fileItem)
         self.inputFiles_tab.resizeColumnsToContents()
-        self.inputFiles_tab.setColumnWidth(2, 0)
         QApplication.processEvents()
 
 
@@ -236,7 +240,8 @@ class SinglePointScreen(QMainWindow):
                     iDataColPosition = saLine.index(sDataColumn)
                 except:
                     print(f'Error, data column {sDataColumn} not present in datafile {file}')
-                    self.updateRawdataStatus(f"Could not find column {sDataColumn} in file", 'error')
+                    sFile = os.path.basename(file.name)
+                    self.updateRawdataStatus(sFile, f"Could not find column {sDataColumn} in file", 'error')
                 iWellColPosition = saLine.index('Well')
                 saDataLines = saLines[iLineNumber:]
                 iLineNumber = 0
