@@ -134,8 +134,6 @@ class SinglePointScreen(QMainWindow):
         self.inputFiles_tab.resizeColumnsToContents()
 
         self.inputFiles_tab.scrollToItem(item)
-
-        
         QApplication.processEvents()
 
         
