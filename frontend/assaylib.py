@@ -1,11 +1,11 @@
 import imp
-import sys, requests, json, os, subprocess, platform, shutil, datetime, traceback, logging, dbInterface, re
+import sys, requests, json, os, subprocess, platform, datetime, logging, dbInterface, re
 from unittest import result
-from PyQt5.QtGui import QImage, QPixmap
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidgetItem, QWidget
 from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
+from PyQt5 import sip
 
 def gotoSP(self):
     resize_window(self)
@@ -20,6 +20,8 @@ def gotoDR(self):
     self.window().widget(2).drPlateIdFile_btn.setFocus()
     return
 '''
+
+
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(int)

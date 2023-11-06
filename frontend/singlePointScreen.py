@@ -5,7 +5,6 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor
 import openpyxl
-import csv
 from pathlib import Path
 from instruments import parseEnvision
 import pandas as pd
