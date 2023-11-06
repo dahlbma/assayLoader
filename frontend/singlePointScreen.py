@@ -23,7 +23,8 @@ class SinglePointScreen(QMainWindow):
         self.token = token
         self.mod_name = "loader"
         logger = logging.getLogger(self.mod_name)
-        loadUi(resource_path("assets/sp.ui"), self)
+        #loadUi(resource_path("assets/sp.ui"), self)
+        loadUi(resource_path("assets/singlePointTab.ui"), self)
 
         #self.inputFiles_tab.setReadOnly(True)
 

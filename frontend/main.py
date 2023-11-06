@@ -4,7 +4,6 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtGui
-# from loaderlib import *
 from loginscreen import LoginScreen
 
 os_name = platform.system()
