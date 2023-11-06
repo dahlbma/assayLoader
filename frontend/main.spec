@@ -36,7 +36,7 @@ exe = EXE(
     splash, 
     splash.binaries,
     [],
-    name='ce',
+    name='al',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
