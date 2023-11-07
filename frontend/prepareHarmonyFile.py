@@ -1,6 +1,5 @@
 import re
-
-
+import os
 
 def number_to_alphabet(sRow):
     if 1 <= sRow <= 26:
@@ -10,11 +9,8 @@ def number_to_alphabet(sRow):
         return "Invalid input"
 
 
-
 def parseHarmonyFile(sDir, sFileName):
-    print(f'Parsing {sFileName}')
-    pattern = r'(\d+)\t(\d+)'
-    
+    pattern = r'(\d+)\t(\d+)'    
     saOutput = []
     iLine = 0
     try:
@@ -23,7 +19,6 @@ def parseHarmonyFile(sDir, sFileName):
             for line in lines:
                 iLine += 1
                 if line.startswith("Row\tColumn"):
-                    print(line)
                     saOutput.append(line.replace("Row\tColumn", 'Well'))
                     break
             iLinesAgain = 0
@@ -33,9 +28,7 @@ def parseHarmonyFile(sDir, sFileName):
                     number_list = line.split('\t')
                     sRow = number_to_alphabet(int(number_list[0]))
                     sColumn = str(f"{int(number_list[1]):02}")
-                    #f"{i:02}"
                     sWell = f'{sRow}{sColumn}'
-                    print(sWell)
                     output_string = re.sub(pattern, sWell, line, count=1)
                     saOutput.append(output_string)
 
@@ -44,13 +37,13 @@ def parseHarmonyFile(sDir, sFileName):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+    long_string = ''.join(saOutput)
 
-    long_string = ' '.join(saOutput)
-    #for line in saOutput:
-    #    print(line[:-1])
-
-    sOutFile = sDir + '/' + 'prepared_' + sFileName
+    sOutFile = os.path.join('/', sDir, 'prepared_' + sFileName)
+    
+    
     with open(sOutFile, 'w') as file:
         file.write(long_string)
+    print(f'Parsing {sFileName} into {sOutFile}')
 
 
