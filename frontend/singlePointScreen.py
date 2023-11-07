@@ -11,6 +11,7 @@ import pandas as pd
 import subprocess
 from z_factor import *
 from assaylib import *
+from prepareHarmonyFile import *
 import platform
 
 # Get the operating system name
@@ -25,6 +26,8 @@ class SinglePointScreen(QMainWindow):
         #loadUi(resource_path("assets/sp.ui"), self)
         loadUi(resource_path("assets/singlePointTab.ui"), self)
 
+        self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
+        
         #self.inputFiles_tab.setReadOnly(True)
 
         saInstruments = dbInterface.getInstruments(self.token)
@@ -37,7 +40,6 @@ class SinglePointScreen(QMainWindow):
         self.fileToPlateMap_btn.setDisabled(True)
         
         self.runQc_btn.setDisabled(True)
-        #self.runQc_btn.setEnabled(True)
         self.runQc_btn.clicked.connect(self.runQc)
 
         self.generateQcInput_btn.setDisabled(True)
@@ -80,6 +82,26 @@ class SinglePointScreen(QMainWindow):
         }
 
 
+    def prepareHarmonyFiles(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Excel File", "", "Excel Files (*.xlsx);;All Files (*)", options=options)
+
+        if file_path:
+            directory_path = os.path.dirname(file_path)
+            try:
+                df = pd.read_excel(file_path)
+                # Assuming 'plate' and 'file' are column names in the Excel file
+                data_dict = df[['plate', 'file']].to_dict(orient='records')
+            except Exception as e:
+                print(f"Error reading Excel file: {e}")
+                return
+
+            for item in data_dict:
+                parseHarmonyFile(directory_path, item['file'])
+            #for sPlate, sFileName in data_dict.items():
+            #    parseHarmonyFile(sFileName)
+
+        
     def checkForm(self):
         if all(self.form_values.values()):
             self.runQc_btn.setEnabled(True)
