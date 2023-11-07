@@ -13,6 +13,7 @@ def parseHarmonyFile(sDir, sFileName):
     pattern = r'(\d+)\t(\d+)'    
     saOutput = []
     iLine = 0
+    
     try:
         with open(sDir + '/' + sFileName, 'r') as file:
             lines = file.readlines()
@@ -39,11 +40,11 @@ def parseHarmonyFile(sDir, sFileName):
 
     long_string = ''.join(saOutput)
 
-    sOutFile = os.path.join('/', sDir, 'prepared_' + sFileName)
-    
+    sFile = 'prepared_' + sFileName
+    sOutFile = os.path.join('/', sDir, sFile)
     
     with open(sOutFile, 'w') as file:
         file.write(long_string)
     print(f'Parsing {sFileName} into {sOutFile}')
-
+    return sFile
 

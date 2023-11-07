@@ -84,7 +84,15 @@ class SinglePointScreen(QMainWindow):
 
     def prepareHarmonyFiles(self):
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open Excel File", "", "Excel Files (*.xlsx);;All Files (*)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self,
+                                                   "Open Excel File", "",
+                                                   "Excel Files (*.xlsx);;All Files (*)",
+                                                   options=options)
+
+        data = {
+            "plate": [],
+            "file": []
+        }
 
         if file_path:
             directory_path = os.path.dirname(file_path)
@@ -95,11 +103,18 @@ class SinglePointScreen(QMainWindow):
             except Exception as e:
                 print(f"Error reading Excel file: {e}")
                 return
-
+            
             for item in data_dict:
-                parseHarmonyFile(directory_path, item['file'])
-            #for sPlate, sFileName in data_dict.items():
-            #    parseHarmonyFile(sFileName)
+                preparedFile = parseHarmonyFile(directory_path, item['file'])
+                data['plate'].append(item['plate'])
+                data['file'].append(preparedFile)
+
+            sOutFile = os.path.join('/', directory_path, "prepared_plate_to_file.xlsx")
+
+            df = pd.DataFrame(data)
+            excel_writer = pd.ExcelWriter(sOutFile, engine="xlsxwriter")
+            df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
+            excel_writer.close()
 
         
     def checkForm(self):
