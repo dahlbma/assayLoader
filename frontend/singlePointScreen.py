@@ -90,6 +90,30 @@ class SinglePointScreen(QMainWindow):
     def printPlates(self):
         print("Print labels")
 
+        text = self.plates_te.toPlainText()
+        lines = text.split('\n')
+
+        # Use a regular expression to filter lines with 'P' followed by 5 digits
+        filtered_lines = [line for line in lines if re.match(r'^[pP]\d{5}$', line)]
+
+        # Set the filtered lines back to the QTextEdit
+        self.plates_te.setPlainText('\n'.join(filtered_lines))
+        iPlates = self.nrOfPlateCopies_sp.value()
+
+        if iPlates == 0:
+            return
+
+        plateIndex = [x for x in range(1, iPlates + 1)]
+        platesText = self.plates_te.toPlainText()
+        saPlates = platesText.split('\n')
+        for sPlate in saPlates:
+            for i in plateIndex:
+                sCurrentPlate = sPlate.upper() + '_' + str(i)
+                dbInterface.printPlateLabel(self.token, sCurrentPlate)
+                print(sCurrentPlate)
+                
+        
+
         
     def prepareHarmonyFiles(self):
         options = QFileDialog.Options()

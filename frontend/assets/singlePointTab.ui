@@ -181,7 +181,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="nrOfPlateCopies"/>
+                      <widget class="QSpinBox" name="nrOfPlateCopies_sp"/>
                      </item>
                     </layout>
                    </item>

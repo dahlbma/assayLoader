@@ -146,3 +146,14 @@ def getInstrument(token, sInstrument):
         print(res)
         return res, True
 
+
+def printPlateLabel(token, sPlate):
+    r = requests.get(f'{baseUrl}printPlateLabel/{sPlate}',
+            headers={'token':token})
+
+    if r.status_code != 200:
+        return False
+    else:
+        #res = r.content.decode()
+        return True
+
