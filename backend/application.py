@@ -313,3 +313,25 @@ class GetInstrument(tornado.web.RequestHandler):
         res = res_to_json(tRes, cur)
         
         self.finish(json.dumps(res))
+
+
+@jwtauth
+class PrintPlateLabel(tornado.web.RequestHandler):
+    def get(self, sPlate):
+        sPlate = sPlate.upper()
+        s = f'''
+^XA
+^MMT
+^PW400
+^LL0064
+^LS0
+^BY2,3,43^FT47,48^BCN,,Y,N
+^FD>:P>{sPlate}^FS
+^FT277,48^A0N,22,25^FH\^FD{sPlate}^FS
+^PQ1,0,1,Y^XZ
+'''
+        f = open('/tmp/file.txt','w')
+        f.write(s)
+        f.close()
+        os.system("lp -h homer.scilifelab.se:631 -d CBCS-GK420t_plates  /tmp/file.txt")
+

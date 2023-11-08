@@ -127,6 +127,7 @@ def make_app():
         (r"/getAssayTypes", application.GetAssayTypes),
         (r"/getInstruments", application.GetInstruments),
         (r"/getInstrument/(?P<sInstrument>[^\/]+)", application.GetInstrument),
+        (r"/printPlateLabel/(?P<sPlate>[^\/]+)", application.PrintPlateLabel),
         (r"/getDetectionTypes", application.GetDetectionTypes),
         (r"/getOperators", application.GetOperators),
         (r"/getProjects", application.GetProjects),
