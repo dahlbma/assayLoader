@@ -244,11 +244,11 @@ class UploadBinary(tornado.web.RequestHandler):
 
         bin_file = ""
         if os_name == 'Windows':
-            bin_file = f'dist/{os_name}/ce.exe'
+            bin_file = f'dist/{os_name}/al.exe'
         elif os_name == 'Linux':
-            bin_file = f'dist/{os_name}/ce'
+            bin_file = f'dist/{os_name}/al'
         elif os_name == 'Darwin':
-            bin_file = f'dist/{os_name}/ce'
+            bin_file = f'dist/{os_name}/al'
         else:
             # unsupported OS
             self.set_status(500)

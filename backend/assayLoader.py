@@ -115,7 +115,7 @@ class GetAssayLoaderBinary(tornado.web.RequestHandler):
         except Exception as e:
             logging.error(f"Did not send bin file, error: {str(e)}")
 
-           
+
 def make_app():
     return tornado.web.Application([
         (r"/getDatabase", application.GetDatabase),
