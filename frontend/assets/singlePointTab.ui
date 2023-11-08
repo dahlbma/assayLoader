@@ -150,18 +150,82 @@
              <attribute name="title">
               <string>Prep data</string>
              </attribute>
-             <widget class="QPushButton" name="prepareHarmony_btn">
+             <widget class="QWidget" name="layoutWidget">
               <property name="geometry">
                <rect>
-                <x>110</x>
-                <y>90</y>
-                <width>191</width>
-                <height>23</height>
+                <x>590</x>
+                <y>110</y>
+                <width>231</width>
+                <height>381</height>
                </rect>
               </property>
-              <property name="text">
-               <string>Harmony file to plate file</string>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Print plate labels for multi reaction steps</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_2">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_11">
+                     <item>
+                      <widget class="QLabel" name="label_10">
+                       <property name="text">
+                        <string>Reaction steps</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSpinBox" name="nrOfPlateCopies"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <widget class="QTextEdit" name="plates_te"/>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="printPlates_btn">
+                   <property name="text">
+                    <string>Print labels</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="layoutWidget_2">
+              <property name="geometry">
+               <rect>
+                <x>120</x>
+                <y>110</y>
+                <width>131</width>
+                <height>44</height>
+               </rect>
               </property>
+              <layout class="QVBoxLayout" name="verticalLayout_7">
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Convert Harmony datafiles</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="prepareHarmony_btn">
+                 <property name="text">
+                  <string>Harmony file to plate file</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </widget>
             <widget class="QWidget" name="sp_qc_data_tab">
@@ -1177,7 +1241,7 @@
      <x>0</x>
      <y>0</y>
      <width>1421</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

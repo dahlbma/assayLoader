@@ -26,9 +26,14 @@ class SinglePointScreen(QMainWindow):
         #loadUi(resource_path("assets/sp.ui"), self)
         loadUi(resource_path("assets/singlePointTab.ui"), self)
 
+        #####################
+        # Prep data screen
         self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
-        
-        #self.inputFiles_tab.setReadOnly(True)
+        #self.nrOfPlateCopies_sp           # spin box
+        #self.plates_te.                   # text edit
+        self.printPlates_btn.clicked.connect(self.printPlates)
+        # Prep data screen end
+        #####################
 
         saInstruments = dbInterface.getInstruments(self.token)
         saInstruments = [""] + saInstruments
@@ -82,6 +87,10 @@ class SinglePointScreen(QMainWindow):
         }
 
 
+    def printPlates(self):
+        print("Print labels")
+
+        
     def prepareHarmonyFiles(self):
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self,
