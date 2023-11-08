@@ -20,7 +20,7 @@ def parseHarmonyFile(sDir, sFileName):
             for line in lines:
                 iLine += 1
                 if line.startswith("Row\tColumn"):
-                    saOutput.append(line.replace("Row\tColumn", 'Well'))
+                    saOutput.append(line.replace("Row\tColumn", 'Well').replace('\t', ','))
                     break
             iLinesAgain = 0
             for line in lines:
@@ -31,7 +31,7 @@ def parseHarmonyFile(sDir, sFileName):
                     sColumn = str(f"{int(number_list[1]):02}")
                     sWell = f'{sRow}{sColumn}'
                     output_string = re.sub(pattern, sWell, line, count=1)
-                    saOutput.append(output_string)
+                    saOutput.append(output_string.replace('\t', ','))
 
     except FileNotFoundError:
         print(f"File '{sFileName}' not found.")
