@@ -22,7 +22,7 @@ class SinglePointScreen(QMainWindow):
         super(SinglePointScreen, self).__init__()
         self.token = token
         self.mod_name = "loader"
-        logger = logging.getLogger(self.mod_name)
+        self.logger = logging.getLogger(self.mod_name)
         #loadUi(resource_path("assets/sp.ui"), self)
         loadUi(resource_path("assets/singlePointTab.ui"), self)
 
@@ -85,7 +85,7 @@ class SinglePointScreen(QMainWindow):
             "neg_ctrl": False,
             "qc_output_file": False
         }
-
+        print('In b', file=sys.stderr)
 
     def printPlates(self):
         print("Print labels")
@@ -250,7 +250,7 @@ class SinglePointScreen(QMainWindow):
                 slask = selected_row['Compound ID'][0]
             except:
                 iNoPlatemapEntry += 1
-                print(f'Warning, no platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
+                self.logger.warning(f'No platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
                 continue
             try:
                 selected_row['Compound ID'][0].startswith('CBK')
@@ -267,7 +267,7 @@ class SinglePointScreen(QMainWindow):
                 sType = 'Data'
                 iData += 1
             else:
-                logging.getLogger(self.mod_name).info(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}")
+                self.logger.warning(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}")
                 #print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
                 iSkipped += 1
                 continue

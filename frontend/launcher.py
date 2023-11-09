@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow
 from PyQt5 import QtGui
 import shutil
+import subprocess
 
 from assaylib import *
 
@@ -116,7 +117,16 @@ class LauncherScreen(QDialog):
             os_name = platform.system()
             exec_path = ex_paths[os_name]
             if os_name == 'Windows':
-                subprocess.Popen([f'{exec_path}'], shell=True)
+                
+                process = subprocess.Popen([f'{exec_path}'],
+                                           shell=True,
+                                           stdout=sys.stdout,
+                                           stderr=sys.stdout,
+                                           text=True)
+
+                powershell_executable = "powershell.exe"
+                powershell_command = r'Start-Process -FilePath "D:\chemreg\assayLoader\frontend\al.exe"'
+                
             elif os_name == 'Linux':
                 subprocess.Popen([f'./{exec_path}'], shell=True)
             elif os_name == 'Darwin':
