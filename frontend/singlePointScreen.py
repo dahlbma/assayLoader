@@ -110,7 +110,8 @@ class SinglePointScreen(QMainWindow):
             for i in plateIndex:
                 sCurrentPlate = sPlate.upper() + '_' + str(i)
                 dbInterface.printPlateLabel(self.token, sCurrentPlate)
-                print(sCurrentPlate)
+                logging.getLogger(self.mod_name).info(f"Print label {sCurrentPlate}")
+                #print(sCurrentPlate)
                 
         
 
@@ -266,7 +267,8 @@ class SinglePointScreen(QMainWindow):
                 sType = 'Data'
                 iData += 1
             else:
-                print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
+                logging.getLogger(self.mod_name).info(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}")
+                #print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
                 iSkipped += 1
                 continue
 
