@@ -11,7 +11,7 @@ With `frontend` as current directory, build the main assayLoader executable with
     <pyinstaller> main.spec
     py -3.8 -m PyInstaller main.spec
 
-which will build the main executable `ce`(.exe)
+which will build the main executable `al`(.exe)
 </br>or
 
     <pyinstaller> launcher.spec
