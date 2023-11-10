@@ -40,7 +40,7 @@ class SinglePointScreen(QMainWindow):
         self.instrument_cb.addItems(saInstruments)
         self.instrument_cb.currentIndexChanged.connect(self.instrumentChange)
         
-        self.dataColumn_eb.editingFinished.connect(self.checkDataColumn)
+        #self.dataColumn_cb.editingFinished.connect(self.checkDataColumn)
         self.fileToPlateMap_btn.clicked.connect(self.selectFileToPlateMap)
         self.fileToPlateMap_btn.setDisabled(True)
         
@@ -389,9 +389,9 @@ class SinglePointScreen(QMainWindow):
         sInstrument = self.instrument_cb.currentText()
         saInstrument, iAllOk = dbInterface.getInstrument(self.token, sInstrument)
         if iAllOk:
-            self.dataColumn_eb.setText(saInstrument[0]['data_col'])
-            #self.posCtrl_eb.setText()
-            #self.negCtrl_eb.setText()
+            #self.dataColumn_cb.setText(saInstrument[0]['data_col'])
+            pass
+
 
     def generateQcInput(self):
         frames = []
@@ -401,7 +401,7 @@ class SinglePointScreen(QMainWindow):
             full_path = os.path.join(path_to_data_dir, sFile)
 
             with open(full_path, 'r') as file:
-                saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
+                saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_cb.currentText())
                 dfPlate = self.extractData(sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition)
                 frames.append(dfPlate)
         resDf = pd.concat(frames)

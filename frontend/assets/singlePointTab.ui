@@ -144,7 +144,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="sp_prep_data_tab">
              <property name="sizePolicy">
@@ -387,7 +387,7 @@
                               </widget>
                              </item>
                              <item>
-                              <widget class="QLineEdit" name="dataColumn_eb"/>
+                              <widget class="QComboBox" name="dataColumn_cb"/>
                              </item>
                              <item>
                               <spacer name="horizontalSpacer_20">
