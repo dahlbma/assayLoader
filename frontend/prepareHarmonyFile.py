@@ -9,7 +9,7 @@ def number_to_alphabet(sRow):
         return "Invalid input"
 
 
-def parseHarmonyFile(sDir, sFileName):
+def parseHarmonyFile(self, sDir, sFileName):
     pattern = r'(\d+)\t(\d+)'    
     saOutput = []
     iLine = 0
@@ -34,9 +34,9 @@ def parseHarmonyFile(sDir, sFileName):
                     saOutput.append(output_string.replace('\t', ','))
 
     except FileNotFoundError:
-        print(f"File '{sFileName}' not found.")
+        self.printPrepLog(f"File '{sFileName}' not found.", 'error')
     except Exception as e:
-        print(f"An error occurred: {e}")
+        self.printPrepLog(f"An error occurred: {e}", 'error')
 
     long_string = ''.join(saOutput)
 
@@ -45,6 +45,6 @@ def parseHarmonyFile(sDir, sFileName):
     
     with open(sOutFile, 'w') as file:
         file.write(long_string)
-    print(f'Parsing {sFileName} into {sOutFile}')
+    self.printPrepLog(f'Parsing {sFileName} into {sFile}')
     return sFile
 

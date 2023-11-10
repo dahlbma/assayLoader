@@ -143,7 +143,6 @@ def getInstrument(token, sInstrument):
     else:
         res = r.content.decode()
         res = json.loads(res)
-        print(res)
         return res, True
 
 

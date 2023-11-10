@@ -85,11 +85,18 @@ class SinglePointScreen(QMainWindow):
             "neg_ctrl": False,
             "qc_output_file": False
         }
-        print('In b', file=sys.stderr)
 
+    def printPrepLog(self, s, type=''):
+        if type == 'error':
+            s = f'''<font color='red'>{s}</font>'''
+        self.prepLog_te.append(s)
+    
+    def printQcLog(self, s, type=''):
+        if type == 'error':
+            s = f'''<font color='red'>{s}</font>'''
+        self.qcLog_te.append(s)
+        
     def printPlates(self):
-        print("Print labels")
-
         text = self.plates_te.toPlainText()
         lines = text.split('\n')
 
@@ -110,10 +117,7 @@ class SinglePointScreen(QMainWindow):
             for i in plateIndex:
                 sCurrentPlate = sPlate.upper() + '_' + str(i)
                 dbInterface.printPlateLabel(self.token, sCurrentPlate)
-                logging.getLogger(self.mod_name).info(f"Print label {sCurrentPlate}")
-                #print(sCurrentPlate)
-                
-        
+                self.printPrepLog(f"Print label {sCurrentPlate}")
 
         
     def prepareHarmonyFiles(self):
@@ -135,18 +139,18 @@ class SinglePointScreen(QMainWindow):
                 # Assuming 'plate' and 'file' are column names in the Excel file
                 data_dict = df[['plate', 'file']].to_dict(orient='records')
             except Exception as e:
-                print(f"Error reading Excel file: {e}")
+                self.printPrepLog(f"Error reading Excel file: {e}", 'error')
                 return
             
             for item in data_dict:
-                preparedFile = parseHarmonyFile(directory_path, item['file'])
+                preparedFile = parseHarmonyFile(self, directory_path, item['file'])
                 data['plate'].append(item['plate'])
                 data['file'].append(preparedFile)
 
             sOutFile = os.path.join('/', directory_path, "prepared_plate_to_file.xlsx")
-
+            self.printPrepLog(f'Created {sOutFile}')
             df = pd.DataFrame(data)
-            excel_writer = pd.ExcelWriter(sOutFile, engine="xlsxwriter")
+            excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
             df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
             excel_writer.close()
 
@@ -192,7 +196,7 @@ class SinglePointScreen(QMainWindow):
                 row_position = row
 
         if row_position == -1:
-            print(f'Error can not find {sFile}')
+            self.printQcLog(f'Error can not find {sFile}', 'error')
             return
         
         if sStatusState == 'error':
@@ -200,7 +204,7 @@ class SinglePointScreen(QMainWindow):
         else:
             color_row(row_position + 1, "white")
         item = QTableWidgetItem(sStatusMessage)
-        print(sStatusMessage)
+        #self.printQcLog(sStatusMessage, sStatusState)
         self.inputFiles_tab.setItem(row_position, 1, item)
         self.inputFiles_tab.resizeColumnsToContents()
 
@@ -250,12 +254,12 @@ class SinglePointScreen(QMainWindow):
                 slask = selected_row['Compound ID'][0]
             except:
                 iNoPlatemapEntry += 1
-                self.logger.warning(f'No platemap entry for well {saLine[iWellColPosition]} in plate {sPlate}')
+                self.printQcLog(f'No platemap for well {saLine[iWellColPosition]} in plate {sPlate}', 'error')
                 continue
             try:
                 selected_row['Compound ID'][0].startswith('CBK')
             except:
-                print(f'Warning,can not read {saLine[iWellColPosition]} in plate {sPlate}')
+                self.printQcLog(f'''Warning, can't read {saLine[iWellColPosition]} in plate {sPlate}''', 'error')
                 continue
             if selected_row['Compound ID'][0] == sPosCtrl:
                 sType = 'Pos'
@@ -267,8 +271,7 @@ class SinglePointScreen(QMainWindow):
                 sType = 'Data'
                 iData += 1
             else:
-                self.logger.warning(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}")
-                #print(f'''Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}''')
+                self.printQcLog(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}", 'error')
                 iSkipped += 1
                 continue
 
@@ -309,7 +312,7 @@ class SinglePointScreen(QMainWindow):
                 try:
                     iDataColPosition = saLine.index(sDataColumn)
                 except:
-                    print(f'Error, data column {sDataColumn} not present in datafile {file}')
+                    self.printQcLog(f'Data column {sDataColumn} not present in datafile {file}', 'error')
                     sFile = os.path.basename(file.name)
                     self.updateRawdataStatus(sFile, f"Could not find column {sDataColumn} in file", 'error')
                 iWellColPosition = saLine.index('Well')
@@ -320,7 +323,7 @@ class SinglePointScreen(QMainWindow):
         # We did not find any datalines in this file, this is an error state.
         # Here we should pop up a dialog and inform the user.
         if saDataLines == None:
-            print(f'error, no Well found for plate {sPlate}')
+            self.printQcLog(f'No Well found for plate {sPlate}', 'error')
             return saDataLines, iDataColPosition, iWellColPosition
 
         # Find the last data line and skip all lines below that line.
@@ -351,7 +354,7 @@ class SinglePointScreen(QMainWindow):
         for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
             full_path = os.path.join(path_to_data_dir, sFile)
             self.addFileToTable(sFile, full_path)
-            print(sFile)
+            self.printQcLog(sFile)
         '''
             with open(full_path, 'r') as file:
                 saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
@@ -364,7 +367,6 @@ class SinglePointScreen(QMainWindow):
         self.generateQcInput_btn.setEnabled(True)
 
         self.form_values['raw_data_directory'] = True
-        #self.checkForm()
 
 
     def selectPlatemap(self):
@@ -375,7 +377,7 @@ class SinglePointScreen(QMainWindow):
 
         if platemap:
             self.platemapDf = pd.read_excel(platemap)
-            print(f"Selected file: {platemap}")
+            self.printQcLog(f"Selected file: {platemap}")
             self.platemapFile_lab.setText(os.path.basename(platemap))
             self.form_values['platemap_file'] = True
             self.fileToPlateMap_btn.setEnabled(True)
@@ -411,7 +413,7 @@ class SinglePointScreen(QMainWindow):
 
         
     def runQc(self):
-        print('running qc')
+        self.printQcLog('running QC')
         sOutput = self.outputFile_eb.text()
         iHitThreshold = self.hitThreshold_eb.text()
         try:
@@ -419,7 +421,7 @@ class SinglePointScreen(QMainWindow):
         except:
             iHitThreshold = float(-1000.0)
         
-        calcQc("preparedZinput.csv", sOutput, iHitThreshold)
+        calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
 
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows

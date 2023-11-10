@@ -10,7 +10,7 @@ from openpyxl.drawing.image import Image
 from openpyxl.styles import NamedStyle, PatternFill, Alignment, Border, Side, Font
 import io
 from scipy.stats import percentileofscore
-
+from PyQt5.QtWidgets import QApplication
 
 # 1536-well plate (32 rows and 48 columns) would span from well "A01" to well "AF48".
 
@@ -432,12 +432,8 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
     try:
         plateDf['ptile'] = plateDf['ptile'].astype(int)
     except Exception as e:
-        print(plateDf)
-        print(plateDf.iloc[118])
-        print(plateDf.iloc[119])
-        quit()
         # Catch the exception and print the error message
-        print(f"An error occurred: {e}")
+        self.printQcLog(f"An error occurred: {e}", 'error')
 
     for _, row in plateDf.iterrows():
         well = row['well']
@@ -460,11 +456,14 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
         if percentile < 10 or percentile > 90:
             cell.font = whiteFont
 
-def calcQc(input_file, output_file, iHitThreshold):
+def calcQc(self, input_file, output_file, iHitThreshold):
         
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
+    self.printQcLog(f"Reading input")
+    QApplication.processEvents()
 
+    
     # Generate the gradient from white to red in 10 steps
     #gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#AF0000", num_steps=24)
     gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#C0504D", num_steps=34)
@@ -509,7 +508,9 @@ def calcQc(input_file, output_file, iHitThreshold):
                                                                          screenDataWs,
                                                                          heatMapsWs,
                                                                          iHitThreshold)
-
+    self.printQcLog(f"Calculating all means and std")
+    QApplication.processEvents()
+    
     for column in screenDataWs.columns:
         max_length = 0
         column_letter = column[0].column_letter  # Get the column letter
@@ -531,7 +532,9 @@ def calcQc(input_file, output_file, iHitThreshold):
     for plateDf in listOfPlatesDf:
         # Call the function to create the thick border
         plate = plateDf.iloc[0]['plate']
-        print(f"Plate {plate}")
+        self.printQcLog(f"Plate {plate}")
+        QApplication.processEvents()
+
         iRow = start_row + ((iPlate) * iPlateRows)
     
         start_cell = start_col + str(iRow)
@@ -603,6 +606,9 @@ def calcQc(input_file, output_file, iHitThreshold):
     mean_values = df[df['type'] == 'Data'].groupby(df['well'].str[0])['raw_data'].mean()
     df_mean_row = mean_values.to_frame()
     #######
+
+    self.printQcLog(f"Generate Excel file")
+    QApplication.processEvents()
 
     addColumnOfDataToSheet(screenDataWs, "Average", start_cell, df_mean_row, 'raw_data')
 
