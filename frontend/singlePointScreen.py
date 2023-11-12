@@ -1,6 +1,6 @@
 import re, sys, os, logging, glob
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor
@@ -23,7 +23,6 @@ class SinglePointScreen(QMainWindow):
         self.token = token
         self.mod_name = "loader"
         self.logger = logging.getLogger(self.mod_name)
-        #loadUi(resource_path("assets/sp.ui"), self)
         loadUi(resource_path("assets/singlePointTab.ui"), self)
 
         #####################
@@ -35,6 +34,8 @@ class SinglePointScreen(QMainWindow):
         # Prep data screen end
         #####################
 
+        self.dataColumn_cb.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
         saInstruments = dbInterface.getInstruments(self.token)
         saInstruments = [""] + saInstruments
         self.instrument_cb.addItems(saInstruments)
@@ -294,6 +295,19 @@ class SinglePointScreen(QMainWindow):
                                  sStatus)
         return df
 
+
+    def findDataColumns(self, sFileName):
+        with open(sFileName, 'r') as sFile:
+            saLines = sFile.readlines()
+            # Skip all the lines in the start of the file, look for where the 'Well' appears
+            for line in saLines:
+                saLine = line.split(',')
+                if 'Well' in saLine:
+                    return saLine
+
+        # This is an error
+        return None
+        
     
     def digestPlate(self, sPlate, file, sDataColumn):
         saLines = file.readlines()
@@ -351,22 +365,20 @@ class SinglePointScreen(QMainWindow):
         
         sFiles = ''
         frames = []
+        full_path = ''
         for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
             full_path = os.path.join(path_to_data_dir, sFile)
             self.addFileToTable(sFile, full_path)
             self.printQcLog(sFile)
-        '''
-            with open(full_path, 'r') as file:
-                saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_eb.text())
-                dfPlate = self.extractData(sPlate, saDataLines, iDataColPosition, iWellColPosition)
-                frames.append(dfPlate)
-        resDf = pd.concat(frames)
-        resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
-        self.qcInputFile_lab.setText('preparedZinput.csv')
-        '''
-        self.generateQcInput_btn.setEnabled(True)
+        saDataColumns = self.findDataColumns(full_path)
 
-        self.form_values['raw_data_directory'] = True
+        if saDataColumns != None:
+            self.dataColumn_cb.addItems(saDataColumns)
+            self.generateQcInput_btn.setEnabled(True)
+            self.form_values['raw_data_directory'] = True
+        else:
+            self.printQcLog(f'''Can't find any data linies in file {full_path}''', 'error')
+            
 
 
     def selectPlatemap(self):
