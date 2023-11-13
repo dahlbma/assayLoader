@@ -121,13 +121,7 @@ class SinglePointScreen(QMainWindow):
                 self.printPrepLog(f"Print label {sCurrentPlate}")
 
         
-    def prepareHarmonyFiles(self):
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self,
-                                                   "Open Excel File", "",
-                                                   "Excel Files (*.xlsx);;All Files (*)",
-                                                   options=options)
-
+    def prepareHarmonyFiles(self, file_path):
         data = {
             "plate": [],
             "file": []
@@ -154,21 +148,22 @@ class SinglePointScreen(QMainWindow):
             excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
             df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
             excel_writer.close()
+            return sOutFile
 
-        
+
     def checkForm(self):
         if all(self.form_values.values()):
             self.runQc_btn.setEnabled(True)
         else:
             self.runQc_btn.setDisabled(True)
-            #self.runQc_btn.setEnabled(True)
+
 
     def checkDataColumn(self):
         #self.checkForm()
         # Read a csv file from the inputFiles_tab text box and see of the datacolumn in this eb is present
         pass
 
-    
+
     def getInputFilesFromTab(self):
         saFiles = []
 
@@ -227,7 +222,11 @@ class SinglePointScreen(QMainWindow):
 
 
     def getPlateMapFromDf(self, sPlateId):
-        new_df = self.platemapDf[self.platemapDf['Platt ID'] == sPlateId]
+        try:
+            new_df = self.platemapDf[self.platemapDf['Platt ID'] == sPlateId]
+        except:
+            self.printQcLog(f'''Can't find plate {sPlateId} in platemap file''', 'error')
+            return None
         #new_df = self.platemapDf[self.platemapDf.iloc[:, 0] == sPlateId]
         return new_df
 
@@ -272,7 +271,7 @@ class SinglePointScreen(QMainWindow):
                 sType = 'Data'
                 iData += 1
             else:
-                self.printQcLog(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]}", 'error')
+                self.printQcLog(f"Skipping well {selected_row['Well'][0]} with compound_id = {selected_row['Compound ID'][0]} in plate {sPlate}", 'error')
                 iSkipped += 1
                 continue
 
@@ -356,12 +355,17 @@ class SinglePointScreen(QMainWindow):
         file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")
         if not file_path:
             return
+
+        path_to_data_dir = os.path.dirname(file_path)
+
+        # If the instrument is Harmony we need to prepare the rawdata files.
+        if self.instrument_cb.currentText() == 'Harmony':
+            file_path = self.prepareHarmonyFiles(file_path)
+        
         self.fileToPlatemapFile = file_path
         df = pd.read_excel(file_path)
         self.fileToPlate_lab.setText(os.path.basename(file_path))
         self.plate_file_dict = df.set_index('plate')['file'].to_dict()
-
-        path_to_data_dir = os.path.dirname(file_path)
         
         sFiles = ''
         frames = []
@@ -373,12 +377,12 @@ class SinglePointScreen(QMainWindow):
         saDataColumns = self.findDataColumns(full_path)
 
         if saDataColumns != None:
+            self.dataColumn_cb.clear()
             self.dataColumn_cb.addItems(saDataColumns)
             self.generateQcInput_btn.setEnabled(True)
             self.form_values['raw_data_directory'] = True
         else:
-            self.printQcLog(f'''Can't find any data linies in file {full_path}''', 'error')
-            
+            self.printQcLog(f'''Can't find any data lines in file {full_path}''', 'error')
 
 
     def selectPlatemap(self):
@@ -389,6 +393,18 @@ class SinglePointScreen(QMainWindow):
 
         if platemap:
             self.platemapDf = pd.read_excel(platemap)
+            platemapColumns = self.platemapDf.columns.tolist()
+            iCol = 0
+            if len(platemapColumns) < 4:
+                self.printQcLog('Platemap has wrong format, to few columns', 'error')
+                return
+            saColOrder = ['Platt ID', 'Well', 'Compound ID', 'Batch nr']
+            for sCol in saColOrder:
+                if platemapColumns[iCol] != sCol:
+                    print(platemapColumns[iCol], sCol)
+                    self.printQcLog(f'Platemap has wrong columns, looking for columns in this order {saColOrder}', 'error')
+                    return
+                iCol += 1
             self.printQcLog(f"Selected file: {platemap}")
             self.platemapFile_lab.setText(os.path.basename(platemap))
             self.form_values['platemap_file'] = True
@@ -413,10 +429,33 @@ class SinglePointScreen(QMainWindow):
             full_path = os.path.join(path_to_data_dir, sFile)
 
             with open(full_path, 'r') as file:
-                saDataLines, iDataColPosition, iWellColPosition = self.digestPlate(sPlate, file, self.dataColumn_cb.currentText())
-                dfPlate = self.extractData(sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition)
+                (saDataLines,
+                 iDataColPosition,
+                 iWellColPosition) = self.digestPlate(sPlate,
+                                                      file,
+                                                      self.dataColumn_cb.currentText())
+                dfPlate = self.extractData(sFile,
+                                           sPlate,
+                                           saDataLines,
+                                           iDataColPosition,
+                                           iWellColPosition)
                 frames.append(dfPlate)
         resDf = pd.concat(frames)
+
+        def is_numerical(column):
+            try:
+                pd.to_numeric(column, errors='raise')
+                return True
+            except (ValueError, TypeError):
+                return False
+
+        # Verify 'raw_data' column is numerical
+        if 'raw_data' in resDf.columns and is_numerical(resDf['raw_data']):
+            pass
+        else:
+            self.printQcLog(f"The 'raw_data' column is not entirely numerical, did you coose the correct 'Raw data column'?'", 'error')
+            return
+        
         resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
         self.qcInputFile_lab.setText('preparedZinput.csv')
         self.generateQcInput_btn.setEnabled(True)
