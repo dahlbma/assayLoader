@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1411</width>
-    <height>920</height>
+    <width>1414</width>
+    <height>918</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -998,7 +998,7 @@
                         <item>
                          <widget class="QLabel" name="label_7">
                           <property name="text">
-                           <string>Hit Threshold</string>
+                           <string>Comment</string>
                           </property>
                           <property name="alignment">
                            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1019,9 +1019,9 @@
                          </spacer>
                         </item>
                         <item>
-                         <widget class="QLineEdit" name="hit_trsh_eb">
+                         <widget class="QLineEdit" name="comment_eb">
                           <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                            </sizepolicy>
@@ -1233,23 +1233,96 @@
                 </layout>
                </widget>
               </item>
-              <item row="0" column="1">
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="1" column="0" colspan="2">
                <layout class="QGridLayout" name="gridLayout_6">
                 <item row="0" column="0">
-                 <widget class="QTableWidget" name="sp_table"/>
+                 <widget class="QTableWidget" name="sp_table">
+                  <column>
+                   <property name="text">
+                    <string>New Column</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>batch_id</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>New Column</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>poject</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>target</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>plate_id</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>well</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>assay_type</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>detection_type</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>concentration</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>inhibition</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>activation</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>hit</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>hit_treshold</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>experiment_date</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>operator</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>comment</string>
+                   </property>
+                  </column>
+                 </widget>
                 </item>
                 <item row="1" column="0">
                  <layout class="QGridLayout" name="gridLayout_8">
@@ -1301,8 +1374,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1411</width>
-     <height>22</height>
+     <width>1414</width>
+     <height>23</height>
     </rect>
    </property>
   </widget>
