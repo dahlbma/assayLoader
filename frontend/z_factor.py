@@ -178,7 +178,7 @@ def plotMeanStd(values, stds, sHeader):
     return image_buffer
 
 
-def calcData(excelSettings, df, ws, heatMapWs, iHitThreshold):
+def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold):
     columns = ['Plate', 'meanRaw', 'stdRaw', 'meanNegCtrl', 'stdNegCtrl', 'meanPosCtrl', 'stdPosCtrl', 'Z-factor']
     df_summary = pd.DataFrame(columns=columns)
     df_inhibition = pd.DataFrame(columns=['inhibition'])
@@ -188,6 +188,8 @@ def calcData(excelSettings, df, ws, heatMapWs, iHitThreshold):
     
     saPlates = list()
     for plate in df['plate'].unique():
+        self.printQcLog(f"Reading plate {plate}")
+
         saPlates.append(plate)
         plate_df = df[df['plate'] == plate]
         (df_plate,
@@ -461,8 +463,6 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
     self.printQcLog(f"Reading input")
-    QApplication.processEvents()
-
     
     # Generate the gradient from white to red in 10 steps
     #gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#AF0000", num_steps=24)
@@ -503,14 +503,15 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     # End Heat map data
     #########################################################
 
-    listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData = calcData(excelSettings,
+    self.printQcLog(f"Calculating all means and std")
+    listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData = calcData(self,
+                                                                         excelSettings,
                                                                          df,
                                                                          screenDataWs,
                                                                          heatMapsWs,
                                                                          iHitThreshold)
-    self.printQcLog(f"Calculating all means and std")
-    QApplication.processEvents()
-    
+    self.printQcLog(f"All data read")
+
     for column in screenDataWs.columns:
         max_length = 0
         column_letter = column[0].column_letter  # Get the column letter
@@ -532,8 +533,7 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     for plateDf in listOfPlatesDf:
         # Call the function to create the thick border
         plate = plateDf.iloc[0]['plate']
-        self.printQcLog(f"Plate {plate}")
-        QApplication.processEvents()
+        self.printQcLog(f"Calculating stats for {plate}")
 
         iRow = start_row + ((iPlate) * iPlateRows)
     
@@ -584,10 +584,7 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     create_plate_frame(screenDataWs, 'Well Avg', "", start_cell, num_columns, num_rows)
     populate_plate_data(excelSettings, screenDataWs, 1, df_avg_well, start_cell, 'avgDataValue', lDebug=True)
 
-
     self.printQcLog(f"Generate Excel file")
-    QApplication.processEvents()
-
 
     ##
     ######################################################
@@ -597,3 +594,4 @@ def calcQc(self, input_file, output_file, iHitThreshold):
 
     wb.save(excel_file_path)
 
+    return dfCalcData

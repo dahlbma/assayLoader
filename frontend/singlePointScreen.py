@@ -116,11 +116,13 @@ class SinglePointScreen(QMainWindow):
         if type == 'error':
             s = f'''<font color='red'>{s}</font>'''
         self.prepLog_te.append(s)
+        QApplication.processEvents()
     
     def printQcLog(self, s, type=''):
         if type == 'error':
             s = f'''<font color='red'>{s}</font>'''
         self.qcLog_te.append(s)
+        QApplication.processEvents()
         
     def printPlates(self):
         text = self.plates_te.toPlainText()
@@ -492,6 +494,22 @@ class SinglePointScreen(QMainWindow):
 
         self.runQc_btn.setEnabled(True)
 
+
+    def populate_table(self, dataframe, column_name):
+        # Clear existing items in the table
+        self.sp_table.clear()
+
+        # Set the number of rows
+        self.sp_table.setRowCount(dataframe.shape[0])
+
+        # Populate the specified column of the table with data from the DataFrame
+        for row_index, row_data in dataframe.iterrows():
+            item = QTableWidgetItem(str(row_data[column_name]))
+            self.sp_table.setItem(row_index, 0, item)  # Assuming the column is the first column (column index 0)
+
+        # Set the column count to 1
+        self.sp_table.setColumnCount(1)
+
         
     def runQc(self):
         self.printQcLog('running QC')
@@ -502,9 +520,9 @@ class SinglePointScreen(QMainWindow):
         except:
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        dQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
+        dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
         QApplication.restoreOverrideCursor()
-
+        print(dfQcData)
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
         elif os_name == "Darwin":
@@ -513,3 +531,4 @@ class SinglePointScreen(QMainWindow):
             subprocess.run(['xdg-open', sOutput], check=True) # Linux
 
 
+        self.populate_table(dfQcData, 'compound_id')
