@@ -550,7 +550,7 @@ def calcQc(self, input_file, output_file, iHitThreshold):
 
     ######################################################
     ##  Hit count per well
-    start_cell = 'S240'
+    start_cell = 'N240'
     create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
     create_plate_frame(screenDataWs, 'Hit Distr', "", start_cell, num_columns, num_rows)
     populate_plate_data(excelSettings, screenDataWs, 1, df_hit_distr, start_cell, 'count')
@@ -579,50 +579,15 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     df_avg_well = df_avg_well.reindex(columns=["well", "avgDataValue"])
     df_avg_well["well"] = all_wells
 
-    start_cell = 'S266'
+    start_cell = 'N266'
     create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
     create_plate_frame(screenDataWs, 'Well Avg', "", start_cell, num_columns, num_rows)
     populate_plate_data(excelSettings, screenDataWs, 1, df_avg_well, start_cell, 'avgDataValue', lDebug=True)
 
-    # Calculate average for each column (1-24)
-    avg_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgDataValue": "mean"}).reset_index()
-    avg_columns.rename(columns={"avgDataValue": "Avg_Column"}, inplace=True)
-    start_cell = "S285"
-    addLineOfDataToSheet(screenDataWs, "Average", start_cell, avg_columns, 'Avg_Column')
-
-    # Calculate standard deviation for each column (1-24)
-    std_columns = df_avg_well.groupby(df_avg_well["well"].str[1:]).agg({"avgDataValue": "std"}).reset_index()
-    std_columns.rename(columns={"avgDataValue": "Std_Column"}, inplace=True)
-    start_cell = "S286"
-    addLineOfDataToSheet(screenDataWs, "STD", start_cell, std_columns, 'Std_Column')
-
-    # Calculate average for each row (A-P)
-    avg_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgDataValue": "mean"}).reset_index()
-    avg_rows.rename(columns={"avgDataValue": "Avg_Row"}, inplace=True)
-    start_cell = "AR268"
-        
-    #######
-    # Calculate the mean values of 'raw_data' for each row 'A' to 'P', this does not work for 1536 plates
-    mean_values = df[df['type'] == 'Data'].groupby(df['well'].str[0])['raw_data'].mean()
-    df_mean_row = mean_values.to_frame()
-    #######
 
     self.printQcLog(f"Generate Excel file")
     QApplication.processEvents()
 
-    addColumnOfDataToSheet(screenDataWs, "Average", start_cell, df_mean_row, 'raw_data')
-
-    # Calculate standard deviation for each row (A-P)
-    std_rows = df_avg_well.groupby(df_avg_well["well"].str[0]).agg({"avgDataValue": "std"}).reset_index()
-    std_rows.rename(columns={"avgDataValue": "Std_Row"}, inplace=True)
-    start_cell = "AS268"
-
-    std_values = df[df['type'] == 'Data'].groupby(df['well'].str[0])['raw_data'].std()
-    df_std_row = std_values.to_frame()
-        
-    ####
-
-    addColumnOfDataToSheet(screenDataWs, "STD", start_cell, df_std_row, 'raw_data')
 
     ##
     ######################################################

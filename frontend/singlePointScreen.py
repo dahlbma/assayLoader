@@ -451,6 +451,7 @@ class SinglePointScreen(QMainWindow):
     def generateQcInput(self):
         frames = []
         path_to_data_dir = os.path.dirname(self.fileToPlatemapFile)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
 
         for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
             full_path = os.path.join(path_to_data_dir, sFile)
@@ -481,11 +482,13 @@ class SinglePointScreen(QMainWindow):
             pass
         else:
             self.printQcLog(f"The 'raw_data' column is not entirely numerical, did you coose the correct 'Raw data column'?'", 'error')
+            QApplication.restoreOverrideCursor()
             return
         
         resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
         self.qcInputFile_lab.setText('preparedZinput.csv')
         self.generateQcInput_btn.setEnabled(True)
+        QApplication.restoreOverrideCursor()
 
         self.runQc_btn.setEnabled(True)
 
@@ -498,8 +501,9 @@ class SinglePointScreen(QMainWindow):
             slask = int(iHitThreshold)
         except:
             iHitThreshold = float(-1000.0)
-        
-        calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        dQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
+        QApplication.restoreOverrideCursor()
 
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
