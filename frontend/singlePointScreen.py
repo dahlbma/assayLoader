@@ -1,7 +1,7 @@
 import re, sys, os, logging, glob
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
+from PyQt5.QtCore import Qt, QDate
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor
 import openpyxl
@@ -35,7 +35,7 @@ class SinglePointScreen(QMainWindow):
         #####################
 
         self.dataColumn_cb.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        
+
         saInstruments = dbInterface.getInstruments(self.token)
         saInstruments = [""] + saInstruments
         self.instrument_cb.addItems(saInstruments)
@@ -77,6 +77,8 @@ class SinglePointScreen(QMainWindow):
         self.fileToPlate_lab.setText('')
         self.qcInputFile_lab.setText('')
 
+        self.populateScreenData()
+        
         self.form_values = {
             "instrument": False,
             "raw_data_column": False,
@@ -87,6 +89,29 @@ class SinglePointScreen(QMainWindow):
             "qc_output_file": False
         }
 
+
+    def populateScreenData(self):
+        saProjects = dbInterface.getProjects(self.token)
+        self.project_cb.addItems(saProjects)
+
+        saOperators = dbInterface.getOperators(self.token)
+        self.operator_cb.addItems(saOperators)
+
+        saTargets = dbInterface.getTargets(self.token)
+        self.target_cb.addItems(saTargets)
+
+        saAssayType = dbInterface.getAssayTypes(self.token)
+        self.assayType_cb.addItems(saAssayType)
+
+        saDetectionType = dbInterface.getDetectionTypes(self.token)
+        self.detectionType_cb.addItems(saDetectionType)
+
+        #saScreenType = dbInterface.getScreenTypes(self.token)
+        #self.screenType_cb.addItems(saScreenType)
+
+        self.testDate.setDate(QDate.currentDate())
+        
+        
     def printPrepLog(self, s, type=''):
         if type == 'error':
             s = f'''<font color='red'>{s}</font>'''
@@ -232,7 +257,7 @@ class SinglePointScreen(QMainWindow):
 
 
     def extractData(self, sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition):
-        columns = ['plate', 'well', 'raw_data', 'type']
+        columns = ['plate', 'well', 'compound_id', 'batch_id', 'raw_data', 'type']
         df = pd.DataFrame(columns=columns)
         sPosCtrl = self.posCtrl_eb.text()
         sNegCtrl = self.negCtrl_eb.text()
@@ -282,6 +307,8 @@ class SinglePointScreen(QMainWindow):
                 return df
             data = {'plate': sPlate,
                     'well': well,
+                    'compound_id': selected_row['Compound ID'][0],
+                    'batch_id': selected_row['Batch nr'][0],
                     'raw_data': raw_data,
                     'type': sType}
             df.loc[len(df.index)] = data

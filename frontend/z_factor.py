@@ -234,11 +234,11 @@ def calcData(excelSettings, df, ws, heatMapWs, iHitThreshold):
     for row in dataframe_to_rows(df_inhibition_calculated, index=False, header=True):
         ws.append(row)
     
-    ws['I1'] = ' Hit limit: {:.2f}'.format(hitLimit)
-    ws['I2'] = ' Min inhib: {:.2f}'.format(minInhib)
-    ws['I3'] = ' Max inhib: {:.2f}'.format(maxInhib)
-    ws['I4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
-    ws['I5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
+    ws['K1'] = ' Hit limit: {:.2f}'.format(hitLimit)
+    ws['K2'] = ' Min inhib: {:.2f}'.format(minInhib)
+    ws['K3'] = ' Max inhib: {:.2f}'.format(maxInhib)
+    ws['K4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
+    ws['K5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
 
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     negPlt = plotMeanStd(df_summary['meanNegCtrl'], df_summary['stdNegCtrl'], 'NegCtrl')
@@ -247,14 +247,14 @@ def calcData(excelSettings, df, ws, heatMapWs, iHitThreshold):
     inhibitionHistogramPlt = plotInhibitionHistogram(df_inhibition)
     inhibitionScatterPlt = inhibitionScatterPlot(df_inhibition_calculated, hitLimit)
     
-    addPlotToSheet(ws, 'S1', inhibPlt)
-    addPlotToSheet(ws, 'S40', negPlt)
-    addPlotToSheet(ws, 'S80', posPlt)
-    addPlotToSheet(ws, 'S120', inhibitionHistogramPlt)
-    addPlotToSheet(ws, 'S160', inhibitionScatterPlt)
-    addPlotToSheet(ws, 'S200', zFactorPlt)
+    addPlotToSheet(ws, 'U1', inhibPlt)
+    addPlotToSheet(ws, 'U40', negPlt)
+    addPlotToSheet(ws, 'U80', posPlt)
+    addPlotToSheet(ws, 'U120', inhibitionHistogramPlt)
+    addPlotToSheet(ws, 'U160', inhibitionScatterPlt)
+    addPlotToSheet(ws, 'U200', zFactorPlt)
     
-    start_column = 'J'
+    start_column = 'L'
     #light_red_3_fill = PatternFill(start_color="FF5050", end_color="FF5050", fill_type="solid")
     light_red_3_fill = PatternFill(start_color="11FF5050", end_color="11FF5050", fill_type="solid")
     # Convert the DataFrame to rows and write them to the Excel sheet
@@ -627,8 +627,8 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     ##
     ######################################################
 
-    setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='I1', end_cell='I5')
-    setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='J1', end_cell='Q' + str(len(listOfPlatesDf) + 1))
+    setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='K1', end_cell='K5')
+    setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='L1', end_cell='S' + str(len(listOfPlatesDf) + 1))
 
     wb.save(excel_file_path)
 

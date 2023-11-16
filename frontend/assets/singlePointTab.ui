@@ -897,7 +897,7 @@
                          </spacer>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="det_type_cb">
+                         <widget class="QComboBox" name="detectionType_cb">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                             <horstretch>0</horstretch>
@@ -1141,7 +1141,7 @@
                          </spacer>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="assay_type_cb">
+                         <widget class="QComboBox" name="assayType_cb">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                             <horstretch>0</horstretch>
@@ -1239,7 +1239,7 @@
                  <widget class="QTableWidget" name="sp_table">
                   <column>
                    <property name="text">
-                    <string>New Column</string>
+                    <string>compound_id</string>
                    </property>
                   </column>
                   <column>
@@ -1249,7 +1249,7 @@
                   </column>
                   <column>
                    <property name="text">
-                    <string>New Column</string>
+                    <string>target</string>
                    </property>
                   </column>
                   <column>
@@ -1339,17 +1339,24 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="0" column="3">
+                  <item row="0" column="4">
                    <widget class="QPushButton" name="saveData_btn">
                     <property name="text">
                      <string>Save to DB</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
+                  <item row="0" column="2">
                    <widget class="QPushButton" name="loadAssayFile_btn">
                     <property name="text">
                      <string>Read from file</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QPushButton" name="updateGrid_btn">
+                    <property name="text">
+                     <string>Update grid</string>
                     </property>
                    </widget>
                   </item>
@@ -1375,7 +1382,7 @@
      <x>0</x>
      <y>0</y>
      <width>1414</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
