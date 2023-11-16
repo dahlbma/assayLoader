@@ -92,9 +92,10 @@ def calculatePlateData(df, plate, ws):
 
     pos3SD = 3 * stdPosCtrl
     neg3SD = 3 * stdNegCtrl
-
-    Z = 1 - (pos3SD + neg3SD)/abs(meanPosCtrl - meanNegCtrl)
-    
+    try:
+        Z = 1 - (pos3SD + neg3SD)/abs(meanPosCtrl - meanNegCtrl)
+    except:
+        return False
     condition = (df['type'] == 'Neg') | (df['type'] == 'Pos')
     df['inhibition'] = np.where(condition, None, 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)))
 

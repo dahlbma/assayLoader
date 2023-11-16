@@ -50,7 +50,7 @@ class SinglePointScreen(QMainWindow):
 
         self.generateQcInput_btn.setDisabled(True)
         self.generateQcInput_btn.clicked.connect(self.generateQcInput)
-        
+
         self.outputFile_eb.editingFinished.connect(self.checkDataColumn)
         self.outputFile_eb.setText('screenQC.xlsx')
 
@@ -495,20 +495,41 @@ class SinglePointScreen(QMainWindow):
         self.runQc_btn.setEnabled(True)
 
 
-    def populate_table(self, dataframe, column_name):
-        # Clear existing items in the table
-        self.sp_table.clear()
+    def populate_table(self, dataframe, column_name, insertRows=False):
+        def insertRow(iNrOfRows, iNrOfCols):
+            print(f'Adding {iNrOfCols} columns, rows {iNrOfRows}')
+            data = [''] * iNrOfCols
+            #row_position = self.sp_table.rowCount()
+            #self.sp_table.insertRow(row_position)
+            
+            iLocalCol = 0
+            for iRow in range(iNrOfRows):
+                self.sp_table.insertRow(iRow)
+                for iCol in range(iNrOfCols):
+                    item = QTableWidgetItem(str(''))
+                    self.sp_table.setItem(iRow, iCol, item)
 
-        # Set the number of rows
-        self.sp_table.setRowCount(dataframe.shape[0])
+        iCol = -1
+        print(f'Column count: {range(self.sp_table.columnCount())}')
+        if insertRows:
+            insertRow(dataframe.shape[0], self.sp_table.columnCount())
 
+        for col in range(self.sp_table.columnCount()):
+            header_item = self.sp_table.horizontalHeaderItem(col)
+            header_text = header_item.text()
+
+            if header_text == column_name:
+                iCol = col
+                break
+
+        if iCol == -1:
+            self.printQcLog(f'Couldnt find column {column_name}', 'error')
+            return
+        
         # Populate the specified column of the table with data from the DataFrame
         for row_index, row_data in dataframe.iterrows():
             item = QTableWidgetItem(str(row_data[column_name]))
-            self.sp_table.setItem(row_index, 0, item)  # Assuming the column is the first column (column index 0)
-
-        # Set the column count to 1
-        self.sp_table.setColumnCount(1)
+            self.sp_table.setItem(row_index, iCol, item)
 
         
     def runQc(self):
@@ -522,7 +543,6 @@ class SinglePointScreen(QMainWindow):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
         QApplication.restoreOverrideCursor()
-        print(dfQcData)
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
         elif os_name == "Darwin":
@@ -531,4 +551,9 @@ class SinglePointScreen(QMainWindow):
             subprocess.run(['xdg-open', sOutput], check=True) # Linux
 
 
-        self.populate_table(dfQcData, 'compound_id')
+        self.populate_table(dfQcData, 'compound_id', insertRows=True)
+        self.populate_table(dfQcData, 'batch_id')
+        self.populate_table(dfQcData, 'inhibition')
+        self.populate_table(dfQcData, 'hit')
+        self.populate_table(dfQcData, 'plate')
+        self.populate_table(dfQcData, 'well')
