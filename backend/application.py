@@ -139,8 +139,7 @@ class GetProjects(tornado.web.RequestHandler):
 @jwtauth
 class GetTargets(tornado.web.RequestHandler):
     def get(self):
-        assayDB = getDatabase(self)
-        sSql = f'select distinct(target) target from {assayDB}.lcb_sp'
+        sSql = f'select target_id from hive.target_details order by target_id'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
