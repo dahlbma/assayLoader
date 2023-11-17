@@ -1,9 +1,10 @@
 import re, sys, os, logging, glob
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
-from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtCore import Qt, QDate, QUrl
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import openpyxl
 from pathlib import Path
 from instruments import parseEnvision
@@ -33,6 +34,10 @@ class SinglePointScreen(QMainWindow):
         self.printPlates_btn.clicked.connect(self.printPlates)
         # Prep data screen end
         #####################
+
+        current_directory = os.getcwd()
+        self.media_player = QMediaPlayer()
+        #self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(f'{current_directory}/beep-07a.wav')))
 
         self.dataColumn_cb.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -78,6 +83,7 @@ class SinglePointScreen(QMainWindow):
         self.qcInputFile_lab.setText('')
 
         self.populateScreenData()
+        self.updateGrid_btn.clicked.connect(self.updateGrid)
         
         self.form_values = {
             "instrument": False,
@@ -89,7 +95,40 @@ class SinglePointScreen(QMainWindow):
             "qc_output_file": False
         }
 
+    def findColumnNumber(self, sCol):
+        iCol = -1
+        for col in range(self.sp_table.columnCount()):
+            header_item = self.sp_table.horizontalHeaderItem(col)
+            header_text = header_item.text()
 
+            if header_text == sCol:
+                iCol = col
+                break
+        return iCol
+        
+    def populateColumn(self, sCol, sValue):        
+        iNrRows = self.sp_table.rowCount()
+        iCol = self.findColumnNumber(sCol)
+
+        iRow_index = 0
+        for iRow_index in range(iNrRows):
+            item = QTableWidgetItem(str(sValue))
+            self.sp_table.setItem(iRow_index, iCol, item)
+
+        
+    def updateGrid(self):
+        self.populateColumn('project', self.project_cb.currentText())
+        self.populateColumn('operator', self.operator_cb.currentText())
+        self.populateColumn('target', self.target_cb.currentText())
+        self.populateColumn('assay_type', self.assayType_cb.currentText())
+        self.populateColumn('detection_type', self.detectionType_cb.currentText())
+        testDate = self.testDate.date()
+        sDate = testDate.toString("yyyy-MM-dd") 
+        self.populateColumn('experiment_date', sDate)
+        self.populateColumn('comment', self.comment_eb.text())
+        self.populateColumn('eln', self.eln_eb.text())
+       
+        
     def populateScreenData(self):
         saProjects = dbInterface.getProjects(self.token)
         self.project_cb.addItems(saProjects)
@@ -118,9 +157,14 @@ class SinglePointScreen(QMainWindow):
         self.prepLog_te.append(s)
         QApplication.processEvents()
     
-    def printQcLog(self, s, type=''):
+    def printQcLog(self, s, type='', beep=False):
         if type == 'error':
             s = f'''<font color='red'>{s}</font>'''
+            if beep:
+                current_directory = os.getcwd()
+                self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(f'{current_directory}/beep-07a.wav')))
+                self.media_player.play()
+
         self.qcLog_te.append(s)
         QApplication.processEvents()
         
@@ -303,9 +347,10 @@ class SinglePointScreen(QMainWindow):
                 continue
 
             try:
-                raw_data = saLine[iDataColPosition]
+                raw_data = float(saLine[iDataColPosition])
                 well = saLine[iWellColPosition]
             except:
+                self.printQcLog(f'The raw data column is not numeric', 'error', beep=True)
                 return df
             data = {'plate': sPlate,
                     'well': well,
@@ -478,12 +523,15 @@ class SinglePointScreen(QMainWindow):
                 return True
             except (ValueError, TypeError):
                 return False
-
-        # Verify 'raw_data' column is numerical
-        if 'raw_data' in resDf.columns and is_numerical(resDf['raw_data']):
+        
+        mean_value = resDf['raw_data'].mean()
+        median_value = resDf['raw_data'].median()
+        std_deviation = resDf['raw_data'].std()
+        
+        if 'raw_data' in resDf.columns and is_numerical(resDf['raw_data']) and std_deviation != 0.0:
             pass
         else:
-            self.printQcLog(f"The 'raw_data' column is not entirely numerical, did you coose the correct 'Raw data column'?'", 'error')
+            self.printQcLog(f"Can't do statistics on 'raw_data', did you choose the correct 'Raw data column'?'", 'error', beep=True)
             QApplication.restoreOverrideCursor()
             return
         
@@ -496,12 +544,8 @@ class SinglePointScreen(QMainWindow):
 
 
     def populate_table(self, dataframe, column_name, insertRows=False):
+
         def insertRow(iNrOfRows, iNrOfCols):
-            print(f'Adding {iNrOfCols} columns, rows {iNrOfRows}')
-            data = [''] * iNrOfCols
-            #row_position = self.sp_table.rowCount()
-            #self.sp_table.insertRow(row_position)
-            
             iLocalCol = 0
             for iRow in range(iNrOfRows):
                 self.sp_table.insertRow(iRow)
@@ -509,27 +553,22 @@ class SinglePointScreen(QMainWindow):
                     item = QTableWidgetItem(str(''))
                     self.sp_table.setItem(iRow, iCol, item)
 
-        iCol = -1
-        print(f'Column count: {range(self.sp_table.columnCount())}')
         if insertRows:
             insertRow(dataframe.shape[0], self.sp_table.columnCount())
 
-        for col in range(self.sp_table.columnCount()):
-            header_item = self.sp_table.horizontalHeaderItem(col)
-            header_text = header_item.text()
-
-            if header_text == column_name:
-                iCol = col
-                break
+        iCol = self.findColumnNumber(column_name)
 
         if iCol == -1:
-            self.printQcLog(f'Couldnt find column {column_name}', 'error')
+            self.printQcLog(f"Couldn't find column {column_name}", 'error')
             return
         
         # Populate the specified column of the table with data from the DataFrame
+        iRow_index = 0
         for row_index, row_data in dataframe.iterrows():
             item = QTableWidgetItem(str(row_data[column_name]))
-            self.sp_table.setItem(row_index, iCol, item)
+
+            self.sp_table.setItem(iRow_index, iCol, item)
+            iRow_index += 1
 
         
     def runQc(self):
@@ -542,7 +581,15 @@ class SinglePointScreen(QMainWindow):
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
         dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
-        QApplication.restoreOverrideCursor()
+
+
+        mask = dfQcData['compound_id'].str.startswith('CBK')
+        dfQcData = dfQcData[mask].reset_index(drop=True)
+        
+        # Filter the DataFrame using the mask
+        #dfQcData = dfQcData.drop(index=dfQcData[~mask].index)
+
+
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
         elif os_name == "Darwin":
@@ -550,10 +597,12 @@ class SinglePointScreen(QMainWindow):
         elif os_name == "Linux":
             subprocess.run(['xdg-open', sOutput], check=True) # Linux
 
-
+        self.sp_table.setRowCount(0)
         self.populate_table(dfQcData, 'compound_id', insertRows=True)
         self.populate_table(dfQcData, 'batch_id')
         self.populate_table(dfQcData, 'inhibition')
         self.populate_table(dfQcData, 'hit')
         self.populate_table(dfQcData, 'plate')
         self.populate_table(dfQcData, 'well')
+        
+        QApplication.restoreOverrideCursor()
