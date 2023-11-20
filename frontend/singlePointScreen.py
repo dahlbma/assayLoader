@@ -84,6 +84,7 @@ class SinglePointScreen(QMainWindow):
 
         self.populateScreenData()
         self.updateGrid_btn.clicked.connect(self.updateGrid)
+        self.saveData_btn.clicked.connect(self.saveSpToDb)
         
         self.form_values = {
             "instrument": False,
@@ -95,6 +96,26 @@ class SinglePointScreen(QMainWindow):
             "qc_output_file": False
         }
 
+    '''
+    def saveRowToDb(self, row):
+        print(row)
+    '''
+    def saveSpToDb(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        for row in range(self.sp_table.rowCount()):
+            row_dict = {}
+            for col in range(self.sp_table.columnCount()):
+                header_item = self.sp_table.horizontalHeaderItem(col)
+                item = self.sp_table.item(row, col)
+                if header_item and item:
+                    column_name = header_item.text()
+                    cell_value = item.text()
+                    row_dict[column_name] = cell_value
+            dbInterface.saveSpRowToDb(self.token, row_dict)
+            QApplication.processEvents()
+        QApplication.restoreOverrideCursor()
+        
+        
     def findColumnNumber(self, sCol):
         iCol = -1
         for col in range(self.sp_table.columnCount()):
@@ -210,6 +231,9 @@ class SinglePointScreen(QMainWindow):
             
             for item in data_dict:
                 preparedFile = parseHarmonyFile(self, directory_path, item['file'])
+                if preparedFile == "":
+                    self.printQcLog(f"{item['file']} does not exist.", 'error', beep=True)
+                    return ""
                 data['plate'].append(item['plate'])
                 data['file'].append(preparedFile)
 
@@ -359,7 +383,7 @@ class SinglePointScreen(QMainWindow):
                     'raw_data': raw_data,
                     'type': sType}
             df.loc[len(df.index)] = data
-        if iData == 0:
+        if iData == 0 or iPosCtrl == 0 or iNegCtrl == 0:
             sStatus = 'error'
         else:
             sStatus = 'normal'
@@ -435,7 +459,9 @@ class SinglePointScreen(QMainWindow):
         # If the instrument is Harmony we need to prepare the rawdata files.
         if self.instrument_cb.currentText() == 'Harmony':
             file_path = self.prepareHarmonyFiles(file_path)
-        
+            if file_path == "":
+                return
+            
         self.fileToPlatemapFile = file_path
         df = pd.read_excel(file_path)
         self.fileToPlate_lab.setText(os.path.basename(file_path))
@@ -447,7 +473,12 @@ class SinglePointScreen(QMainWindow):
         for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
             full_path = os.path.join(path_to_data_dir, sFile)
             self.addFileToTable(sFile, full_path)
-            self.printQcLog(sFile)
+
+            if os.path.exists(full_path):
+                self.printQcLog(f"{sFile} exists")
+            else:
+                self.printQcLog(f"{sFile} does not exist.", 'error', beep=True)
+
         saDataColumns = self.findDataColumns(full_path)
 
         if saDataColumns != None:
@@ -503,18 +534,23 @@ class SinglePointScreen(QMainWindow):
         for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
             full_path = os.path.join(path_to_data_dir, sFile)
 
-            with open(full_path, 'r') as file:
-                (saDataLines,
-                 iDataColPosition,
-                 iWellColPosition) = self.digestPlate(sPlate,
-                                                      file,
-                                                      self.dataColumn_cb.currentText())
-                dfPlate = self.extractData(sFile,
-                                           sPlate,
-                                           saDataLines,
-                                           iDataColPosition,
-                                           iWellColPosition)
-                frames.append(dfPlate)
+            try:
+                with open(full_path, 'r') as file:
+                    (saDataLines,
+                     iDataColPosition,
+                     iWellColPosition) = self.digestPlate(sPlate,
+                                                          file,
+                                                          self.dataColumn_cb.currentText())
+                    dfPlate = self.extractData(sFile,
+                                               sPlate,
+                                               saDataLines,
+                                               iDataColPosition,
+                                               iWellColPosition)
+                    frames.append(dfPlate)
+            except:
+                self.printQcLog(f"Can't open {full_path}", 'error', beep=True)
+                QApplication.restoreOverrideCursor()
+                return
         resDf = pd.concat(frames)
 
         def is_numerical(column):
@@ -580,8 +616,13 @@ class SinglePointScreen(QMainWindow):
         except:
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
-
+        try:
+            dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
+        except:
+            self.printQcLog(f"Error calculating QC", 'error')
+            QApplication.restoreOverrideCursor()
+            return
+            
 
         mask = dfQcData['compound_id'].str.startswith('CBK')
         dfQcData = dfQcData[mask].reset_index(drop=True)

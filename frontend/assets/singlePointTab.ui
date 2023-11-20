@@ -144,7 +144,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="sp_prep_data_tab">
              <property name="sizePolicy">
@@ -1299,7 +1299,7 @@
                   </column>
                   <column>
                    <property name="text">
-                    <string>hit_treshold</string>
+                    <string>hit_threshold</string>
                    </property>
                   </column>
                   <column>

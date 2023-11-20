@@ -35,6 +35,7 @@ def parseHarmonyFile(self, sDir, sFileName):
 
     except FileNotFoundError:
         self.printPrepLog(f"File '{sFileName}' not found.", 'error')
+        return ""
     except Exception as e:
         self.printPrepLog(f"An error occurred: {e}", 'error')
 
