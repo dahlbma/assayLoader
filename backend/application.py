@@ -130,8 +130,8 @@ class GetDoseResponseConfig(tornado.web.RequestHandler):
 @jwtauth
 class GetProjects(tornado.web.RequestHandler):
     def get(self):
-        assayDB = getDatabase(self)
-        sSql = f'select project_name project from hive.project_details where terminated_date is null'
+        sSql = f'''select project_name project from hive.project_details
+                   where terminated_date is null'''
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -149,8 +149,7 @@ class GetTargets(tornado.web.RequestHandler):
 @jwtauth
 class GetAssayTypes(tornado.web.RequestHandler):
     def get(self):
-        assayDB = getDatabase(self)
-        sSql = f'select distinct(assay_type) assay_type from {assayDB}.lcb_sp'
+        sSql = f'select distinct(assay_type) assay_type from assay.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -159,8 +158,7 @@ class GetAssayTypes(tornado.web.RequestHandler):
 @jwtauth
 class GetDetectionTypes(tornado.web.RequestHandler):
     def get(self):
-        assayDB = getDatabase(self)
-        sSql = f'select distinct(detection_type) detection_type from {assayDB}.lcb_sp'
+        sSql = f'select distinct(detection_type) detection_type from assay.lcb_sp'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
@@ -169,7 +167,6 @@ class GetDetectionTypes(tornado.web.RequestHandler):
 @jwtauth
 class GetOperators(tornado.web.RequestHandler):
     def get(self):
-        assayDB = getDatabase(self)
         sSql = f'''select userid from hive.user_details where organization = 'screen' '''
         cur.execute(sSql)
         res = res2json()
@@ -231,11 +228,20 @@ class PingDB(tornado.web.RequestHandler):
 @jwtauth
 class SaveSpRowToDb(tornado.web.RequestHandler):
     def post(self, *args, **kwargs):
-
+        def nullifyNumeric(sString):
+            if sString == '':
+                return 'NULL'
+            else:
+                return sString
+        
+        assayDB = getDatabase(self)
         arg_dict = {}
         file_dict = {}
         try:
-            tornado.httputil.parse_body_arguments(self.request.headers["Content-Type"], self.request.body, arg_dict, file_dict)
+            tornado.httputil.parse_body_arguments(self.request.headers["Content-Type"],
+                                                  self.request.body,
+                                                  arg_dict,
+                                                  file_dict)
         except:
             self.set_status(400)
             self.finish('Decode failed')
@@ -249,21 +255,66 @@ class SaveSpRowToDb(tornado.web.RequestHandler):
         sWell = arg_dict['well'][0].decode('utf-8')
         sAssay_type = arg_dict['assay_type'][0].decode('utf-8')
         sDetection_type = arg_dict['detection_type'][0].decode('utf-8')
-        sConcentration = arg_dict['concentration'][0].decode('utf-8')
-        sInhibition = arg_dict['inhibition'][0].decode('utf-8')
-        sActivation = arg_dict['activation'][0].decode('utf-8')
+        sConcentration = nullifyNumeric(arg_dict['concentration'][0].decode('utf-8'))
+        sInhibition = nullifyNumeric(arg_dict['inhibition'][0].decode('utf-8'))
+        sActivation = nullifyNumeric(arg_dict['activation'][0].decode('utf-8'))
         sHit = arg_dict['hit'][0].decode('utf-8')
-        sHit_threshold = arg_dict['hit_threshold'][0].decode('utf-8')
+        sHit_threshold = nullifyNumeric(arg_dict['hit_threshold'][0].decode('utf-8'))
         sExperiment_date = arg_dict['experiment_date'][0].decode('utf-8')
         sOperator = arg_dict['operator'][0].decode('utf-8')
         sEln = arg_dict['eln'][0].decode('utf-8')
         sComment = arg_dict['comment'][0].decode('utf-8')
         
-        s = f'''{sCompound} {sBatch} {sInhibition} {sTarget} {sProject} {sPlate} {sWell}'''
-        logging.info(s)
-        
+        #sSql = f'''insert into {assayDB}.lcb_sp
+        # Replace the next with the line above when we go live
+        sSql = f'''insert into assay_test.lcb_sp
+        (compound_id,
+        compound_batch,
+        project,
+        target,
+        PLATE_ID,
+        WELL_ID,
+        assay_type,
+        detection_type,
+        INHIBITION,
+        ACTIVATION,
+        HIT,
+        HIT_THRESHOLD,
+        CONC,
+        TDATE,
+        operator,
+        eln_id,
+        COMMENTS,
+        CREATED_DATE)
+        values (
+        '{sCompound}',
+        '{sBatch}',
+        '{sProject}',
+        '{sTarget}',
+        '{sPlate}',
+        '{sWell}',
+        '{sAssay_type}',
+        '{sDetection_type}',
+        {sInhibition},
+        {sActivation},
+        '{sHit}',
+        {sHit_threshold},
+        {sConcentration},
+        '{sExperiment_date}',
+        '{sOperator}',
+        '{sEln}',
+        '{sComment}',
+        now())
+        '''
 
-        sSql = ''
+        try:
+            cur.execute(sSql)
+        except Exception as e:
+            sError = f"{str(e)}"
+            logging.error(sError)
+            self.set_status(400)
+            self.finish(sError)
+            
         
     def get(self):
         pass
