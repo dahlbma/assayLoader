@@ -1,4 +1,5 @@
 import tornado.gen
+from tornado.escape import json_decode, json_encode
 import json
 import logging
 import ast
@@ -227,6 +228,45 @@ class PingDB(tornado.web.RequestHandler):
         res = cur.fetchall()
         self.finish()
         
+@jwtauth
+class SaveSpRowToDb(tornado.web.RequestHandler):
+    def post(self, *args, **kwargs):
+
+        arg_dict = {}
+        file_dict = {}
+        try:
+            tornado.httputil.parse_body_arguments(self.request.headers["Content-Type"], self.request.body, arg_dict, file_dict)
+        except:
+            self.set_status(400)
+            self.finish('Decode failed')
+            return
+
+        sCompound = arg_dict['compound_id'][0].decode('utf-8')
+        sBatch = arg_dict['batch_id'][0].decode('utf-8')
+        sTarget = arg_dict['target'][0].decode('utf-8')
+        sProject = arg_dict['project'][0].decode('utf-8')
+        sPlate = arg_dict['plate'][0].decode('utf-8')
+        sWell = arg_dict['well'][0].decode('utf-8')
+        sAssay_type = arg_dict['assay_type'][0].decode('utf-8')
+        sDetection_type = arg_dict['detection_type'][0].decode('utf-8')
+        sConcentration = arg_dict['concentration'][0].decode('utf-8')
+        sInhibition = arg_dict['inhibition'][0].decode('utf-8')
+        sActivation = arg_dict['activation'][0].decode('utf-8')
+        sHit = arg_dict['hit'][0].decode('utf-8')
+        sHit_threshold = arg_dict['hit_threshold'][0].decode('utf-8')
+        sExperiment_date = arg_dict['experiment_date'][0].decode('utf-8')
+        sOperator = arg_dict['operator'][0].decode('utf-8')
+        sEln = arg_dict['eln'][0].decode('utf-8')
+        sComment = arg_dict['comment'][0].decode('utf-8')
+        
+        s = f'''{sCompound} {sBatch} {sInhibition} {sTarget} {sProject} {sPlate} {sWell}'''
+        logging.info(s)
+        
+
+        sSql = ''
+        
+    def get(self):
+        pass
 
 @jwtauth
 class UploadBinary(tornado.web.RequestHandler):

@@ -137,6 +137,7 @@ def make_app():
         (r"/getAssayLoaderBinary/(?P<os_name>[^\/]+)", GetAssayLoaderBinary),
         (r"/dist/(.*)", tornado.web.StaticFileHandler, {"path": "dist/"}),
         (r"/uploadBinary", application.UploadBinary),
+        (r"/saveSpRowToDb", application.SaveSpRowToDb),
         (r"/uploadLauncher", application.UploadLauncher),
         (r"/getAssayLoaderLauncher/Windows/(.*)", web.StaticFileHandler, {"path": "dist/launchers/Windows/"}),
         (r"/getAssayLoaderLauncher/Linux/(.*)", web.StaticFileHandler, {"path": "dist/launchers/Linux/"}),
