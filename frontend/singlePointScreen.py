@@ -96,11 +96,14 @@ class SinglePointScreen(QMainWindow):
             "qc_output_file": False
         }
 
-    '''
-    def saveRowToDb(self, row):
-        print(row)
-    '''
+
     def saveSpToDb(self):
+        def color_row_red(row):
+            for col in range(self.sp_table.columnCount()):
+                item = self.sp_table.item(row, col)
+                if item:
+                    item.setBackground(QColor('red'))
+        
         QApplication.setOverrideCursor(Qt.WaitCursor)
         for row in range(self.sp_table.rowCount()):
             row_dict = {}
@@ -111,11 +114,15 @@ class SinglePointScreen(QMainWindow):
                     column_name = header_item.text()
                     cell_value = item.text()
                     row_dict[column_name] = cell_value
-            dbInterface.saveSpRowToDb(self.token, row_dict)
+            
+            sRes, lStatus = dbInterface.saveSpRowToDb(self.token, row_dict)
+            if lStatus == False:
+                color_row_red(row)
+            
             QApplication.processEvents()
         QApplication.restoreOverrideCursor()
         
-        
+
     def findColumnNumber(self, sCol):
         iCol = -1
         for col in range(self.sp_table.columnCount()):
@@ -148,7 +155,10 @@ class SinglePointScreen(QMainWindow):
         self.populateColumn('experiment_date', sDate)
         self.populateColumn('comment', self.comment_eb.text())
         self.populateColumn('eln', self.eln_eb.text())
-       
+
+        #self.populateColumn('hit_threshold', self.eln_eb.text())
+        #self.populateColumn('concentration', self.eln_eb.text())
+
         
     def populateScreenData(self):
         saProjects = dbInterface.getProjects(self.token)
