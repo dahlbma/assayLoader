@@ -156,7 +156,6 @@ class SinglePointScreen(QMainWindow):
         self.populateColumn('comment', self.comment_eb.text())
         self.populateColumn('eln', self.eln_eb.text())
 
-        #self.populateColumn('hit_threshold', self.eln_eb.text())
         #self.populateColumn('concentration', self.eln_eb.text())
 
         
@@ -584,7 +583,9 @@ class SinglePointScreen(QMainWindow):
         if 'raw_data' in resDf.columns and is_numerical(resDf['raw_data']) and std_deviation != 0.0:
             pass
         else:
-            self.printQcLog(f"Can't do statistics on 'raw_data', did you choose the correct 'Raw data column'?'", 'error', beep=True)
+            self.printQcLog(f"Can't do statistics on 'raw_data', did you choose the correct 'Raw data column'?'",
+                            'error',
+                            beep=True)
             QApplication.restoreOverrideCursor()
             return
         
@@ -634,19 +635,19 @@ class SinglePointScreen(QMainWindow):
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
+            newHitThreshold, dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
         except:
             self.printQcLog(f"Error calculating QC", 'error')
             QApplication.restoreOverrideCursor()
             return
-            
+
+        dfQcData['inhibition'] = pd.to_numeric(dfQcData['inhibition'], errors='coerce').round(2)
+        newHitThreshold = "{:.2f}".format(newHitThreshold)
+        self.hitThreshold_eb.setText(str(newHitThreshold))
 
         mask = dfQcData['compound_id'].str.startswith('CBK')
         dfQcData = dfQcData[mask].reset_index(drop=True)
         
-        # Filter the DataFrame using the mask
-        #dfQcData = dfQcData.drop(index=dfQcData[~mask].index)
-
 
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
@@ -662,5 +663,7 @@ class SinglePointScreen(QMainWindow):
         self.populate_table(dfQcData, 'hit')
         self.populate_table(dfQcData, 'plate')
         self.populate_table(dfQcData, 'well')
-        
+
+        self.populateColumn('hit_threshold', newHitThreshold)
+
         QApplication.restoreOverrideCursor()

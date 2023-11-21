@@ -101,7 +101,7 @@ def calculatePlateData(df, plate, ws):
 
     df['negCtrlInhibition'] = np.where(df['type'] == 'Neg', 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
     df['posCtrlInhibition'] = np.where(df['type'] == 'Pos', 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
-
+    
     return df, Z, meanPosCtrl, stdPosCtrl, meanNegCtrl, stdNegCtrl, meanInhib, stdInhib
 
 def plotZfactor(df):
@@ -267,8 +267,9 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold):
             cell.value = value
             cell.font = excelSettings["custom_font"]
             cell.style = excelSettings["decimal_style"]
-            
-    return listOfDfPlates, meanInhibition, stdInhibition, df_inhibition_calculated
+
+    return listOfDfPlates, meanInhibition, stdInhibition, df_inhibition_calculated, hitLimit
+
 
 def create_plate_frame(ws, sHeading, plate_id, top_left_cell, num_columns, num_rows):
     """
@@ -505,12 +506,12 @@ def calcQc(self, input_file, output_file, iHitThreshold):
     #########################################################
 
     self.printQcLog(f"Calculating all means and std")
-    listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData = calcData(self,
-                                                                         excelSettings,
-                                                                         df,
-                                                                         screenDataWs,
-                                                                         heatMapsWs,
-                                                                         iHitThreshold)
+    listOfPlatesDf, meanInhibition, stdInhibition, dfCalcData, hitLimt= calcData(self,
+                                                                                 excelSettings,
+                                                                                 df,
+                                                                                 screenDataWs,
+                                                                                 heatMapsWs,
+                                                                                 iHitThreshold)
     self.printQcLog(f"All data read")
 
     for column in screenDataWs.columns:
@@ -595,4 +596,4 @@ def calcQc(self, input_file, output_file, iHitThreshold):
 
     wb.save(excel_file_path)
 
-    return dfCalcData
+    return hitLimt, dfCalcData
