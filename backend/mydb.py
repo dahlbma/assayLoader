@@ -59,10 +59,13 @@ class DisconnectSafeCursor(object):
                         scarabLogger.error(args)
                 return self.cursor.execute(*args, **kwargs)
         except MySQLdb.OperationalError:
-            self.db.reconnect()
-            self.cursor = self.db.cursor()
+            ## How can we reconnect in a safe way?
+            #self.db.reconnect()
+            #self.cursor = self.db.cursor()
+            pass
             return self.cursor.execute(*args, **kwargs)
-
+    
+        
     def fetchone(self):
         return self.cursor.fetchone()
 
