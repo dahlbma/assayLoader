@@ -264,6 +264,20 @@ class SaveSpRowToDb(tornado.web.RequestHandler):
         sOperator = arg_dict['operator'][0].decode('utf-8')
         sEln = arg_dict['eln'][0].decode('utf-8')
         sComment = arg_dict['comment'][0].decode('utf-8')
+
+        sSql = f'''
+        select compound_id, notebook_ref batch_id from cool.config
+        where config_id = '{sPlate}' and well = '{sWell}'
+        '''
+        try:
+            cur.execute(sSql)
+            tRes = cur.fetchall()
+            if len(tRes) == 1:
+                sCompound = tRes[0][0]
+                sBatch = tRes[0][1]
+        except:
+            pass
+
         
         #sSql = f'''insert into {assayDB}.lcb_sp
         # Replace the next with the line above when we go live
