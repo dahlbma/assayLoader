@@ -464,6 +464,13 @@ class SinglePointScreen(QMainWindow):
             
         self.fileToPlatemapFile = file_path
         df = pd.read_excel(file_path)
+
+        if df.columns.tolist() != ['plate', 'file'] or len(df.columns) != 2:
+            self.printQcLog(f"The file to plate file {file_path} has the wrong format", 'error', beep=True)
+            return
+            
+
+        
         self.fileToPlate_lab.setText(os.path.basename(file_path))
         self.plate_file_dict = df.set_index('plate')['file'].to_dict()
         
