@@ -1,4 +1,4 @@
-import re, sys, os, logging, glob
+import re, sys, os, logging, glob, csv
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
 from PyQt5.QtCore import Qt, QDate, QUrl
@@ -143,7 +143,21 @@ class SinglePointScreen(QMainWindow):
             item = QTableWidgetItem(str(sValue))
             self.sp_table.setItem(iRow_index, iCol, item)
 
-        
+
+    def save_to_csv(self, filename):
+        with open(filename, 'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            
+            # Write header
+            header = [self.sp_table.horizontalHeaderItem(col).text() for col in range(self.sp_table.columnCount())]
+            csvwriter.writerow(header)
+
+            # Write data
+            for row in range(self.sp_table.rowCount()):
+                row_data = [self.sp_table.item(row, col).text() for col in range(self.sp_table.columnCount())]
+                csvwriter.writerow(row_data)
+
+
     def updateGrid(self):
         self.populateColumn('project', self.project_cb.currentText())
         self.populateColumn('operator', self.operator_cb.currentText())
@@ -156,7 +170,7 @@ class SinglePointScreen(QMainWindow):
         self.populateColumn('comment', self.comment_eb.text())
         self.populateColumn('eln', self.eln_eb.text())
 
-        #self.populateColumn('concentration', self.eln_eb.text())
+        self.save_to_csv("gridData.csv")
 
         
     def populateScreenData(self):
