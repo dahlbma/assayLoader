@@ -322,7 +322,8 @@ class SaveSpRowToDb(tornado.web.RequestHandler):
         '''
 
         try:
-            cur.execute(sSql)
+            #cur.execute(sSql)
+            pass
         except Exception as e:
             sError = f"{str(e)}"
             logging.error(sError)
