@@ -336,7 +336,7 @@ class SinglePointScreen(QMainWindow):
 
 
     def extractData(self, sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition):
-        columns = ['plate', 'well', 'compound_id', 'batch_id', 'raw_data', 'type']
+        columns = ['plate', 'well', 'compound_id', 'batch_id', 'raw_data', 'type', 'concentration']
         df = pd.DataFrame(columns=columns)
         sPosCtrl = self.posCtrl_eb.text()
         sNegCtrl = self.negCtrl_eb.text()
@@ -390,7 +390,8 @@ class SinglePointScreen(QMainWindow):
                     'compound_id': selected_row['Compound ID'][0],
                     'batch_id': selected_row['Batch nr'][0],
                     'raw_data': raw_data,
-                    'type': sType}
+                    'type': sType,
+                    'concentration': selected_row['Conc (mM)'][0]}
             df.loc[len(df.index)] = data
         if iData == 0 or iPosCtrl == 0 or iNegCtrl == 0:
             sStatus = 'error'
@@ -663,6 +664,7 @@ class SinglePointScreen(QMainWindow):
         self.populate_table(dfQcData, 'hit')
         self.populate_table(dfQcData, 'plate')
         self.populate_table(dfQcData, 'well')
+        self.populate_table(dfQcData, 'concentration')
 
         self.populateColumn('hit_threshold', newHitThreshold)
 
