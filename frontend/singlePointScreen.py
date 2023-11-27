@@ -245,6 +245,22 @@ class SinglePointScreen(QMainWindow):
                         matching_files.append(os.path.join(root, file))
             return matching_files
 
+        data = {
+            "plate": [],
+            "file": []
+        }
+
+        ## Move all the file mmanipulation of Harmony files to the prepare tab.
+        ##
+        
+        directory_path = os.path.dirname(file_path)
+        print(directory_path)
+        subdirectory_path = os.path.join(file_path, "preparedHaronyFiles")
+        try:
+            os.makedirs(subdirectory_path)
+        except:
+            pass
+
         # Harmony names all raw datafiles to 'PlateResults.txt'
         file_name = 'PlateResults.txt'
         harmony_files = find_files(file_path, file_name)
@@ -255,18 +271,14 @@ class SinglePointScreen(QMainWindow):
             match = re.search(pattern, file_name)
             if match:
                 first_occurrence = match.group()
-                printQcLog(f"Found plate: {first_occurrence}")
+                self.printQcLog(f"Found plate: {first_occurrence}")
 
-                # Copy the harmony files to all_in_one folder
+                preparedFile = parseHarmonyFileII(self, directory_path, file_name)
+            data['plate'].append(first_occurrence)
+            data['file'].append(preparedFile)
 
         
-        subdirectory_path = os.path.join(file_path, "preparedHaronyFiles")
-        try:
-            os.makedirs(subdirectory_path)
-        except:
-            pass
 
-        quit()
 
     def prepareHarmonyFiles(self, file_path):
         data = {
@@ -530,7 +542,7 @@ class SinglePointScreen(QMainWindow):
         # If the instrument is Harmony we need to prepare the rawdata files.
         if self.instrument_cb.currentText() == 'Harmony':
             file_path = self.prepareHarmonyFilesII(file_path)
-            quit()
+
             if file_path == "":
                 return
             
