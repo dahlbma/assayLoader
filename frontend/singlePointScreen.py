@@ -250,6 +250,16 @@ class SinglePointScreen(QMainWindow):
         harmony_files = find_files(file_path, file_name)
         print(harmony_files[1])
 
+        pattern = re.compile(r'P\d{5}')
+        for file_name in harmony_files:
+            match = re.search(pattern, file_name)
+            if match:
+                first_occurrence = match.group()
+                printQcLog(f"Found plate: {first_occurrence}")
+
+                # Copy the harmony files to all_in_one folder
+
+        
         subdirectory_path = os.path.join(file_path, "preparedHaronyFiles")
         try:
             os.makedirs(subdirectory_path)
