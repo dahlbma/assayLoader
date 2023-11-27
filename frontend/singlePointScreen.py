@@ -236,6 +236,28 @@ class SinglePointScreen(QMainWindow):
                 self.printPrepLog(f"Print label {sCurrentPlate}")
 
         
+    def prepareHarmonyFilesII(self, file_path):
+        def find_files(directory, filename):
+            matching_files = []
+            for root, _, files in os.walk(directory):
+                for file in files:
+                    if file == filename:
+                        matching_files.append(os.path.join(root, file))
+            return matching_files
+
+        # Harmony names all raw datafiles to 'PlateResults.txt'
+        file_name = 'PlateResults.txt'
+        harmony_files = find_files(file_path, file_name)
+        print(harmony_files[1])
+
+        subdirectory_path = os.path.join(file_path, "preparedHaronyFiles")
+        try:
+            os.makedirs(subdirectory_path)
+        except:
+            pass
+
+        quit()
+
     def prepareHarmonyFiles(self, file_path):
         data = {
             "plate": [],
@@ -473,8 +495,23 @@ class SinglePointScreen(QMainWindow):
 
     def selectFileToPlateMap(self):
         self.inputFiles_tab.setRowCount(0)
-        
-        file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")
+        file_paht = ''
+        if self.instrument_cb.currentText() == 'Harmony':
+            options = QFileDialog.Options()
+            options |= QFileDialog.DontUseNativeDialog  # Use the native file dialog
+
+            directory_dialog = QFileDialog()
+            directory_dialog.setOptions(options)
+
+            # Set the file mode to DirectoryOnly to allow selecting directories only
+            directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
+
+            # Show the directory dialog
+            file_path = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
+
+        else:
+            file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")      
+ 
         if not file_path:
             return
 
@@ -482,7 +519,8 @@ class SinglePointScreen(QMainWindow):
 
         # If the instrument is Harmony we need to prepare the rawdata files.
         if self.instrument_cb.currentText() == 'Harmony':
-            file_path = self.prepareHarmonyFiles(file_path)
+            file_path = self.prepareHarmonyFilesII(file_path)
+            quit()
             if file_path == "":
                 return
             
