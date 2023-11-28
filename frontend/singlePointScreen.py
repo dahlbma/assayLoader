@@ -28,7 +28,7 @@ class SinglePointScreen(QMainWindow):
 
         #####################
         # Prep data screen
-        self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
+        self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFilesII)
         #self.nrOfPlateCopies_sp           # spin box
         #self.plates_te.                   # text edit
         self.printPlates_btn.clicked.connect(self.printPlates)
@@ -236,7 +236,8 @@ class SinglePointScreen(QMainWindow):
                 self.printPrepLog(f"Print label {sCurrentPlate}")
 
         
-    def prepareHarmonyFilesII(self, file_path):
+    def prepareHarmonyFilesII(self):
+        
         def find_files(directory, filename):
             matching_files = []
             for root, _, files in os.walk(directory):
@@ -250,12 +251,16 @@ class SinglePointScreen(QMainWindow):
             "file": []
         }
 
-        ## Move all the file mmanipulation of Harmony files to the prepare tab.
-        ##
-        
-        directory_path = os.path.dirname(file_path)
-        print(directory_path)
-        subdirectory_path = os.path.join(file_path, "preparedHaronyFiles")
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog  # Use the native file dialog
+        directory_dialog = QFileDialog()
+        directory_dialog.setOptions(options)
+        # Set the file mode to DirectoryOnly to allow selecting directories only
+        directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
+        # Show the directory dialog
+        selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
+
+        subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
         try:
             os.makedirs(subdirectory_path)
         except:
@@ -263,55 +268,32 @@ class SinglePointScreen(QMainWindow):
 
         # Harmony names all raw datafiles to 'PlateResults.txt'
         file_name = 'PlateResults.txt'
-        harmony_files = find_files(file_path, file_name)
-        print(harmony_files[1])
+        harmony_files = find_files(selected_directory, file_name)
 
-        pattern = re.compile(r'P\d{5}')
+        pattern = re.compile(r'P\d{6}')
         for file_name in harmony_files:
-            match = re.search(pattern, file_name)
-            if match:
-                first_occurrence = match.group()
-                self.printQcLog(f"Found plate: {first_occurrence}")
+            with open(file_name, 'r') as file:
+                content = file.read()
+                match = re.search(pattern, content)
+                if match:
+                    sPlate = match.group()
+                    self.printPrepLog(f"Found plate: {sPlate}")
+                    preparedFile = parseHarmonyFile(self, subdirectory_path, file_name, sPlate)
 
-                preparedFile = parseHarmonyFileII(self, directory_path, file_name)
-            data['plate'].append(first_occurrence)
-            data['file'].append(preparedFile)
+                    data['plate'].append(sPlate)
+                    data['file'].append(preparedFile)
+                else:
+                    self.printPrepLog(f"No plate in {file_name}", 'error')
+
+        sOutFile = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
+        self.printPrepLog(f'Created {sOutFile}')
+        df = pd.DataFrame(data)
+        excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
+        df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
+        excel_writer.close()
+
 
         
-
-
-    def prepareHarmonyFiles(self, file_path):
-        data = {
-            "plate": [],
-            "file": []
-        }
-
-        if file_path:
-            directory_path = os.path.dirname(file_path)
-            try:
-                df = pd.read_excel(file_path)
-                # Assuming 'plate' and 'file' are column names in the Excel file
-                data_dict = df[['plate', 'file']].to_dict(orient='records')
-            except Exception as e:
-                self.printPrepLog(f"Error reading Excel file: {e}", 'error')
-                return
-            
-            for item in data_dict:
-                preparedFile = parseHarmonyFile(self, directory_path, item['file'])
-                if preparedFile == "":
-                    self.printQcLog(f"{item['file']} does not exist.", 'error', beep=True)
-                    return ""
-                data['plate'].append(item['plate'])
-                data['file'].append(preparedFile)
-
-            sOutFile = os.path.join('/', directory_path, "prepared_plate_to_file.xlsx")
-            self.printPrepLog(f'Created {sOutFile}')
-            df = pd.DataFrame(data)
-            excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
-            df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
-            excel_writer.close()
-            return sOutFile
-
 
     def checkForm(self):
         if all(self.form_values.values()):
@@ -389,7 +371,7 @@ class SinglePointScreen(QMainWindow):
         except:
             self.printQcLog(f'''Can't find plate {sPlateId} in platemap file''', 'error')
             return None
-        #new_df = self.platemapDf[self.platemapDf.iloc[:, 0] == sPlateId]
+
         return new_df
 
 
@@ -545,16 +527,14 @@ class SinglePointScreen(QMainWindow):
 
             if file_path == "":
                 return
-            
+
         self.fileToPlatemapFile = file_path
         df = pd.read_excel(file_path)
 
         if df.columns.tolist() != ['plate', 'file'] or len(df.columns) != 2:
             self.printQcLog(f"The file to plate file {file_path} has the wrong format", 'error', beep=True)
             return
-            
 
-        
         self.fileToPlate_lab.setText(os.path.basename(file_path))
         self.plate_file_dict = df.set_index('plate')['file'].to_dict()
         
