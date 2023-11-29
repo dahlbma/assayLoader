@@ -122,6 +122,14 @@ class SinglePointScreen(QMainWindow):
             QApplication.processEvents()
         QApplication.restoreOverrideCursor()
         
+        
+    def createPlatemap(self, platesDf, subdirectory_path):
+        platemap = []
+        for index, row in platesDf.iterrows():
+            plate_value = row['plate']
+            plate_data, lSuccess = dbInterface.getPlate(plate_value)
+            if lSuccess:
+                pass
 
     def findColumnNumber(self, sCol):
         iCol = -1
@@ -288,12 +296,11 @@ class SinglePointScreen(QMainWindow):
         sOutFile = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
         self.printPrepLog(f'Created {sOutFile}')
         df = pd.DataFrame(data)
+        self.createPlatemap(df, subdirectory_path)
         excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
         df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
         excel_writer.close()
 
-
-        
 
     def checkForm(self):
         if all(self.form_values.values()):

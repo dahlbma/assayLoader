@@ -144,7 +144,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="sp_prep_data_tab">
              <property name="sizePolicy">
@@ -156,19 +156,16 @@
              <attribute name="title">
               <string>Prep data</string>
              </attribute>
-             <widget class="QWidget" name="layoutWidget">
+             <widget class="QWidget" name="">
               <property name="geometry">
                <rect>
-                <x>21</x>
-                <y>22</y>
-                <width>1041</width>
-                <height>571</height>
+                <x>22</x>
+                <y>25</y>
+                <width>1121</width>
+                <height>531</height>
                </rect>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_10">
-               <property name="sizeConstraint">
-                <enum>QLayout::SetDefaultConstraint</enum>
-               </property>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_13">
                  <item>
@@ -186,6 +183,20 @@
                       <string>Harmony file to plate file</string>
                      </property>
                     </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_12">
+                     <item>
+                      <widget class="QLabel" name="label_13">
+                       <property name="text">
+                        <string>Evaluation</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="evaluation_cb"/>
+                     </item>
+                    </layout>
                    </item>
                    <item>
                     <spacer name="verticalSpacer">
@@ -1382,7 +1393,7 @@
      <x>0</x>
      <y>0</y>
      <width>1649</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

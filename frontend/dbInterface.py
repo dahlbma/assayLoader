@@ -156,10 +156,21 @@ def printPlateLabel(token, sPlate):
         #res = r.content.decode()
         return True
 
+
 def saveSpRowToDb(token, row):
     r = requests.post(f'{baseUrl}saveSpRowToDb',
                       headers={'token':token},
                       data = row)
+    
+    if r.status_code != 200:
+        return r.content.decode(), False
+    else:
+        return r.content.decode(), True
+
+
+def getPlate(token, plate):
+    r = requests.post(f'{baseUrl}getPlate/{plate}',
+                      headers={'token':token})
     
     if r.status_code != 200:
         return r.content.decode(), False
