@@ -440,3 +440,18 @@ class PrintPlateLabel(tornado.web.RequestHandler):
         f.close()
         os.system("lp -h homer.scilifelab.se:631 -d CBCS-GK420t_plates  /tmp/file.txt")
 
+
+@jwtauth
+class GetPlate(tornado.web.RequestHandler):
+    def get(self):
+        sSql = f'''select config_id plate,
+        well,
+        compound_id,
+        notebook_ref,
+        form,
+        conc from cool.config where config_id = '{plate_id}'
+        '''
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
+
