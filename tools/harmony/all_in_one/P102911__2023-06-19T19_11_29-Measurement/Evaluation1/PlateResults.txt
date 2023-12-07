@@ -1,7 +1,7 @@
 Database Name	Phenix ODA 2
 Database Location	http://opera2.dyn.scilifelab.se/ODA/OdaService.asmx
 Evaluation Signature	5ec3077d-bd1c-42fe-b7a2-44bb07190012
-Plate Name	P102911
+Plate Name	P102307
 Measurement	Measurement 1
 Evaluation	Evaluation1
 

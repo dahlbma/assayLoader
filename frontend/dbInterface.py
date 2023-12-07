@@ -6,7 +6,6 @@ baseUrl = 'http://esox3.scilifelab.se:8084/'
 def listify(data, addBlank=True):
     res = data.content.decode()
     res = json.loads(res)
-
     cleanList = list()
     if addBlank:
         cleanList.append(' ')
@@ -169,10 +168,13 @@ def saveSpRowToDb(token, row):
 
 
 def getPlate(token, plate):
-    r = requests.post(f'{baseUrl}getPlate/{plate}',
-                      headers={'token':token})
+    r = requests.get(f'{baseUrl}getPlate/{plate}',
+                     headers={'token':token})
     
     if r.status_code != 200:
         return r.content.decode(), False
     else:
-        return r.content.decode(), True
+        res = r.content.decode()
+        res = json.loads(res)
+
+        return res, True

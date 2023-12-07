@@ -124,13 +124,28 @@ class SinglePointScreen(QMainWindow):
         
         
     def createPlatemap(self, platesDf, subdirectory_path):
-        platemap = []
+        columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc (mM)']
+        platemapDf = pd.DataFrame(columns=columns)
+        
         for index, row in platesDf.iterrows():
+            df = pd.DataFrame()
             plate_value = row['plate']
-            plate_data, lSuccess = dbInterface.getPlate(plate_value)
+            plate_data, lSuccess = dbInterface.getPlate(self.token, plate_value)
             if lSuccess:
-                pass
+                self.printPrepLog(f'Got plate data for {plate_value}')
 
+                df = pd.DataFrame(plate_data, columns=['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc (mM)'])
+            else:
+                self.printPrepLog(f'Error getting plate {plate_value} {plate_data}', 'error')
+            platemapDf = pd.concat([platemapDf if not platemapDf.empty else None, df], ignore_index=True)
+
+            
+
+        excel_filename = 'PLATEMAP.xlsx'
+        full_path = os.path.join(subdirectory_path, excel_filename)
+        platemapDf.to_excel(full_path, index=False)
+
+        
     def findColumnNumber(self, sCol):
         iCol = -1
         for col in range(self.sp_table.columnCount()):
@@ -427,11 +442,14 @@ class SinglePointScreen(QMainWindow):
                 continue
 
             try:
-                raw_data = float(saLine[iDataColPosition])
                 well = saLine[iWellColPosition]
+                raw_data = float(saLine[iDataColPosition])
             except:
-                self.printQcLog(f'The raw data column is not numeric', 'error', beep=True)
-                return df
+                self.printQcLog(f'The raw data column is not numeric in plate {sPlate} well {well}', 'error', beep=True)
+                #return df
+                #raw_data = 0
+                continue
+            
             data = {'plate': sPlate,
                     'well': well,
                     'compound_id': selected_row['Compound ID'][0],
@@ -625,7 +643,8 @@ class SinglePointScreen(QMainWindow):
                                                iDataColPosition,
                                                iWellColPosition)
                     frames.append(dfPlate)
-            except:
+            except Exception as e:
+                print(str(e))
                 self.printQcLog(f"Can't open {full_path}", 'error', beep=True)
                 QApplication.restoreOverrideCursor()
                 return
