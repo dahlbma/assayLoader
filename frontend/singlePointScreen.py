@@ -311,6 +311,7 @@ class SinglePointScreen(QMainWindow):
         sOutFile = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
         self.printPrepLog(f'Created {sOutFile}')
         df = pd.DataFrame(data)
+        df = df.sort_values(by='plate')
         self.createPlatemap(df, subdirectory_path)
         excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
         df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
@@ -444,7 +445,10 @@ class SinglePointScreen(QMainWindow):
             try:
                 well = saLine[iWellColPosition]
                 raw_data = float(saLine[iDataColPosition])
-            except:
+            except Exception as e:
+                #print(f'{saLine}')
+                #print(f'{iDataColPosition}')
+                #print(f'{str(e)}')
                 self.printQcLog(f'The raw data column is not numeric in plate {sPlate} well {well}', 'error', beep=True)
                 #return df
                 #raw_data = 0
@@ -501,6 +505,8 @@ class SinglePointScreen(QMainWindow):
                     self.printQcLog(f'Data column {sDataColumn} not present in datafile {file}', 'error')
                     sFile = os.path.basename(file.name)
                     self.updateRawdataStatus(sFile, f"Could not find column {sDataColumn} in file", 'error')
+                    #print(sDataColumn)
+                    #print(saLine)
                 iWellColPosition = saLine.index('Well')
                 saDataLines = saLines[iLineNumber:]
                 iLineNumber = 0
@@ -637,6 +643,12 @@ class SinglePointScreen(QMainWindow):
                      iWellColPosition) = self.digestPlate(sPlate,
                                                           file,
                                                           self.dataColumn_cb.currentText())
+                    try:
+                        iDataColPosition = int(iDataColPosition)
+                    except:
+                        print(f'iDataColPosition ', iDataColPosition)
+                        continue
+                    
                     dfPlate = self.extractData(sFile,
                                                sPlate,
                                                saDataLines,
