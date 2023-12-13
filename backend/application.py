@@ -443,13 +443,17 @@ class PrintPlateLabel(tornado.web.RequestHandler):
 
 @jwtauth
 class GetPlate(tornado.web.RequestHandler):
-    def get(self):
-        sSql = f'''select config_id plate,
+    def get(self, sPlate):
+        # Platt ID	Well	Compound ID	Batch nr	Form	Conc (mM)
+
+
+        sSql = f'''select
+        config_id plate,
         well,
         compound_id,
-        notebook_ref,
-        form,
-        conc from cool.config where config_id = '{plate_id}'
+        notebook_ref batch_id,
+        conc
+        from cool.config where config_id = '{sPlate}'
         '''
         cur.execute(sSql)
         res = res2json()
