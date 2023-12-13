@@ -95,6 +95,7 @@ def calculatePlateData(df, plate, ws):
     try:
         Z = 1 - (pos3SD + neg3SD)/abs(meanPosCtrl - meanNegCtrl)
     except:
+        printQcLog(f'Failed calculating plate: {plate}')
         return False
     condition = (df['type'] == 'Neg') | (df['type'] == 'Pos')
     df['inhibition'] = np.where(condition, None, 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)))
@@ -106,15 +107,16 @@ def calculatePlateData(df, plate, ws):
 
 def plotZfactor(df):
     # Create a bar plot for the 'Z-factor' column
-    plt.bar(df['Plate'], df['Z-factor'], tick_label=df['Plate'])
+    plt.bar(range(len(df['Plate'])), df['Z-factor'])
     
     # Set labels and title
     plt.xlabel('Plate')
     plt.ylabel('Z-factor')
     plt.title('Bar Plot of Z-factor')
-    plt.xticks(fontsize=6)
-    plt.xticks(range(1, len(df) +1, 2), fontsize=6)
 
+    plt.xticks(fontsize=6)
+    plt.xticks(range(1, len(df) +1, 3), fontsize=6)
+    
     image_buffer = io.BytesIO()
     plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
     plt.close()

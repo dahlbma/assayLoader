@@ -449,7 +449,7 @@ class SinglePointScreen(QMainWindow):
                 #print(f'{saLine}')
                 #print(f'{iDataColPosition}')
                 #print(f'{str(e)}')
-                self.printQcLog(f'The raw data column is not numeric in plate {sPlate} well {well}', 'error', beep=True)
+                self.printQcLog(f'The raw data value is not numeric in plate {sPlate} well {well}', 'error', beep=False)
                 #return df
                 #raw_data = 0
                 continue
@@ -729,7 +729,8 @@ class SinglePointScreen(QMainWindow):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             newHitThreshold, dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
-        except:
+        except Exception as e:
+            print(f"{str(e)}")
             self.printQcLog(f"Error calculating QC", 'error')
             QApplication.restoreOverrideCursor()
             return
