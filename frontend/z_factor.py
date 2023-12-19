@@ -128,7 +128,6 @@ def inhibitionScatterPlot(df_inhibition, hitLimit):
     plt.scatter(range(len(df_inhibition)), df_inhibition['posCtrlInhibition'], label='PosCtrl', marker='.', s=1, c='green')
     plt.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2, c='blue')
     plt.scatter(range(len(df_inhibition)), df_inhibition['negCtrlInhibition'], label='NegCtrl', marker='.', s=1, c='red')
-
     # Draw a horizontal line at the hit limit
     plt.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
 

@@ -20,6 +20,7 @@ y_data = np.array([0.1, 0.3, 0.6, 0.9, 1.0])
 
 # Fit the data to the 4-PL model
 params, covariance = curve_fit(fourpl, x_data, y_data, p0=[1, 3, 0, 1])
+#params, covariance = curve_fit(fourpl, x_data, y_data)
 
 # Extract the fitted parameters
 a_fit, b_fit, c_fit, d_fit = params

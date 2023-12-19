@@ -14,6 +14,7 @@ from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
 import platform
+from inhibitionScatter import ScatterPlotWindow
 
 # Get the operating system name
 os_name = platform.system()
@@ -717,6 +718,34 @@ class SinglePointScreen(QMainWindow):
             self.sp_table.setItem(iRow_index, iCol, item)
             iRow_index += 1
 
+
+    def show_scatter_plot(self):
+        scatter_window = ScatterPlotWindow(self)
+        scatter_window.setGeometry(200, 200, 800, 600)
+        scatter_window.show()
+
+
+    def inhibitionScatterPlot(self, df_inhibition, hitLimit):
+        # Create a scatterplot of the "inhibition" columns
+        plt.scatter(range(len(df_inhibition)), df_inhibition['posCtrlInhibition'], label='PosCtrl', marker='.', s=1, c='green')
+        plt.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2, c='blue')
+        plt.scatter(range(len(df_inhibition)), df_inhibition['negCtrlInhibition'], label='NegCtrl', marker='.', s=1, c='red')
+        # Draw a horizontal line at the hit limit
+        plt.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
+        
+        # Set labels and title
+        plt.xlabel('Data Points')
+        plt.ylabel('Inhibition')
+        plt.title('Inhibition scatterplot')
+        
+        # Add a legend
+        plt.legend()
+        
+        image_buffer = io.BytesIO()
+        plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
+        plt.close()
+        return image_buffer
+
         
     def runQc(self):
         self.printQcLog('running QC')
@@ -734,14 +763,14 @@ class SinglePointScreen(QMainWindow):
             self.printQcLog(f"Error calculating QC", 'error')
             QApplication.restoreOverrideCursor()
             return
-
+        
+        self.inhibitionScatterPlot(df_inhibition, newHitThreshold)
         dfQcData['inhibition'] = pd.to_numeric(dfQcData['inhibition'], errors='coerce').round(2)
         newHitThreshold = "{:.2f}".format(newHitThreshold)
         self.hitThreshold_eb.setText(str(newHitThreshold))
 
         mask = dfQcData['compound_id'].str.startswith('CBK')
         dfQcData = dfQcData[mask].reset_index(drop=True)
-        
 
         if os_name == "Windows":
             subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
