@@ -51,7 +51,8 @@ class SinglePointScreen(QMainWindow):
         self.fileToPlateMap_btn.clicked.connect(self.selectFileToPlateMap)
         self.fileToPlateMap_btn.setDisabled(True)
         
-        self.runQc_btn.setDisabled(True)
+        self.runQc_btn.setEnabled(True)
+        #self.runQc_btn.setDisabled(True)
         self.runQc_btn.clicked.connect(self.runQc)
 
         self.generateQcInput_btn.setDisabled(True)
@@ -719,9 +720,10 @@ class SinglePointScreen(QMainWindow):
             iRow_index += 1
 
 
-    def show_scatter_plot(self):
+    def show_scatter_plot(self, df):
         scatter_window = ScatterPlotWindow(self)
         scatter_window.setGeometry(200, 200, 800, 600)
+        scatter_window.show_data(df)
         scatter_window.show()
 
 
@@ -764,7 +766,8 @@ class SinglePointScreen(QMainWindow):
             QApplication.restoreOverrideCursor()
             return
         
-        self.inhibitionScatterPlot(df_inhibition, newHitThreshold)
+        self.show_scatter_plot(dfQcData)
+        
         dfQcData['inhibition'] = pd.to_numeric(dfQcData['inhibition'], errors='coerce').round(2)
         newHitThreshold = "{:.2f}".format(newHitThreshold)
         self.hitThreshold_eb.setText(str(newHitThreshold))
