@@ -44,10 +44,11 @@ class ScatterPlotWindow(QMainWindow):
         try:
             y_val = self.df['inhibition'][index]
         except:
+            # We hit the inhibition line, jus return
             return
-        label = self.df['plate'][index]
+        plate = self.df['plate'][index]
         well = self.df['well'][index]
-        tooltip_text = f'{label} {well}\nInhibition: {y_val:.2f}'
+        tooltip_text = f'{plate} {well}\nInhibition: {y_val:.2f}'
 
         sel.annotation.set_text(tooltip_text)
         sel.annotation.get_bbox_patch().set_facecolor('white')
