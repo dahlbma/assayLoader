@@ -32,6 +32,7 @@ class ScatterPlotWindow(QMainWindow):
 
     def show_data(self, sel):
         index = sel.index
+        print(index)
         x_val = self.data['x'][index]
         y_val = self.data['y'][index]
         label = self.data['label'][index]

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -20,30 +20,39 @@ class ScatterPlotWindow(QMainWindow):
         layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
 
-        #self.data = {'x': np.random.rand(100), 'y': np.random.rand(100), 'label': [f'Data {i+1}' for i in range(100)]}
-        #self.scatter = self.ax.scatter(self.data['x'], self.data['y'], picker=True)
-        self.ax.set_xlabel('X-axis')
-        self.ax.set_ylabel('Y-axis')
+        self.ax.set_xlabel('Data point')
+        self.ax.set_ylabel('Inhibition')
 
-        mplcursors.cursor(hover=True).connect("add", self.show_data)
+        self.setWindowTitle('Inhibition')
 
-        self.setWindowTitle('Scatter Plot Window')
 
-    def show_data(self, df):
+    def show_data(self, df, hitLimit):
         self.df = df
-        self.data = {'x': self.df.index, 'y': df['inhibition'], 'label': [f'Data {self.df.index}']}
-        self.scatter = self.ax.scatter(self.df.index, self.df['inhibition'], picker=True)
 
-        index = self.df.index
-        x_val = self.df.index[index]
-        y_val = self.df['inhibition'][index]
-        #label = self.data['label'][index]
+        # Create a scatterplot of the "inhibition" columns
+        self.ax.scatter(range(len(df)), df['posCtrlInhibition'], label='PosCtrl', marker='.', s=30, c='green')
+        self.ax.scatter(range(len(df)), df['inhibition'], label='Inhibition', marker='.', s=30, c='blue')
+        self.ax.scatter(range(len(df)), df['negCtrlInhibition'], label='NegCtrl', marker='.', s=30, c='red')
+        # Draw a horizontal line at the hit limit
+        self.ax.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
+        mplcursors.cursor(hover=True).connect("add", self.show_tooltip)
+        
 
-        #tooltip_text = f'{label}\nX: {x_val:.2f}\nY: {y_val:.2f}'
+    def show_tooltip(self, sel):
+        index = sel.index
+        x_val = index
+        try:
+            y_val = self.df['inhibition'][index]
+        except:
+            return
+        label = self.df['plate'][index]
+        well = self.df['well'][index]
+        tooltip_text = f'{label} {well}\nInhibition: {y_val:.2f}'
 
-        #self.annotation.set_text(tooltip_text)
-        #self.annotation.get_bbox_patch().set_facecolor('white')
-        #self.annotation.get_bbox_patch().set_alpha(0.7)
+        sel.annotation.set_text(tooltip_text)
+        sel.annotation.get_bbox_patch().set_facecolor('white')
+        sel.annotation.get_bbox_patch().set_alpha(0.7)
+
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

@@ -720,10 +720,10 @@ class SinglePointScreen(QMainWindow):
             iRow_index += 1
 
 
-    def show_scatter_plot(self, df):
+    def show_scatter_plot(self, df, iHitLimit):
         scatter_window = ScatterPlotWindow(self)
         scatter_window.setGeometry(200, 200, 800, 600)
-        scatter_window.show_data(df)
+        scatter_window.show_data(df, iHitLimit)
         scatter_window.show()
 
 
@@ -766,7 +766,7 @@ class SinglePointScreen(QMainWindow):
             QApplication.restoreOverrideCursor()
             return
         
-        self.show_scatter_plot(dfQcData)
+        self.show_scatter_plot(dfQcData, newHitThreshold)
         
         dfQcData['inhibition'] = pd.to_numeric(dfQcData['inhibition'], errors='coerce').round(2)
         newHitThreshold = "{:.2f}".format(newHitThreshold)
