@@ -12,11 +12,12 @@ def calculate_hill_slope(a):
 
 # Function to calculate IC50
 def calculate_ic50(a, b, c, d):
-    return b * ((d - c) / 2)**(1/a)
+    return b
 
 # Generate example data
-x_data = np.array([1, 10, 100, 1000, 10000])
-y_data = np.array([0.1, 0.3, 0.6, 0.9, 1.0])
+x_data = np.array([0.1, 1, 10, 100, 1000, 10000, 100000])
+y_data = np.array([0.041, 0.1, 0.3, 0.6, 0.9, 0.9, 1.100])
+
 
 # Fit the data to the 4-PL model
 params, covariance = curve_fit(fourpl, x_data, y_data, p0=[1, 3, 0, 1])
