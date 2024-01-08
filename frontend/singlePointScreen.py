@@ -286,6 +286,9 @@ class SinglePointScreen(QMainWindow):
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
 
         subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
+        if subdirectory_path == "preparedHaronyFiles":
+            return
+        print(subdirectory_path)
         try:
             os.makedirs(subdirectory_path)
         except:
