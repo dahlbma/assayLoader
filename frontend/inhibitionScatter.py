@@ -42,13 +42,26 @@ class ScatterPlotWindow(QMainWindow):
         index = sel.index
         x_val = index
         try:
-            y_val = self.df['inhibition'][index]
+            if pd.isna(self.df['inhibition'][index]):
+                if pd.isna(self.df['negCtrlInhibition'][index]):
+                    if pd.isna(self.df['posCtrlInhibition'][index]):
+                        y_val = 'Fix me'
+                    else:
+                        y_val = self.df['posCtrlInhibition'][index]
+                else:
+                    y_val = self.df['negCtrlInhibition'][index]
+            else:
+                y_val = self.df['inhibition'][index]
+
         except:
             # We hit the inhibition line, jus return
             return
+
+        pd.isna(y_val)
         plate = self.df['plate'][index]
         well = self.df['well'][index]
-        tooltip_text = f'{plate} {well}\nInhibition: {y_val:.2f}'
+        compound_id = self.df['compound_id'][index]
+        tooltip_text = f'{plate} {well}\nCmp: {compound_id}\nInhibition: {y_val:.2f}'
 
         sel.annotation.set_text(tooltip_text)
         sel.annotation.get_bbox_patch().set_facecolor('white')
