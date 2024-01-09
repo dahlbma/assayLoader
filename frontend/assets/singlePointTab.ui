@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1423</width>
-    <height>881</height>
+    <width>1473</width>
+    <height>886</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -302,421 +302,364 @@
              </attribute>
              <layout class="QGridLayout" name="verticalLayout_5">
               <item row="0" column="0">
-               <widget class="QFrame" name="frame_4">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+               <layout class="QGridLayout" name="gridLayout_3">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
-                <property name="frameShape">
-                 <enum>QFrame::NoFrame</enum>
+                <property name="bottomMargin">
+                 <number>1</number>
                 </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_3">
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="QFrame" name="frame_5">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::NoFrame</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                   <widget class="QWidget" name="">
-                    <property name="geometry">
-                     <rect>
-                      <x>9</x>
-                      <y>10</y>
-                      <width>1371</width>
-                      <height>711</height>
-                     </rect>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_3">
-                     <property name="sizeConstraint">
-                      <enum>QLayout::SetDefaultConstraint</enum>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>1</number>
-                     </property>
-                     <item row="0" column="0">
-                      <layout class="QHBoxLayout" name="horizontalLayout_19">
-                       <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_11">
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_27">
-                           <item>
-                            <widget class="QLabel" name="label_16">
-                             <property name="text">
-                              <string>Instrument</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QComboBox" name="instrument_cb"/>
-                           </item>
-                           <item>
-                            <spacer name="horizontalSpacer_19">
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                              <size>
-                               <width>40</width>
-                               <height>20</height>
-                              </size>
-                             </property>
-                            </spacer>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_29">
-                           <item>
-                            <widget class="QPushButton" name="platemapFile_btn">
-                             <property name="text">
-                              <string>Platemap file</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QLabel" name="platemapFile_lab">
-                             <property name="font">
-                              <font>
-                               <pointsize>8</pointsize>
-                              </font>
-                             </property>
-                             <property name="text">
-                              <string>:</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <spacer name="horizontalSpacer_21">
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                              <size>
-                               <width>40</width>
-                               <height>20</height>
-                              </size>
-                             </property>
-                            </spacer>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_30">
-                           <item>
-                            <widget class="QPushButton" name="fileToPlateMap_btn">
-                             <property name="text">
-                              <string>Filename to plate file</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QLabel" name="fileToPlate_lab">
-                             <property name="font">
-                              <font>
-                               <pointsize>8</pointsize>
-                              </font>
-                             </property>
-                             <property name="text">
-                              <string>:</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <spacer name="horizontalSpacer_22">
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                              <size>
-                               <width>40</width>
-                               <height>20</height>
-                              </size>
-                             </property>
-                            </spacer>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_28">
-                           <item>
-                            <widget class="QLabel" name="label_17">
-                             <property name="text">
-                              <string>Raw data column</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QComboBox" name="dataColumn_cb"/>
-                           </item>
-                           <item>
-                            <spacer name="horizontalSpacer_20">
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                              <size>
-                               <width>40</width>
-                               <height>20</height>
-                              </size>
-                             </property>
-                            </spacer>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_31">
-                           <item>
-                            <widget class="QPushButton" name="generateQcInput_btn">
-                             <property name="text">
-                              <string>Generate input to QC</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <spacer name="horizontalSpacer_23">
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                              <size>
-                               <width>40</width>
-                               <height>20</height>
-                              </size>
-                             </property>
-                            </spacer>
-                           </item>
-                          </layout>
-                         </item>
-                        </layout>
-                       </item>
-                       <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_12">
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_18">
-                           <item>
-                            <layout class="QHBoxLayout" name="horizontalLayout_17">
-                             <item>
-                              <layout class="QVBoxLayout" name="verticalLayout_13">
-                               <item>
-                                <layout class="QHBoxLayout" name="horizontalLayout_33">
-                                 <item>
-                                  <widget class="QLabel" name="label_18">
-                                   <property name="text">
-                                    <string>Pos ctrl</string>
-                                   </property>
-                                  </widget>
-                                 </item>
-                                 <item>
-                                  <widget class="QLineEdit" name="posCtrl_eb"/>
-                                 </item>
-                                </layout>
-                               </item>
-                               <item>
-                                <layout class="QHBoxLayout" name="horizontalLayout_34">
-                                 <item>
-                                  <widget class="QLabel" name="label_19">
-                                   <property name="text">
-                                    <string>Neg ctrl</string>
-                                   </property>
-                                  </widget>
-                                 </item>
-                                 <item>
-                                  <widget class="QLineEdit" name="negCtrl_eb"/>
-                                 </item>
-                                </layout>
-                               </item>
-                              </layout>
-                             </item>
-                             <item>
-                              <layout class="QVBoxLayout" name="verticalLayout_10">
-                               <item>
-                                <layout class="QHBoxLayout" name="horizontalLayout_15">
-                                 <item>
-                                  <widget class="QLabel" name="label_14">
-                                   <property name="text">
-                                    <string>Min pos ctrl</string>
-                                   </property>
-                                  </widget>
-                                 </item>
-                                 <item>
-                                  <widget class="QLineEdit" name="minPosCtrl_eb"/>
-                                 </item>
-                                </layout>
-                               </item>
-                               <item>
-                                <layout class="QHBoxLayout" name="horizontalLayout_16">
-                                 <item>
-                                  <widget class="QLabel" name="label_15">
-                                   <property name="text">
-                                    <string>Max neg ctrl</string>
-                                   </property>
-                                  </widget>
-                                 </item>
-                                 <item>
-                                  <widget class="QLineEdit" name="maxNegCtrl_eb"/>
-                                 </item>
-                                </layout>
-                               </item>
-                              </layout>
-                             </item>
-                            </layout>
-                           </item>
-                           <item>
-                            <layout class="QHBoxLayout" name="horizontalLayout_35">
-                             <item>
-                              <layout class="QHBoxLayout" name="horizontalLayout_36">
-                               <item>
-                                <widget class="QLabel" name="label_20">
-                                 <property name="text">
-                                  <string>Hit theshold (default 3σ)</string>
-                                 </property>
-                                </widget>
-                               </item>
-                               <item>
-                                <widget class="QLineEdit" name="hitThreshold_eb"/>
-                               </item>
-                              </layout>
-                             </item>
-                            </layout>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_37">
-                           <item>
-                            <layout class="QHBoxLayout" name="horizontalLayout_38">
-                             <item>
-                              <widget class="QLabel" name="label_21">
-                               <property name="text">
-                                <string>Output file</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="outputFile_eb"/>
-                             </item>
-                            </layout>
-                           </item>
-                           <item>
-                            <layout class="QHBoxLayout" name="horizontalLayout_39">
-                             <item>
-                              <widget class="QPushButton" name="runQc_btn">
-                               <property name="text">
-                                <string>Run QC</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <spacer name="horizontalSpacer_24">
-                               <property name="orientation">
-                                <enum>Qt::Horizontal</enum>
-                               </property>
-                               <property name="sizeHint" stdset="0">
-                                <size>
-                                 <width>40</width>
-                                 <height>20</height>
-                                </size>
-                               </property>
-                              </spacer>
-                             </item>
-                            </layout>
-                           </item>
-                          </layout>
-                         </item>
-                         <item>
-                          <widget class="QLabel" name="qcInputFile_lab">
-                           <property name="text">
-                            <string>:</string>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
-                       </item>
-                      </layout>
-                     </item>
-                     <item row="1" column="0">
-                      <layout class="QHBoxLayout" name="horizontalLayout_2">
-                       <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_14">
-                         <item>
-                          <widget class="QLabel" name="label_22">
-                           <property name="text">
-                            <string>Raw data files:</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QTableWidget" name="inputFiles_tab">
-                           <column>
+                <item row="0" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_19">
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_11">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_27">
+                      <item>
+                       <widget class="QLabel" name="label_16">
+                        <property name="text">
+                         <string>Instrument</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QComboBox" name="instrument_cb"/>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_19">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_29">
+                      <item>
+                       <widget class="QPushButton" name="platemapFile_btn">
+                        <property name="text">
+                         <string>Platemap file</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="platemapFile_lab">
+                        <property name="font">
+                         <font>
+                          <pointsize>8</pointsize>
+                         </font>
+                        </property>
+                        <property name="text">
+                         <string>:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_21">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_30">
+                      <item>
+                       <widget class="QPushButton" name="fileToPlateMap_btn">
+                        <property name="text">
+                         <string>Filename to plate file</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="fileToPlate_lab">
+                        <property name="font">
+                         <font>
+                          <pointsize>8</pointsize>
+                         </font>
+                        </property>
+                        <property name="text">
+                         <string>:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_22">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_28">
+                      <item>
+                       <widget class="QLabel" name="label_17">
+                        <property name="text">
+                         <string>Raw data column</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QComboBox" name="dataColumn_cb"/>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_20">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_31">
+                      <item>
+                       <widget class="QPushButton" name="generateQcInput_btn">
+                        <property name="text">
+                         <string>Generate input to QC</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_23">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_12">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_18">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_17">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_13">
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_33">
+                            <item>
+                             <widget class="QLabel" name="label_18">
+                              <property name="text">
+                               <string>Pos ctrl</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLineEdit" name="posCtrl_eb"/>
+                            </item>
+                           </layout>
+                          </item>
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_34">
+                            <item>
+                             <widget class="QLabel" name="label_19">
+                              <property name="text">
+                               <string>Neg ctrl</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLineEdit" name="negCtrl_eb"/>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_10">
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_15">
+                            <item>
+                             <widget class="QLabel" name="label_14">
+                              <property name="text">
+                               <string>Min pos ctrl</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLineEdit" name="minPosCtrl_eb"/>
+                            </item>
+                           </layout>
+                          </item>
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_16">
+                            <item>
+                             <widget class="QLabel" name="label_15">
+                              <property name="text">
+                               <string>Max neg ctrl</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLineEdit" name="maxNegCtrl_eb"/>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_35">
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_36">
+                          <item>
+                           <widget class="QLabel" name="label_20">
                             <property name="text">
-                             <string>File</string>
+                             <string>Hit theshold (default 3σ)</string>
                             </property>
-                           </column>
-                           <column>
-                            <property name="text">
-                             <string>Status</string>
-                            </property>
-                           </column>
-                          </widget>
-                         </item>
-                        </layout>
-                       </item>
-                       <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_8">
-                         <item>
-                          <widget class="QLabel" name="label_12">
-                           <property name="text">
-                            <string>Log output:</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QTextEdit" name="qcLog_te">
-                           <property name="font">
-                            <font>
-                             <pointsize>8</pointsize>
-                            </font>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="hitThreshold_eb"/>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_37">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_38">
+                        <item>
+                         <widget class="QLabel" name="label_21">
+                          <property name="text">
+                           <string>Output file</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="outputFile_eb"/>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_39">
+                        <item>
+                         <widget class="QPushButton" name="runQc_btn">
+                          <property name="text">
+                           <string>Run QC</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_24">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="qcInputFile_lab">
+                      <property name="text">
+                       <string>:</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+                <item row="1" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_14">
+                    <item>
+                     <widget class="QLabel" name="label_22">
+                      <property name="text">
+                       <string>Raw data files:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTableWidget" name="inputFiles_tab">
+                      <column>
+                       <property name="text">
+                        <string>File</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Status</string>
+                       </property>
+                      </column>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                    <item>
+                     <widget class="QLabel" name="label_12">
+                      <property name="text">
+                       <string>Log output:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTextEdit" name="qcLog_te">
+                      <property name="font">
+                       <font>
+                        <pointsize>8</pointsize>
+                       </font>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -1444,8 +1387,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1423</width>
-     <height>20</height>
+     <width>1473</width>
+     <height>23</height>
     </rect>
    </property>
   </widget>
