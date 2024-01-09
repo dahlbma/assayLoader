@@ -399,7 +399,7 @@ class UploadLauncher(tornado.web.RequestHandler):
 @jwtauth
 class GetInstruments(tornado.web.RequestHandler):
     def get(self):
-        sSql = f'select instrument_name from assayloader.instrument'
+        sSql = f'select instrument_name from assayloader.instrument order by pkey asc'
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
