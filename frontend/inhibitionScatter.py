@@ -65,7 +65,7 @@ class ScatterPlotWindow(QMainWindow):
 
         sel.annotation.set_text(tooltip_text)
         sel.annotation.get_bbox_patch().set_facecolor('white')
-        sel.annotation.get_bbox_patch().set_alpha(0.7)
+        sel.annotation.get_bbox_patch().set_alpha(0.9)
 
 
     def resizeEvent(self, event):

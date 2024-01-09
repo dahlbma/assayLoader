@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import os
+os.environ["XDG_SESSION_TYPE"] = "xcb"
+
 
 # Define the 4-PL model function
 def fourpl(x, a, b, c, d):
