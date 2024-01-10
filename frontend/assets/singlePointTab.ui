@@ -515,7 +515,11 @@
                              </widget>
                             </item>
                             <item>
-                             <widget class="QLineEdit" name="minPosCtrl_eb"/>
+                             <widget class="QLineEdit" name="minPosCtrl_eb">
+                              <property name="text">
+                               <string>0</string>
+                              </property>
+                             </widget>
                             </item>
                            </layout>
                           </item>
@@ -529,7 +533,11 @@
                              </widget>
                             </item>
                             <item>
-                             <widget class="QLineEdit" name="maxNegCtrl_eb"/>
+                             <widget class="QLineEdit" name="maxNegCtrl_eb">
+                              <property name="text">
+                               <string>0</string>
+                              </property>
+                             </widget>
                             </item>
                            </layout>
                           </item>
@@ -1388,7 +1396,7 @@
      <x>0</x>
      <y>0</y>
      <width>1473</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

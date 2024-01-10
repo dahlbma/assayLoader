@@ -3,7 +3,7 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
 from PyQt5.QtCore import Qt, QDate, QUrl
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor
+from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QDoubleValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import openpyxl
 from pathlib import Path
@@ -15,6 +15,7 @@ from assaylib import *
 from prepareHarmonyFile import *
 import platform
 from inhibitionScatter import ScatterPlotWindow
+
 
 # Get the operating system name
 os_name = platform.system()
@@ -97,6 +98,11 @@ class SinglePointScreen(QMainWindow):
             "neg_ctrl": False,
             "qc_output_file": False
         }
+
+        validator = QDoubleValidator()
+        validator.setNotation(QDoubleValidator.StandardNotation)
+        self.minPosCtrl_eb.setValidator(validator)
+        self.maxNegCtrl_eb.setValidator(validator)
 
 
     def saveSpToDb(self):
@@ -755,6 +761,10 @@ class SinglePointScreen(QMainWindow):
     def runQc(self):
         self.printQcLog('running QC')
         sOutput = self.outputFile_eb.text()
+        
+        iMinPosCtrl = int(self.minPosCtrl_eb.text())
+        iMaxNegCtrl = int(self.maxNegCtrl_eb.text())
+
         iHitThreshold = self.hitThreshold_eb.text()
         try:
             slask = int(iHitThreshold)
@@ -762,7 +772,12 @@ class SinglePointScreen(QMainWindow):
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            newHitThreshold, dfQcData = calcQc(self, "preparedZinput.csv", sOutput, iHitThreshold)
+            newHitThreshold, dfQcData = calcQc(self,
+                                               "preparedZinput.csv",
+                                               sOutput,
+                                               iHitThreshold,
+                                               iMinPosCtrl,
+                                               iMaxNegCtrl)
         except Exception as e:
             print(f"{str(e)}")
             self.printQcLog(f"Error calculating QC", 'error')

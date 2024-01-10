@@ -54,7 +54,7 @@ class ScatterPlotWindow(QMainWindow):
                 y_val = self.df['inhibition'][index]
 
         except:
-            # We hit the inhibition line, jus return
+            # We hit the inhibition line, just return
             return
 
         pd.isna(y_val)

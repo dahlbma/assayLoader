@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -76,7 +77,8 @@ def setBackgroundColor(ws, color, start_cell, end_cell):
         for cell in row:
             cell.fill = fill
 
-def calculatePlateData(df, plate, ws):
+def calculatePlateData(self, df, plate, ws, iMinPosCtrl, iMaxNegCtrl):
+    lReRun = False
     dataDf = df.loc[df['type'] == 'Data']
     posDf = df.loc[df['type'] == 'Pos']
     negDf = df.loc[df['type'] == 'Neg']
@@ -102,8 +104,20 @@ def calculatePlateData(df, plate, ws):
 
     df['negCtrlInhibition'] = np.where(df['type'] == 'Neg', 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
     df['posCtrlInhibition'] = np.where(df['type'] == 'Pos', 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)), None)
-    
-    return df, Z, meanPosCtrl, stdPosCtrl, meanNegCtrl, stdNegCtrl, meanInhib, stdInhib
+
+    iCurLen = df.shape[0]
+    if iMinPosCtrl != 0:
+        df = df[df['posCtrlInhibition'].isna() | (df['posCtrlInhibition'] > iMinPosCtrl)]
+
+    if iMaxNegCtrl != 0:
+        df = df[df['negCtrlInhibition'].isna() | (df['negCtrlInhibition'] < iMaxNegCtrl)]
+
+    if iCurLen != df.shape[0]:
+        self.printQcLog(f"Removed {iCurLen - df.shape[0]} data points from {plate}")
+        #calculatePlateData(df, plate, ws, iMinPosCtrl, iMaxNegCtrl)
+        lReRun = True
+        
+    return df, Z, meanPosCtrl, stdPosCtrl, meanNegCtrl, stdNegCtrl, meanInhib, stdInhib, lReRun
 
 def plotZfactor(df):
     # Create a bar plot for the 'Z-factor' column
@@ -121,6 +135,41 @@ def plotZfactor(df):
     plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
     plt.close()
     return image_buffer
+
+
+def inhibitionScatterPlotNew(df_inhibition, hitLimit):
+    # Create a scatterplot of the "inhibition" columns
+    fig, ax = plt.subplots()
+
+    
+    ax.scatter(range(len(df_inhibition)), df_inhibition['posCtrlInhibition'], label='PosCtrl', marker='.', s=1, c='green')
+    ax.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2, c='blue')
+    ax.scatter(range(len(df_inhibition)), df_inhibition['negCtrlInhibition'], label='NegCtrl', marker='.', s=1, c='red')
+    # Draw a horizontal line at the hit limit
+    plt.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
+
+    # Set labels and title
+    ax.set_xlabel('Data Points')
+    ax.set_ylabel('Inhibition')
+    ax.set_title('Inhibition scatterplot')
+    
+    # Add a legend
+    ax.legend()
+
+    canvas = FigureCanvasAgg(fig)
+    canvas.draw()
+
+    # Extract the image buffer as a numpy array
+    image_buffer = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
+    image_buffer = image_buffer.reshape(canvas.get_width_height()[::-1] + (3,))
+
+    image_io = io.BytesIO()
+
+    # Save the image buffer to the virtual file-like object
+    plt.imsave(image_io, image_buffer, format='png')
+    image_io.seek(0)
+
+    return image_io
 
 
 def inhibitionScatterPlot(df_inhibition, hitLimit):
@@ -180,7 +229,7 @@ def plotMeanStd(values, stds, sHeader):
     return image_buffer
 
 
-def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold):
+def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl, iMaxNegCtrl):
     columns = ['Plate', 'meanRaw', 'stdRaw', 'meanNegCtrl', 'stdNegCtrl', 'meanPosCtrl', 'stdPosCtrl', 'Z-factor']
     df_summary = pd.DataFrame(columns=columns)
     df_inhibition = pd.DataFrame(columns=['inhibition'])
@@ -201,7 +250,19 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold):
          meanNegCtrl,
          stdNegCtrl,
          meanRaw,
-         stdRaw) = calculatePlateData(plate_df, plate, ws)
+         stdRaw,
+         lReRun) = calculatePlateData(self, plate_df, plate, ws, iMinPosCtrl, iMaxNegCtrl)
+        if lReRun:
+            (df_plate,
+             Z,
+             meanPosCtrl,
+             stdPosCtrl,
+             meanNegCtrl,
+             stdNegCtrl,
+             meanRaw,
+             stdRaw,
+             lReRun) = calculatePlateData(self, df_plate, plate, ws, iMinPosCtrl, iMaxNegCtrl)
+            
         listOfDfPlates.append(df_plate)
         new_row = {'Plate': plate,
                    'meanRaw': meanRaw,
@@ -461,8 +522,8 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
         if percentile < 10 or percentile > 90:
             cell.font = whiteFont
 
-def calcQc(self, input_file, output_file, iHitThreshold):
-        
+def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtrl):
+    
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
     self.printQcLog(f"Reading input")
@@ -512,7 +573,9 @@ def calcQc(self, input_file, output_file, iHitThreshold):
                                                                                  df,
                                                                                  screenDataWs,
                                                                                  heatMapsWs,
-                                                                                 iHitThreshold)
+                                                                                 iHitThreshold,
+                                                                                 iMinPosCtrl,
+                                                                                 iMaxNegCtrl)
     self.printQcLog(f"All data read")
 
     for column in screenDataWs.columns:
