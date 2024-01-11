@@ -306,7 +306,7 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     ws['K5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
 
     ##############################
-    # Next two lines are used to avoid a bug with image io-buffer. Without these lines the wrong images appear if you runQc
+    # Next two lines are used to avoid a bug with image in "io.BytesIO". Without these lines the wrong images appear if you runQc
     # several times without restarting the application
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
