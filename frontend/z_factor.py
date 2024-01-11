@@ -119,6 +119,7 @@ def calculatePlateData(self, df, plate, ws, iMinPosCtrl, iMaxNegCtrl):
         
     return df, Z, meanPosCtrl, stdPosCtrl, meanNegCtrl, stdNegCtrl, meanInhib, stdInhib, lReRun
 
+
 def plotZfactor(df):
     # Create a bar plot for the 'Z-factor' column
     plt.bar(range(len(df['Plate'])), df['Z-factor'])
@@ -141,7 +142,6 @@ def inhibitionScatterPlotNew(df_inhibition, hitLimit):
     # Create a scatterplot of the "inhibition" columns
     fig, ax = plt.subplots()
 
-    
     ax.scatter(range(len(df_inhibition)), df_inhibition['posCtrlInhibition'], label='PosCtrl', marker='.', s=1, c='green')
     ax.scatter(range(len(df_inhibition)), df_inhibition['inhibition'], label='Inhibition', marker='.', s=2, c='blue')
     ax.scatter(range(len(df_inhibition)), df_inhibition['negCtrlInhibition'], label='NegCtrl', marker='.', s=1, c='red')
@@ -305,6 +305,13 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     ws['K4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
     ws['K5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
 
+    ##############################
+    # Next two lines are used to avoid a bug with image io-buffer. Without these lines the wrong images appear if you runQc
+    # several times without restarting the application
+    inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
+    inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
+    ##############################
+    
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     negPlt = plotMeanStd(df_summary['meanNegCtrl'], df_summary['stdNegCtrl'], 'NegCtrl')
     posPlt = plotMeanStd(df_summary['meanPosCtrl'], df_summary['stdPosCtrl'], 'PosCtrl')
