@@ -22,6 +22,7 @@ try:
     with open(file_path, 'r') as file:
         # Read the file line by line
         for line_number, line in enumerate(file, start=1):
+
             # Parse the line as JSON
             try:
                 data_dict = json.loads(line)
@@ -29,6 +30,8 @@ try:
                 print(f"Error decoding JSON in line {line_number}: {e}")
                 continue
 
+            print('############################')
+            print(data_dict.get('Hill', []))
             # Extract the 'x' and 'y' arrays
             x_values = np.array(data_dict.get('x', []))
             y_values = np.array(data_dict.get('y', []))
