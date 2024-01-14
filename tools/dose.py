@@ -35,7 +35,8 @@ try:
 
             try:
                 # Fit the data to the 4-PL model                               a  b  c  d
-                params, covariance = curve_fit(fourpl, x_values, y_values, p0=[1, np.mean(x_values), 0, 1])
+                #a=0.8317, b=0.0000, c=86.0716, d=2.1349
+                params, covariance = curve_fit(fourpl, x_values, y_values, p0=[0.8, np.mean(x_values), 86, 2])
             except:
                 continue
             # Extract the fitted parameters
@@ -65,16 +66,16 @@ try:
             # Plot the original data and the fitted curve with a logarithmic x-axis
             plt.scatter(x_values, y_values, label='Original Data')
             plt.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
-            plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50:.4f}')
+            plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
             plt.xscale('log')  # Set x-axis to logarithmic scale
-            plt.xlabel('Dose or Concentration (log scale)')
+            plt.xlabel('Concentration')
             plt.ylabel('Response')
             plt.legend()
 
             # Print the fitted parameters, Hill slope, and IC50
             print(f"Fitted Parameters: a={a_fit:.4f}, b={b_fit:.4f}, c={c_fit:.4f}, d={d_fit:.4f}")
             print(f"Hill Slope: {hill_slope:.4f}")
-            print(f"IC50: {ic50:.4f}")
+            print(f"IC50: {ic50:.2e}")
             
             plt.show()
 
