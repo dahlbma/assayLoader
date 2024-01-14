@@ -1,0 +1,96 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import os
+import json
+
+# Define the 4-PL model function
+def fourpl(x, a, b, c, d):
+    return c + (d - c) / (1 + (x / b)**a)
+
+# Function to calculate Hill slope
+def calculate_hill_slope(a):
+    return a
+
+# Function to calculate IC50
+def calculate_ic50(a, b, c, d):
+    return b
+
+file_path = "Dose_response_Query.csv"
+
+try:
+    with open(file_path, 'r') as file:
+        # Read the file line by line
+        for line_number, line in enumerate(file, start=1):
+            # Parse the line as JSON
+            try:
+                data_dict = json.loads(line)
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON in line {line_number}: {e}")
+                continue
+
+            # Extract the 'x' and 'y' arrays
+            x_values = np.array(data_dict.get('x', []))
+            y_values = np.array(data_dict.get('y', []))
+
+            try:
+                # Fit the data to the 4-PL model                               a  b  c  d
+                params, covariance = curve_fit(fourpl, x_values, y_values, p0=[1, np.mean(x_values), 0, 1])
+            except:
+                continue
+            # Extract the fitted parameters
+            a_fit, b_fit, c_fit, d_fit = params
+
+            # Calculate the Hill slope
+            hill_slope = calculate_hill_slope(a_fit)
+
+            # Calculate the IC50
+            ic50 = calculate_ic50(a_fit, b_fit, c_fit, d_fit)
+
+
+            # Extract the fitted parameters
+            a_fit, b_fit, c_fit, d_fit = params
+            
+            ## Calculate the Hill slope
+            #hill_slope = calculate_hill_slope(a_fit)
+            
+            ## Calculate the IC50
+            #ic50 = calculate_ic50(a_fit, b_fit, c_fit, d_fit)
+            
+            # Generate a curve using the fitted parameters
+            x_curve = np.logspace(np.log10(min(x_values)), np.log10(max(x_values)), 100)
+            y_curve_fit = fourpl(x_curve, a_fit, b_fit, c_fit, d_fit)
+
+
+            # Plot the original data and the fitted curve with a logarithmic x-axis
+            plt.scatter(x_values, y_values, label='Original Data')
+            plt.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
+            plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50:.4f}')
+            plt.xscale('log')  # Set x-axis to logarithmic scale
+            plt.xlabel('Dose or Concentration (log scale)')
+            plt.ylabel('Response')
+            plt.legend()
+
+            # Print the fitted parameters, Hill slope, and IC50
+            print(f"Fitted Parameters: a={a_fit:.4f}, b={b_fit:.4f}, c={c_fit:.4f}, d={d_fit:.4f}")
+            print(f"Hill Slope: {hill_slope:.4f}")
+            print(f"IC50: {ic50:.4f}")
+            
+            plt.show()
+
+
+
+
+
+            
+            #print(f"Line {line_number}:")
+            #print("x values:", x_values)
+            #print("y values:", y_values)
+            #print()
+
+except FileNotFoundError:
+    print(f"Error: File '{file_path}' not found.")
+except Exception as e:
+    print(f"Error: {e}")
+
+
