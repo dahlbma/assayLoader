@@ -148,7 +148,6 @@ class ScatterplotsTable(QMainWindow):
                 self.table_widget.setItem(line_number, 0, item)
                 self.table_widget.setCellWidget(line_number, 0, scatterplot_widget)
 
-        
                 if line_number > 200:
                     return
 

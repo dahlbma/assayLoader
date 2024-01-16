@@ -269,14 +269,19 @@ class SinglePointScreen(QMainWindow):
         
     def prepareHarmonyFilesII(self):
         
-        def find_files(directory, filename):
+        def find_files(directory, filename_start, filename_end):
+            #matching_files = [filename for filename in os.listdir(directory) if filename.startswith('PlateResults') and filename.endswith('.txt')]
+            
             matching_files = []
             for root, _, files in os.walk(directory):
                 for file in files:
-                    if file == filename:
+                    if file.startswith(filename_start) and file.endswith(filename_end):
                         matching_files.append(os.path.join(root, file))
             return matching_files
-
+            
+            print(matching_files)
+            return matching_files
+            
         data = {
             "plate": [],
             "file": []
@@ -301,8 +306,9 @@ class SinglePointScreen(QMainWindow):
             pass
 
         # Harmony names all raw datafiles to 'PlateResults.txt'
-        file_name = 'PlateResults.txt'
-        harmony_files = find_files(selected_directory, file_name)
+        filename_start = 'PlateResults'
+        filename_end = '.txt'
+        harmony_files = find_files(selected_directory, filename_start, filename_end)
 
         pattern = re.compile(r'P\d{6}')
         for file_name in harmony_files:
