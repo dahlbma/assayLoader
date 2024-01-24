@@ -132,7 +132,7 @@ class SinglePointScreen(QMainWindow):
         
         
     def createPlatemap(self, platesDf, subdirectory_path):
-        columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc (mM)']
+        columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
         platemapDf = pd.DataFrame(columns=columns)
         
         for index, row in platesDf.iterrows():
@@ -142,12 +142,10 @@ class SinglePointScreen(QMainWindow):
             if lSuccess:
                 self.printPrepLog(f'Got plate data for {plate_value}')
 
-                df = pd.DataFrame(plate_data, columns=['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc (mM)'])
+                df = pd.DataFrame(plate_data, columns=columns)
             else:
                 self.printPrepLog(f'Error getting plate {plate_value} {plate_data}', 'error')
             platemapDf = pd.concat([platemapDf if not platemapDf.empty else None, df], ignore_index=True)
-
-            
 
         excel_filename = 'PLATEMAP.xlsx'
         full_path = os.path.join(subdirectory_path, excel_filename)
@@ -477,7 +475,8 @@ class SinglePointScreen(QMainWindow):
                     'batch_id': selected_row['Batch nr'][0],
                     'raw_data': raw_data,
                     'type': sType,
-                    'concentration': selected_row['Conc (mM)'][0]}
+                    'concentration': selected_row['Conc mM'][0],
+                    'volume: selected_row': ['volume nL'][0]}
             df.loc[len(df.index)] = data
         if iData == 0 or iPosCtrl == 0 or iNegCtrl == 0:
             sStatus = 'error'
