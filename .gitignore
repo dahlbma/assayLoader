@@ -67,3 +67,4 @@ nohup.out
 frontend/export_tubeids.txt
 backend/R/.Rhistory
 frontend/Sample_data/test.txt
+*.png
