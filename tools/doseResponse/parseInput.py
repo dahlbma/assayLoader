@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 '''
@@ -13,7 +14,10 @@ C2 = (C1*1000 * V1*1000)/ V2
  This is the Excel formula for calculating the final concentration in each well. In the example
  below the final volume in each well is 30 microL
  =((E3/1000)*(F3/0.000000001))/(30/0.001)
+
+
 '''
+
 
 
 sDataColName = 'Cell Selected - Number of Spots - Mean per Well'
@@ -41,11 +45,6 @@ for index, row in rawDataFilesDf.iterrows():
     else:
         combinedDataDf = pd.concat([combinedDataDf, rawDataDf], ignore_index=True)
 
-#print(len(combinedDataDf))
-#print(len(platemapDf))
-#print(platemapDf)
-#print(combinedDataDf)
-
 platemapDf['rawData'] = ''
 
 for index, row in platemapDf.iterrows():
@@ -62,19 +61,28 @@ for index, row in platemapDf.iterrows():
 columns_to_remove = ['Conc mM', 'volume nL']
 platemapDf = platemapDf.drop(columns=columns_to_remove)
 
-#print(platemapDf)    
 
 excel_file_path = 'prepare_platemap.xlsx'
 platemapDf.to_excel(excel_file_path, index=False)
 
 
 
-# Group by 'Batch' and calculate mean and yErr
-resultDf = platemapDf.groupby(['Batch nr',
-                                'Compound ID',
-                                'finalConc_nL']).agg(yMean=('rawData', 'mean'),
-                                                     yErr=('rawData',
-                                                           lambda x: x.max() - x.min())).reset_index()
+# Group by 'Batch' and calculate mean and yVariance
+#grouped_df = platemapDf.groupby(['Batch nr', 'Compound ID', 'finalConc_nL'])['rawData'].agg(['mean', 'var']).reset_index()
+grouped_df = platemapDf.groupby(['Batch nr', 'Compound ID', 'finalConc_nL'])['rawData'].agg(['mean', 'std']).reset_index()
+resultDf = grouped_df.rename(columns={'mean': 'yMean', 'std': 'yStd'})
+
+### Do proper calculation here instead!!!
+### This is just some dummy scaling 8 (max inhibition value) to be close to 100.
+### Need proper calculation here
+resultDf['yStd'] = resultDf['yStd'] * 12
+
+
+meanPosCtrl = resultDf.loc[resultDf["Compound ID"] == "CTRL", "yMean"].values[0]
+meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]
+
+resultDf['inhibition'] = 100*(1-(resultDf['yMean']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl))
+
 
 # Rename columns if needed
 resultDf = resultDf.rename(columns={'Batch': 'Batch', 'rawData': 'yMean'})

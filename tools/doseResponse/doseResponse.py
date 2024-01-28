@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image
+from openpyxl.styles import Font
+
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -44,24 +47,31 @@ class ScatterplotWidget(QWidget):
 
         # Extract the 'x' and 'y' arrays
         x_values = np.array(df['finalConc_nL'].values/1000000000, dtype=np.float64)
-        y_values = np.array(df['yMean'].values, dtype=np.float64)
-        y_err_values = np.array(df['yErr'].values, dtype=np.float64)
+        #y_values = np.array(df['yMean'].values, dtype=np.float64)
+        y_values = np.array(df['inhibition'].values, dtype=np.float64)
+        y_err_values = np.array(df['yStd'].values, dtype=np.float64)
         
         fitOk = True
         try:
             top = np.max(y_values)
             bottom = np.min(y_values)
-            slope = 1
+            slope = -1
             ic50 = np.mean(x_values)*2
             top = 100
             bottom = 0
             # Fit the data to the 4-PL model
-            params, covariance = curve_fit(fourpl, x_values, y_values, maxfev = 100000, p0=[slope, ic50, bottom, top])
+            params, covariance = curve_fit(fourpl,
+                                           x_values,
+                                           y_values,
+                                           maxfev = 10000,
+                                           p0=[slope, ic50, bottom, top],
+                                           bounds=([-100, 0, -20, 4], [10, 0.01, 40, 120])
+                                           )
             #print(f'covariance: {covariance}')
             # Extract the fitted parameters
             slope, ic50, bottom, top = params
         except Exception as e:
-            print(f'''Can't fit parameters {str(e)}''')
+            print(f'''Can't fit parameters {str(e)} {x_values[0]}''')
             fitOk = False
             slope = -1
             ic50 = -1
@@ -88,7 +98,7 @@ class ScatterplotWidget(QWidget):
             plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
         plt.xscale('log')  # Set x-axis to logarithmic scale
         plt.xlabel('Concentration')
-        plt.ylabel('Response')
+        plt.ylabel('Inhibition %')
         self.canvas.draw()
         self.figure.savefig(f'img/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
         plt.legend()
@@ -130,14 +140,15 @@ class ScatterplotsTable(QMainWindow):
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             
-            # "Batch nr" "Compound ID" "finalConc_nL" "yMean" "yErr"
+            # "Batch nr" "Compound ID" "finalConc_nL" "yMean" "yStd"
             batch = batch_df['Batch nr'].iloc[0]
             compound = batch_df['Compound ID'].iloc[0]
             
             rowPosition = self.table_widget.rowCount()
 
-            #if rowPosition > 5:
-            #    continue
+
+            if rowPosition > 200:
+                continue
 
             
             self.table_widget.insertRow(rowPosition)
@@ -156,14 +167,14 @@ class ScatterplotsTable(QMainWindow):
             item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
             self.table_widget.setItem(rowPosition, 2, item)
 
-            item = QTableWidgetItem(str(f"{scatterplot_widget.slope:.2f}"))
+            item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
             self.table_widget.setItem(rowPosition, 3, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
-            self.table_widget.setItem(rowPosition, 5, item)
+            self.table_widget.setItem(rowPosition, 4, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
-            self.table_widget.setItem(rowPosition, 4, item)            
+            self.table_widget.setItem(rowPosition, 5, item)            
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.minConc}"))
             self.table_widget.setItem(rowPosition, 6, item)
@@ -194,6 +205,14 @@ class ScatterplotsTable(QMainWindow):
 
         file_path = 'DR_Excel.xlsx'
 
+
+        headings = ["Batch", "Compound", "IC50", "Slope", "Bottom", "Top", "Min Conc nM", "Max Conc nM", "Graph"]
+
+        for col_num, heading in enumerate(headings, 1):
+            cell = ws.cell(row=1, column=col_num, value=heading)
+            cell.font = Font(bold=True)
+
+    
         # Write DataFrame to Excel
         for r_idx, row in enumerate(df.itertuples(index=False), start=2):  # Start from row 2 to leave space for header
             for c_idx, value in enumerate(row, start=1):
@@ -209,7 +228,7 @@ class ScatterplotsTable(QMainWindow):
             ws.add_image(img, f"I{i + 2}")
 
         # Adjust row heights and column widths to fit images
-        for r_idx in range(1, len(df) + 2):  # Include header row
+        for r_idx in range(2, len(df) + 2):  # Include header row
             ws.row_dimensions[r_idx].height = 160  # Adjust the height as needed
             
         for c_idx in range(1, len(columns) + 1):
@@ -219,9 +238,6 @@ class ScatterplotsTable(QMainWindow):
         # Save the Excel workbook
 
         wb.save(file_path)
-
-
-
 
 
 
