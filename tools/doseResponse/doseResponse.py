@@ -30,7 +30,6 @@ class ScatterplotWidget(QWidget):
 
         self.figure, self.ax = plt.subplots(figsize=(3, 2))
         self.canvas = FigureCanvas(self.figure)
-        #self.canvas.setSizePolicy(QVBoxLayout.Expanding, QVBoxLayout.Expanding)
 
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
@@ -65,7 +64,7 @@ class ScatterplotWidget(QWidget):
                                            y_values,
                                            maxfev = 10000,
                                            p0=[slope, ic50, bottom, top],
-                                           bounds=([-100, 0, -20, 4], [10, 0.01, 40, 120])
+                                           bounds=([-100, 0, -20, 70], [10, 0.01, 40, 120])
                                            )
             #print(f'covariance: {covariance}')
             # Extract the fitted parameters
@@ -88,6 +87,8 @@ class ScatterplotWidget(QWidget):
 
         plt.errorbar(x_values, y_values, yerr=y_err_values, fmt='o', label='Raw data')
 
+        plt.ylim(min(min(y_values), 0) - 10, max(max(y_values), 100) + 10)
+        
         if fitOk == True:
             plt.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
         if ic50 == -1:
@@ -176,13 +177,12 @@ class ScatterplotsTable(QMainWindow):
             item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
             self.table_widget.setItem(rowPosition, 5, item)            
 
-            item = QTableWidgetItem(str(f"{scatterplot_widget.minConc}"))
+            item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
             self.table_widget.setItem(rowPosition, 6, item)
 
-            item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc}"))
+            item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
             self.table_widget.setItem(rowPosition, 7, item)
 
-            
             item = QTableWidgetItem()
             #item.setSizeHint(scatterplot_widget.sizeHint())
             self.table_widget.setItem(rowPosition, 8, item)
@@ -206,7 +206,7 @@ class ScatterplotsTable(QMainWindow):
         file_path = 'DR_Excel.xlsx'
 
 
-        headings = ["Batch", "Compound", "IC50", "Slope", "Bottom", "Top", "Min Conc nM", "Max Conc nM", "Graph"]
+        headings = ["Batch", "Compound", "IC50", "Slope", "Bottom", "Top", "MinConc nM", "MaxConc nM", "Graph"]
 
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
@@ -232,9 +232,9 @@ class ScatterplotsTable(QMainWindow):
             ws.row_dimensions[r_idx].height = 160  # Adjust the height as needed
             
         for c_idx in range(1, len(columns) + 1):
-            ws.column_dimensions[chr(ord('A') + c_idx - 1)].width = 20  # Adjust the width as needed
+            ws.column_dimensions[chr(ord('A') + c_idx - 1)].width = 13  # Adjust the width as needed
 
-        ws.column_dimensions[chr(ord('I'))].width = 3000
+        ws.column_dimensions[chr(ord('I'))].width = 40
         # Save the Excel workbook
 
         wb.save(file_path)
