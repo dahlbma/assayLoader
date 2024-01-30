@@ -144,7 +144,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="sp_prep_data_tab">
              <property name="sizePolicy">
@@ -185,18 +185,7 @@
                     </widget>
                    </item>
                    <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_12">
-                     <item>
-                      <widget class="QLabel" name="label_13">
-                       <property name="text">
-                        <string>Evaluation</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QComboBox" name="evaluation_cb"/>
-                     </item>
-                    </layout>
+                    <layout class="QHBoxLayout" name="horizontalLayout_12"/>
                    </item>
                    <item>
                     <spacer name="verticalSpacer">

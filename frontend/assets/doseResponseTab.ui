@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>1261</width>
     <height>800</height>
    </rect>
   </property>
@@ -24,6 +24,13 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="goto_sp_btn">
+        <property name="text">
+         <string>Single Point</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <spacer name="horizontalSpacer_5">
         <property name="orientation">
@@ -37,35 +44,60 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="goto_sp_btn">
-        <property name="text">
-         <string>Single Point</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" colspan="3">
        <widget class="QTabWidget" name="module_tab_wg">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="dr_prep_data_tab">
          <attribute name="title">
           <string>DR prep data</string>
          </attribute>
-         <widget class="QPushButton" name="drPlateIdFile_btn">
+         <widget class="QWidget" name="">
           <property name="geometry">
            <rect>
             <x>50</x>
             <y>40</y>
-            <width>141</width>
-            <height>24</height>
+            <width>891</width>
+            <height>391</height>
            </rect>
           </property>
-          <property name="text">
-           <string>Get plate id file</string>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QPushButton" name="prepareHarmony_btn">
+               <property name="text">
+                <string>Harmony top directory</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="generatePlatemap_btn">
+               <property name="text">
+                <string>Generate platemap</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="generateCurvefittingInput_btn">
+               <property name="text">
+                <string>Generate curvefitting input</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="prepLog_te"/>
+           </item>
+          </layout>
          </widget>
+        </widget>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Curve fitting</string>
+         </attribute>
         </widget>
         <widget class="QWidget" name="dr_load_data">
          <attribute name="title">
