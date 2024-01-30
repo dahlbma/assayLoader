@@ -47,7 +47,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QTabWidget" name="module_tab_wg">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="dr_prep_data_tab">
          <attribute name="title">
@@ -98,6 +98,16 @@
          <attribute name="title">
           <string>Curve fitting</string>
          </attribute>
+         <widget class="QTableView" name="tableView">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>440</y>
+            <width>1101</width>
+            <height>261</height>
+           </rect>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="dr_load_data">
          <attribute name="title">
