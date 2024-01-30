@@ -13,13 +13,11 @@ def gotoSP(self):
     self.window().widget(1).instrument_cb.setFocus()
     return
 
-'''
 def gotoDR(self):
     resize_window(self)
     self.window().setCurrentIndex(2)
     self.window().widget(2).drPlateIdFile_btn.setFocus()
     return
-'''
 
 
 class Worker(QObject):

@@ -21,6 +21,7 @@ from inhibitionScatter import ScatterPlotWindow
 os_name = platform.system()
 
 class SinglePointScreen(QMainWindow):
+    from assaylib import gotoDR
     def __init__(self, token, test):
         super(SinglePointScreen, self).__init__()
         self.token = token
@@ -40,6 +41,8 @@ class SinglePointScreen(QMainWindow):
         current_directory = os.getcwd()
         self.media_player = QMediaPlayer()
         #self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(f'{current_directory}/beep-07a.wav')))
+
+        self.goto_dr_btn.clicked.connect(self.gotoDR)
 
         self.dataColumn_cb.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
