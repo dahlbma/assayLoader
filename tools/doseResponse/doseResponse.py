@@ -1,4 +1,5 @@
 from scipy.optimize import curve_fit
+from scipy.integrate import quad
 import os
 import json
 import sys
@@ -32,7 +33,8 @@ class ScatterplotWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        slope, ic50, bottom, top, ic50_std = self.plot_scatter(data_dict)
+        slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict)
+        self.auc = auc
         self.ic50 = ic50
         self.ic50_std = ic50_std
         self.slope = slope
@@ -45,7 +47,6 @@ class ScatterplotWidget(QWidget):
 
         # Extract the 'x' and 'y' arrays
         x_values = np.array(df['finalConc_nL'].values/1000000000, dtype=np.float64)
-        #y_values = np.array(df['yMean'].values, dtype=np.float64)
         y_values = np.array(df['inhibition'].values, dtype=np.float64)
         y_err_values = np.array(df['yStd'].values, dtype=np.float64)
         
@@ -105,7 +106,9 @@ class ScatterplotWidget(QWidget):
         plt.legend()
         self.canvas.draw()
 
-        return slope, ic50, bottom, top, ic50_std
+        (auc, err) = quad(fourpl, min(x_values), max(x_values), args=(slope, ic50, bottom, top))
+        
+        return slope, ic50, bottom, top, ic50_std, auc
 
 
 class ScatterplotsTable(QMainWindow):
@@ -119,22 +122,18 @@ class ScatterplotsTable(QMainWindow):
         # 0            1        2     3    4        5        6
         # Compound_Id, Batch_ID SLOPE IC50 Min.Conc Max.Conc Graph
 
-
-        self.table_widget.setColumnCount(10)
+        self.table_widget.setColumnCount(11)
         #self.table_widget.setRowCount(200)
 
-        #for i in range(200):
-        #    self.table_widget.setRowHeight(i, 450)
-
-        # Set column width to 800 pixels
-        self.table_widget.setColumnWidth(9, 600)
+        # Set column width to 600 pixels
+        self.table_widget.setColumnWidth(10, 600)
 
         layout = QVBoxLayout(self.central_widget)
         layout.addWidget(self.table_widget)
 
         self.generate_scatterplots()
         self.table_widget.setHorizontalHeaderLabels(['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope', 'Bottom',
-                                                     'Top', 'Min Conc nM', 'Max Conc nM', 'Graph'])
+                                                     'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'Graph'])
 
 
     def generate_scatterplots(self):
@@ -147,11 +146,9 @@ class ScatterplotsTable(QMainWindow):
             
             rowPosition = self.table_widget.rowCount()
 
-
             if rowPosition > 200:
                 continue
 
-            
             self.table_widget.insertRow(rowPosition)
             self.table_widget.setRowHeight(rowPosition, 450)
             
@@ -186,10 +183,14 @@ class ScatterplotsTable(QMainWindow):
             item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
             self.table_widget.setItem(rowPosition, 8, item)
 
+            item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
+            self.table_widget.setItem(rowPosition, 9, item)
+
+
             item = QTableWidgetItem()
             #item.setSizeHint(scatterplot_widget.sizeHint())
-            self.table_widget.setItem(rowPosition, 9, item)
-            self.table_widget.setCellWidget(rowPosition, 9, scatterplot_widget)
+            self.table_widget.setItem(rowPosition, 10, item)
+            self.table_widget.setCellWidget(rowPosition, 10, scatterplot_widget)
         self.saveToExcel()
         
 
@@ -197,10 +198,10 @@ class ScatterplotsTable(QMainWindow):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
         for row in range(self.table_widget.rowCount()):
-            row_data = [self.table_widget.item(row, col).text() if col < 10 else None for col in range(self.table_widget.columnCount())]
+            row_data = [self.table_widget.item(row, col).text() if col < 11 else None for col in range(self.table_widget.columnCount())]
             table_data.append(row_data)
 
-        columns = ['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope', 'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'Graph']
+        columns = ['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope', 'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'Graph']
         df = pd.DataFrame(table_data, columns=columns)
 
         wb = Workbook()
@@ -209,18 +210,25 @@ class ScatterplotsTable(QMainWindow):
         file_path = 'DR_Excel.xlsx'
 
 
-        headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope", "Bottom", "Top", "MinConc nM", "MaxConc nM", "Graph"]
+        headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope", "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
 
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
             cell.font = Font(bold=True)
-
     
         # Write DataFrame to Excel
         for r_idx, row in enumerate(df.itertuples(index=False), start=2):  # Start from row 2 to leave space for header
             for c_idx, value in enumerate(row, start=1):
-                ws.cell(row=r_idx, column=c_idx, value=value)
-
+                if c_idx > 2:
+                    try:
+                        if c_idx in (3, 4):
+                            ws.cell(row=r_idx, column=c_idx, value=float(f'{value:e}'))
+                        else:
+                            ws.cell(row=r_idx, column=c_idx, value=float(value))
+                    except:
+                        ws.cell(row=r_idx, column=c_idx, value=value)
+                else:
+                    ws.cell(row=r_idx, column=c_idx, value=value)
                 
         # Add scatterplots to Excel
         for i, canvas in enumerate(df['Graph']):
@@ -228,7 +236,7 @@ class ScatterplotsTable(QMainWindow):
             img = Image(image_path)
                         
             ws.add_image(img)
-            ws.add_image(img, f"I{i + 2}")
+            ws.add_image(img, f"K{i + 2}")
 
         # Adjust row heights and column widths to fit images
         for r_idx in range(2, len(df) + 2):  # Include header row
@@ -237,7 +245,7 @@ class ScatterplotsTable(QMainWindow):
         for c_idx in range(1, len(columns) + 1):
             ws.column_dimensions[chr(ord('A') + c_idx - 1)].width = 13  # Adjust the width as needed
 
-        ws.column_dimensions[chr(ord('I'))].width = 40
+        ws.column_dimensions[chr(ord('K'))].width = 40
         # Save the Excel workbook
 
         wb.save(file_path)
