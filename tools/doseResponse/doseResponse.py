@@ -12,10 +12,8 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Font
 
-
 import warnings
 warnings.filterwarnings('ignore')
-
 
 # Define the 4-PL model function
 def fourpl(x, slope, ic50, bottom, top):
@@ -34,8 +32,9 @@ class ScatterplotWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        slope, ic50, bottom, top = self.plot_scatter(data_dict)
+        slope, ic50, bottom, top, ic50_std = self.plot_scatter(data_dict)
         self.ic50 = ic50
+        self.ic50_std = ic50_std
         self.slope = slope
         self.top = top
         self.bottom = bottom
@@ -64,9 +63,10 @@ class ScatterplotWidget(QWidget):
                                            y_values,
                                            maxfev = 10000,
                                            p0=[slope, ic50, bottom, top],
-                                           bounds=([-100, 0, -20, 70], [10, 0.01, 40, 120])
+                                           bounds=([-100, 0, -20, 50], [10, 0.01, 40, 120])
                                            )
-            #print(f'covariance: {covariance}')
+            perr = np.sqrt(np.diag(covariance))
+            slope_std, ic50_std, bottom_std, top_std = perr
             # Extract the fitted parameters
             slope, ic50, bottom, top = params
         except Exception as e:
@@ -105,7 +105,7 @@ class ScatterplotWidget(QWidget):
         plt.legend()
         self.canvas.draw()
 
-        return slope, ic50, bottom, top
+        return slope, ic50, bottom, top, ic50_std
 
 
 class ScatterplotsTable(QMainWindow):
@@ -119,21 +119,21 @@ class ScatterplotsTable(QMainWindow):
         # 0            1        2     3    4        5        6
         # Compound_Id, Batch_ID SLOPE IC50 Min.Conc Max.Conc Graph
 
-        
-        self.table_widget.setColumnCount(9)
+
+        self.table_widget.setColumnCount(10)
         #self.table_widget.setRowCount(200)
 
         #for i in range(200):
         #    self.table_widget.setRowHeight(i, 450)
 
         # Set column width to 800 pixels
-        self.table_widget.setColumnWidth(8, 600)
+        self.table_widget.setColumnWidth(9, 600)
 
         layout = QVBoxLayout(self.central_widget)
         layout.addWidget(self.table_widget)
 
         self.generate_scatterplots()
-        self.table_widget.setHorizontalHeaderLabels(['Batch', 'Compound', 'IC50', 'Slope', 'Bottom',
+        self.table_widget.setHorizontalHeaderLabels(['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope', 'Bottom',
                                                      'Top', 'Min Conc nM', 'Max Conc nM', 'Graph'])
 
 
@@ -168,25 +168,28 @@ class ScatterplotsTable(QMainWindow):
             item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
             self.table_widget.setItem(rowPosition, 2, item)
 
-            item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
+            item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
             self.table_widget.setItem(rowPosition, 3, item)
 
-            item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
+            item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
             self.table_widget.setItem(rowPosition, 4, item)
 
+            item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
+            self.table_widget.setItem(rowPosition, 5, item)
+
             item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
-            self.table_widget.setItem(rowPosition, 5, item)            
+            self.table_widget.setItem(rowPosition, 6, item)            
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
-            self.table_widget.setItem(rowPosition, 6, item)
+            self.table_widget.setItem(rowPosition, 7, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
-            self.table_widget.setItem(rowPosition, 7, item)
+            self.table_widget.setItem(rowPosition, 8, item)
 
             item = QTableWidgetItem()
             #item.setSizeHint(scatterplot_widget.sizeHint())
-            self.table_widget.setItem(rowPosition, 8, item)
-            self.table_widget.setCellWidget(rowPosition, 8, scatterplot_widget)
+            self.table_widget.setItem(rowPosition, 9, item)
+            self.table_widget.setCellWidget(rowPosition, 9, scatterplot_widget)
         self.saveToExcel()
         
 
@@ -194,10 +197,10 @@ class ScatterplotsTable(QMainWindow):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
         for row in range(self.table_widget.rowCount()):
-            row_data = [self.table_widget.item(row, col).text() if col < 8 else None for col in range(self.table_widget.columnCount())]
+            row_data = [self.table_widget.item(row, col).text() if col < 10 else None for col in range(self.table_widget.columnCount())]
             table_data.append(row_data)
 
-        columns = ['Batch', 'Compound', 'IC50', 'Slope', 'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'Graph']
+        columns = ['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope', 'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'Graph']
         df = pd.DataFrame(table_data, columns=columns)
 
         wb = Workbook()
@@ -206,7 +209,7 @@ class ScatterplotsTable(QMainWindow):
         file_path = 'DR_Excel.xlsx'
 
 
-        headings = ["Batch", "Compound", "IC50", "Slope", "Bottom", "Top", "MinConc nM", "MaxConc nM", "Graph"]
+        headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope", "Bottom", "Top", "MinConc nM", "MaxConc nM", "Graph"]
 
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
