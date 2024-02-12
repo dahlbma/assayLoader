@@ -68,3 +68,11 @@ frontend/export_tubeids.txt
 backend/R/.Rhistory
 frontend/Sample_data/test.txt
 *.png
+tools/doseResponse/txt/prepared_plate_to_file.xlsx
+tools/doseResponse/txt/PLATEMAP.xlsx
+tools/doseResponse/PLATEMAP.xlsx
+tools/doseResponse/DR_Excel.xlsx
+tools/doseResponse/DR_Excel.xlsx
+tools/doseResponse/preparedHaronyFiles/PLATEMAP.xlsx
+tools/doseResponse/prepared_plate_to_file.xlsx
+*.xlsx

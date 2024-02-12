@@ -16,7 +16,7 @@ def gotoSP(self):
 def gotoDR(self):
     resize_window(self)
     self.window().setCurrentIndex(2)
-    self.window().widget(2).drPlateIdFile_btn.setFocus()
+    #self.window().widget(2).drPlateIdFile_btn.setFocus()
     return
 
 
@@ -93,3 +93,12 @@ def resize_window(self, height=800, width=1200):
     windowWidth = int(round((width/height) * windowHeight, -1))
 
     self.window().resize(windowWidth, windowHeight)
+
+
+def printPrepLog(self, s, type=''):
+    if type == 'error':
+        s = f'''<font color='red'>{s}</font>'''
+    self.prepLog_te.append(s)
+    QApplication.processEvents()
+
+
