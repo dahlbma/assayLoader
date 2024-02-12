@@ -1,9 +1,9 @@
 import re, sys, os, logging, glob, csv
 from PyQt5.uic import loadUi
+from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
-from PyQt5.QtCore import Qt, QDate, QUrl
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QDoubleValidator
+from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import openpyxl
 from pathlib import Path
@@ -28,22 +28,28 @@ class DoseResponseScreen(QMainWindow):
         self.mod_name = "loader"
         self.logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/doseResponseTab.ui"), self)
-
-        #self.generatePlatemap_btn.setEnabled(False)
-        #self.generatePlatemap_btn.clicked.connect(self.generatePlatemap)
+        self.rVolume = None
         
-        #self.generateCurvefittingInput_btn.setEnabled(False)
-        #self.generateCurvefittingInput_btn.clicked.connect(self.generateCurvefittingInput)
-
-
         self.finalWellVolumeMicroliter_eb.textChanged.connect(self.wellVolumeChanged)
-        
+
+        regex = QRegExp("[0-9]+.?[0-9]*")  # Only digits 1-9 and a single dot
+        validator = QRegExpValidator(regex, self.finalWellVolumeMicroliter_eb)
+        self.finalWellVolumeMicroliter_eb.setValidator(validator)
+
+        self.selectHarmonyDirectory_btn.setEnabled(False)
         self.selectHarmonyDirectory_btn.clicked.connect(self.selectHarmonyDirectory)
 
         self.goto_sp_btn.clicked.connect(self.gotoSP)
 
+
     def wellVolumeChanged(self, sVolume):
-        print(sVolume)
+        try:
+            self.rVolume = float(sVolume)
+        except:
+            self.selectHarmonyDirectory_btn.setEnabled(False)
+            self.rVolume = None
+            return
+        self.selectHarmonyDirectory_btn.setEnabled(True)
         
 
     def generatePlatemap(self):

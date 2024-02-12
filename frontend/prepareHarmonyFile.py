@@ -107,6 +107,7 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
 
     pattern = re.compile(r'P\d{6}')
     assaylib.printPrepLog(self, f"Searching for Harmony files in {selected_directory}")
+    iCount = 0
     for file_name in harmony_files:
         with open(file_name, 'r') as file:
             content = file.read()
@@ -115,14 +116,14 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
                 sPlate = match.group()
                 assaylib.printPrepLog(self, f"Found plate: {sPlate}")
                 preparedFile = parseHarmonyFile(self, subdirectory_path, file_name, sPlate)
-
                 data['plate'].append(sPlate)
                 data['file'].append(preparedFile)
+                iCount += 1
             else:
                 assaylib.printPrepLog(self, f"No plate in {file_name}", 'error')
 
     sOutFile = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
-    assaylib.printPrepLog(self, f'Created file to platemapping-file:\n{sOutFile}\n')
+    assaylib.printPrepLog(self, f'Created file to platemapping-file with {iCount} plates:\n{sOutFile}\n')
     df = pd.DataFrame(data)
     df = df.sort_values(by='plate')
     sPlatemapFile = createPlatemap(self, df, subdirectory_path)
