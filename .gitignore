@@ -78,3 +78,6 @@ tools/doseResponse/prepared_plate_to_file.xlsx
 *.xlsx
 *.xlsx
 *.xlsx
+tools/doseResponse/preparedHaronyFiles/PLATEMAP.xlsx
+*.xlsx
+tools/doseResponse/preparedHaronyFiles/prepared_plate_to_file.xlsx
