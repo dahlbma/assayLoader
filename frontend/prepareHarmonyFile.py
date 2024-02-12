@@ -33,6 +33,7 @@ def createPlatemap(self, platesDf, subdirectory_path):
     full_path = os.path.join(subdirectory_path, excel_filename)
     platemapDf.to_excel(full_path, index=False)
     assaylib.printPrepLog(self, f'Created platemap-file:\n{full_path}')
+    return full_path
     
 
 def parseHarmonyFile(self, sDestDir, sFullFileName, sPlate):
@@ -124,7 +125,9 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
     assaylib.printPrepLog(self, f'Created file to platemapping-file:\n{sOutFile}\n')
     df = pd.DataFrame(data)
     df = df.sort_values(by='plate')
-    createPlatemap(self, df, subdirectory_path)
+    sPlatemapFile = createPlatemap(self, df, subdirectory_path)
     excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
     df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
     excel_writer.close()
+
+    

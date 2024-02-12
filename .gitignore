@@ -76,3 +76,5 @@ tools/doseResponse/DR_Excel.xlsx
 tools/doseResponse/preparedHaronyFiles/PLATEMAP.xlsx
 tools/doseResponse/prepared_plate_to_file.xlsx
 *.xlsx
+*.xlsx
+*.xlsx

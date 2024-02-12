@@ -55,7 +55,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QPushButton" name="selectHarmonyDirectory_btn">
               <property name="text">
@@ -64,18 +64,31 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="generatePlatemap_btn">
-              <property name="text">
-               <string>Generate platemap</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="generateCurvefittingInput_btn">
-              <property name="text">
-               <string>Generate curvefitting input</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Final well volume μL</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="finalWellVolumeMicroliter_eb"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>

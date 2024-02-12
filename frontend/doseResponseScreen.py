@@ -29,18 +29,26 @@ class DoseResponseScreen(QMainWindow):
         self.logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/doseResponseTab.ui"), self)
 
-        self.generatePlatemap_btn.setEnabled(False)
-        self.generatePlatemap_btn.clicked.connect(self.generatePlatemap)
-        self.generateCurvefittingInput_btn.setEnabled(False)
-        self.generateCurvefittingInput_btn.clicked.connect(self.generateCurvefittingInput)
+        #self.generatePlatemap_btn.setEnabled(False)
+        #self.generatePlatemap_btn.clicked.connect(self.generatePlatemap)
+        
+        #self.generateCurvefittingInput_btn.setEnabled(False)
+        #self.generateCurvefittingInput_btn.clicked.connect(self.generateCurvefittingInput)
+
+
+        self.finalWellVolumeMicroliter_eb.textChanged.connect(self.wellVolumeChanged)
+        
         self.selectHarmonyDirectory_btn.clicked.connect(self.selectHarmonyDirectory)
 
         self.goto_sp_btn.clicked.connect(self.gotoSP)
 
+    def wellVolumeChanged(self, sVolume):
+        print(sVolume)
+        
 
     def generatePlatemap(self):
         print('generate platemap here')
-        self.generateCurvefittingInput_btn.setEnabled(True)
+        #self.generateCurvefittingInput_btn.setEnabled(True)
 
 
     def selectHarmonyDirectory(self):
@@ -58,10 +66,10 @@ class DoseResponseScreen(QMainWindow):
             return
 
         if selected_directory:
-            self.generatePlatemap_btn.setEnabled(True)
-        self.generateCurvefittingInput_btn.setEnabled(False)
+            #self.generatePlatemap_btn.setEnabled(True)
+            pass
+        #self.generateCurvefittingInput_btn.setEnabled(False)
 
-        print(subdirectory_path)
         findHarmonyFiles(self, subdirectory_path, selected_directory)       
         
 
