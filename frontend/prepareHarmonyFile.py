@@ -32,7 +32,9 @@ def createPlatemap(self, platesDf, subdirectory_path):
     excel_filename = 'PLATEMAP.xlsx'
     full_path = os.path.join(subdirectory_path, excel_filename)
     platemapDf.to_excel(full_path, index=False)
-    assaylib.printPrepLog(self, f'Created platemap-file:\n{full_path}')
+    assaylib.printPrepLog(self, f'Created platemap-file:')
+    assaylib.printPrepLog(self, f'{full_path}', type='bold')
+
     return full_path
     
 
@@ -70,14 +72,14 @@ def parseHarmonyFile(self, sDestDir, sFullFileName, sPlate):
 
     long_string = ''.join(saOutput)
 
-    sFile = 'prepared_' + filename
     sFile = sPlate + '.txt'
     sOutFile = os.path.join('/', sDestDir, sFile)
-    
+    fullPath = os.path.abspath(sOutFile)
+
     with open(sOutFile, 'w') as file:
         file.write(long_string)
     #self.printQcLog(f'Parsing {sFullFileName} into {sFile}')
-    return sFile
+    return fullPath
 
 
 def find_files(directory, filename_start, filename_end):
@@ -122,13 +124,14 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
             else:
                 assaylib.printPrepLog(self, f"No plate in {file_name}", 'error')
 
-    sOutFile = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
-    assaylib.printPrepLog(self, f'Created file to platemapping-file with {iCount} plates:\n{sOutFile}\n')
+    plateIdToFileMapping = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
+    assaylib.printPrepLog(self, f'Created file to platemapping-file with {iCount} plates:')
+    assaylib.printPrepLog(self, f'{plateIdToFileMapping}\n', type='bold')
+
     df = pd.DataFrame(data)
     df = df.sort_values(by='plate')
     sPlatemapFile = createPlatemap(self, df, subdirectory_path)
-    excel_writer = pd.ExcelWriter(sOutFile, engine="openpyxl")
+    excel_writer = pd.ExcelWriter(plateIdToFileMapping, engine="openpyxl")
     df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
     excel_writer.close()
-
-    
+    return sPlatemapFile, plateIdToFileMapping

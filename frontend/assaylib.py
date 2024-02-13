@@ -98,6 +98,8 @@ def resize_window(self, height=800, width=1200):
 def printPrepLog(self, s, type=''):
     if type == 'error':
         s = f'''<font color='red'>{s}</font>'''
+    elif type == 'bold': 
+        s = f'''<b>{s}</b>'''
     self.prepLog_te.append(s)
     QApplication.processEvents()
 
