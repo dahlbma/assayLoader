@@ -40,7 +40,7 @@ class SelectDataColumn(QDialog):
         layout.addWidget(self.comboBox)
 
         # Create a button to confirm selection
-        selectButton = QPushButton("Select")
+        selectButton = QPushButton("Select Harmony column")
         selectButton.clicked.connect(self.onSelect)
         layout.addWidget(selectButton)
 
