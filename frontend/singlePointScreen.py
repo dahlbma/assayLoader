@@ -433,19 +433,6 @@ class SinglePointScreen(QMainWindow):
                                  sStatus)
         return df
 
-
-    def findDataColumns(self, sFileName):
-        with open(sFileName, 'r') as sFile:
-            saLines = sFile.readlines()
-            # Skip all the lines in the start of the file, look for where the 'Well' appears
-            for line in saLines:
-                saLine = line.split(',')
-                if 'Well' in saLine:
-                    return saLine
-
-        # This is an error
-        return None
-        
     
     def digestPlate(self, sPlate, file, sDataColumn):
         saLines = file.readlines()
@@ -543,7 +530,7 @@ class SinglePointScreen(QMainWindow):
             else:
                 self.printQcLog(f"{sFile} does not exist.", 'error', beep=True)
 
-        saDataColumns = self.findDataColumns(full_path)
+        saDataColumns = assaylib.findDataColumns(full_path)
 
         if saDataColumns != None:
             self.dataColumn_cb.clear()

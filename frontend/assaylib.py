@@ -95,12 +95,34 @@ def resize_window(self, height=800, width=1200):
     self.window().resize(windowWidth, windowHeight)
 
 
+def resetPrepLog(self):
+    self.prepLog_te.setText('')
+
+    
 def printPrepLog(self, s, type=''):
     if type == 'error':
         s = f'''<font color='red'>{s}</font>'''
     elif type == 'bold': 
         s = f'''<b>{s}</b>'''
     self.prepLog_te.append(s)
+    # Calculate the maximum vertical scrollbar value
+    max_value = self.prepLog_te.verticalScrollBar().maximum()
+
+    # Set the scrollbar value to the maximum to reach the bottom
+    self.prepLog_te.verticalScrollBar().setValue(max_value)
+    
     QApplication.processEvents()
 
 
+def findDataColumns(sFileName):
+    with open(sFileName, 'r') as sFile:
+        saLines = sFile.readlines()
+        # Skip all the lines in the start of the file, look for where the 'Well' appears
+        for line in saLines:
+            saLine = line.split(',')
+            if 'Well' in saLine:
+                return saLine
+
+    # This is an error
+    return None
+        

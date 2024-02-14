@@ -1,64 +1,69 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QCheckBox, QFrame
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QDialog, QComboBox, QHBoxLayout
 
 
-class DynamicCheckboxApp(QWidget):
-    def __init__(self):
+class ItemSelectionDialog(QDialog):
+    def __init__(self, parent, items):
         super().__init__()
 
-        self.init_ui()
+        self.setWindowTitle("Select an Item")
+        self.items = items
+        self.parent = parent
+        
+        self.initUI()
 
-    def init_ui(self):
-        self.layout = QVBoxLayout()
+    def initUI(self):
+        layout = QVBoxLayout()
 
-        self.create_checkbox_btn = QPushButton('Create Checkbox', self)
-        self.create_checkbox_btn.clicked.connect(self.create_checkbox)
-        self.create_checkbox_btn.setFixedSize(120, 30)  # Set fixed size
+        # Create a combo box
+        self.comboBox = QComboBox()
+        self.comboBox.addItems(self.items)
+        layout.addWidget(self.comboBox)
 
-        self.delete_checkbox_btn = QPushButton('Delete Checkbox', self)
-        self.delete_checkbox_btn.clicked.connect(self.delete_checkbox)
-        self.delete_checkbox_btn.setFixedSize(120, 30)  # Set fixed size
+        # Create a button to confirm selection
+        selectButton = QPushButton("Select")
+        selectButton.clicked.connect(self.onSelect)
+        layout.addWidget(selectButton)
 
-        self.container_frame = QFrame(self)
-        self.container_frame.setFrameShape(QFrame.Box)  # Add a frame around the container
-        self.container_frame.setFixedSize(400, 60)  # Set fixed size for the container
+        self.setLayout(layout)
 
-        self.checkbox_layout = QHBoxLayout(self.container_frame)
-
-        self.layout.addWidget(self.create_checkbox_btn)
-        self.layout.addWidget(self.delete_checkbox_btn)
-        self.layout.addWidget(self.container_frame)
-
-        # Add 15 invisible checkboxes to the container
-        self.checkboxes = [QCheckBox(f'Checkbox {i + 1}', self) for i in range(15)]
-        for checkbox in self.checkboxes:
-            checkbox.setVisible(False)
-            self.checkbox_layout.addWidget(checkbox)
-
-        self.setLayout(self.layout)
-
-        self.setGeometry(300, 300, 500, 200)
-        self.setWindowTitle('Dynamic Checkbox App')
-        self.show()
-
-    def create_checkbox(self):
-        for checkbox in self.checkboxes:
-            if not checkbox.isVisible():
-                checkbox.setVisible(True)
-                return
-
-    def delete_checkbox(self):
-        for checkbox in reversed(self.checkboxes):
-            if checkbox.isVisible():
-                checkbox.setVisible(False)
-                return
+    def onSelect(self):
+        # Get the selected item
+        selected_item = self.comboBox.currentText()
+        self.parent.selectedItemLabel.setText(selected_item)
+        self.close()
 
 
-def main():
-    app = QApplication(sys.argv)
-    ex = DynamicCheckboxApp()
-    sys.exit(app.exec_())
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Item Selection Example")
+        self.setGeometry(100, 100, 400, 200)
+
+        # Create a push button
+        self.pushButton = QPushButton("Select Item", self)
+        self.pushButton.setGeometry(50, 50, 100, 30)
+        self.pushButton.clicked.connect(self.showItemSelectionDialog)
+
+        # Create a label to display selected item
+        self.selectedItemLabel = QLabel("", self)
+        self.selectedItemLabel.setGeometry(200, 50, 150, 30)
+
+    def showItemSelectionDialog(self):
+        # Create an instance of ItemSelectionDialog
+        dialog = ItemSelectionDialog(self, ["Item 1", "Item 2", "Item 3"])
+        
+        # If dialog is accepted, update the label with the selected item
+        if dialog.exec_() == QDialog.Accepted:
+            selected_item = dialog.result()
+            self.selectedItemLabel.setText(selected_item)
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

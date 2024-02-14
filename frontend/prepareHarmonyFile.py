@@ -65,7 +65,7 @@ def parseHarmonyFile(self, sDestDir, sFullFileName, sPlate):
                     saOutput.append(output_string.replace('\t', ','))
 
     except FileNotFoundError:
-        #self.printQcLog(f"File '{sFullFileName}' not found.", 'error')
+        assaylib.printPrepLog(self, f"File '{sFullFileName}' not found.", 'error')
         return ""
     except Exception as e:
         assaylib.printPrepLog(self, f"An error occurred: {e}", 'error')
