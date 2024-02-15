@@ -13,45 +13,14 @@ import subprocess
 from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
+from selectDataColumn import *
+from doseResponseTable import DoseResponseTable
 import platform
 from inhibitionScatter import ScatterPlotWindow
 
 
 # Get the operating system name
 os_name = platform.system()
-
-
-class SelectDataColumn(QDialog):
-    def __init__(self, parent, columns):
-        super().__init__()
-
-        self.setWindowTitle("Select a datacolumn")
-        self.columns = columns
-        self.parent = parent
-        
-        self.initUI()
-
-    def initUI(self):
-        layout = QVBoxLayout()
-
-        # Create a combo box
-        self.comboBox = QComboBox()
-        self.comboBox.addItems(self.columns)
-        layout.addWidget(self.comboBox)
-
-        # Create a button to confirm selection
-        selectButton = QPushButton("Select Harmony column")
-        selectButton.clicked.connect(self.onSelect)
-        layout.addWidget(selectButton)
-
-        self.setLayout(layout)
-
-    def onSelect(self):
-        # Get the selected item
-        selected_item = self.comboBox.currentText()
-        self.parent.dataColumn_lab.setText(selected_item)
-        self.parent.sDataColName = selected_item
-        self.close()
 
 
 class DoseResponseScreen(QMainWindow):
@@ -75,11 +44,28 @@ class DoseResponseScreen(QMainWindow):
         self.drInputFile_lab.setText('')
         self.selectDRInput_btn.clicked.connect(self.selectDRInputFile)
         self.dataColumn_lab.setText('')
+
+        self.calculateDR_btn.clicked.connect(self.calcDR)
         self.goto_sp_btn.clicked.connect(self.gotoSP)        
 
+
+    def calcDR(self):
+        row_count = self.doseResponseTable.rowCount()
+
+        # Insert a new row at the bottom
+        self.doseResponseTable.insertRow(row_count)
+
+        # Fill the cells in the new row with some dummy data
+        for col in range(self.doseResponseTable.columnCount()):
+            item = QTableWidgetItem(f"Row {row_count}, Col {col}")
+            self.doseResponseTable.setItem(row_count, col, item)
+        self.doseResponseTable.resizeColumnsToContents()
+
+        
     def selectDRInputFile(self):
         print('DR input clicked')
         
+
     def wellVolumeChanged(self, sVolume):
         try:
             self.rVolume = float(sVolume)
@@ -121,7 +107,6 @@ class DoseResponseScreen(QMainWindow):
 
     def generateDoseResponseInputFile(self, platemapFile, plateIdToFileMapping):
         platemap_xlsx = os.path.abspath(platemapFile)
-        #sDataColName = 'Cell Selected - Number of Spots - Mean per Well'
         sBasePath = os.path.dirname(platemap_xlsx)
         platemapDf = pd.read_excel(platemap_xlsx)
         
@@ -133,12 +118,12 @@ class DoseResponseScreen(QMainWindow):
 
         rawDatafile = rawDataFilesDf.iloc[0]['file']
         saDataColumns = assaylib.findDataColumns(rawDatafile)
-        dataColDialog = SelectDataColumn(self, saDataColumns)
+        dataColDialog = SelectDataColumn(saDataColumns)
         if dataColDialog.exec_() == QDialog.Accepted:
-            sDataColName = dataColDialog.result()
-            self.dataColumn_lab.setText(sDataColName)
+            self.sDataColName = dataColDialog.selectedColumn
+            self.dataColumn_lab.setText(dataColDialog.selectedColumn)
 
-        sDataColName = self.sDataColName  
+        sDataColName = self.sDataColName
         if sDataColName == '':
             return
         
