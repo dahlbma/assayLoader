@@ -50,17 +50,8 @@ class DoseResponseScreen(QMainWindow):
 
 
     def calcDR(self):
-        row_count = self.doseResponseTable.rowCount()
-
-        # Insert a new row at the bottom
-        self.doseResponseTable.insertRow(row_count)
-
-        # Fill the cells in the new row with some dummy data
-        for col in range(self.doseResponseTable.columnCount()):
-            item = QTableWidgetItem(f"Row {row_count}, Col {col}")
-            self.doseResponseTable.setItem(row_count, col, item)
-        self.doseResponseTable.resizeColumnsToContents()
-
+        self.doseResponseTable.generate_scatterplots(self.drInputFile_lab.text())
+        
         
     def selectDRInputFile(self):
         print('DR input clicked')

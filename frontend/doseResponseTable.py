@@ -4,7 +4,7 @@ import os
 import json
 import sys
 import numpy as np
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication
 #from PyQt5.QtCore import Qt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -102,6 +102,16 @@ class ScatterplotWidget(QWidget):
         plt.xlabel('Concentration')
         plt.ylabel('Inhibition %')
         self.canvas.draw()
+
+        # Create sub dir for images of the DR-curves (for Excel)
+        imgDir = 'img'
+        
+        # Check if the directory exists
+        if not os.path.exists(imgDir):
+            # If it doesn't exist, create it
+            os.makedirs(imgDir)
+
+        
         self.figure.savefig(f'img/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
         plt.legend()
         self.canvas.draw()
@@ -117,12 +127,9 @@ class DoseResponseTable(QTableWidget):
         
         super(DoseResponseTable, self).__init__()
 
-        #self.table_widget = QTableWidget(self.central_widget)
-        # 0            1        2     3    4        5        6
-        # Compound_Id, Batch_ID SLOPE IC50 Min.Conc Max.Conc Graph
-
-
-    def generate_scatterplots(self):
+    def generate_scatterplots(self, file_path):
+        # Set the graph column to be 600 wide
+        self.setColumnWidth(10, 600)
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             
@@ -130,64 +137,68 @@ class DoseResponseTable(QTableWidget):
             batch = batch_df['Batch nr'].iloc[0]
             compound = batch_df['Compound ID'].iloc[0]
             
-            rowPosition = self.table_widget.rowCount()
+            rowPosition = self.rowCount()
 
-            if rowPosition > 200:
+            if rowPosition > 40:
                 continue
 
-            self.table_widget.insertRow(rowPosition)
-            self.table_widget.setRowHeight(rowPosition, 450)
+            self.insertRow(rowPosition)
+            self.setRowHeight(rowPosition, 425)
             
             print(f'Plot nr: {rowPosition}')
             # Call the scatter function for each batch
             scatterplot_widget = ScatterplotWidget(batch_df, rowPosition)
 
             item = QTableWidgetItem(batch)
-            self.table_widget.setItem(rowPosition, 0, item)
+            self.setItem(rowPosition, 0, item)
 
             item = QTableWidgetItem(compound)
-            self.table_widget.setItem(rowPosition, 1, item)
+            self.setItem(rowPosition, 1, item)
 
             item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
-            self.table_widget.setItem(rowPosition, 2, item)
+            self.setItem(rowPosition, 2, item)
 
             item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
-            self.table_widget.setItem(rowPosition, 3, item)
+            self.setItem(rowPosition, 3, item)
 
             item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
-            self.table_widget.setItem(rowPosition, 4, item)
+            self.setItem(rowPosition, 4, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
-            self.table_widget.setItem(rowPosition, 5, item)
+            self.setItem(rowPosition, 5, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
-            self.table_widget.setItem(rowPosition, 6, item)            
+            self.setItem(rowPosition, 6, item)            
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
-            self.table_widget.setItem(rowPosition, 7, item)
+            self.setItem(rowPosition, 7, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
-            self.table_widget.setItem(rowPosition, 8, item)
+            self.setItem(rowPosition, 8, item)
 
             item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
-            self.table_widget.setItem(rowPosition, 9, item)
+            self.setItem(rowPosition, 9, item)
 
 
             item = QTableWidgetItem()
             #item.setSizeHint(scatterplot_widget.sizeHint())
-            self.table_widget.setItem(rowPosition, 10, item)
-            self.table_widget.setCellWidget(rowPosition, 10, scatterplot_widget)
+            self.setItem(rowPosition, 10, item)
+            self.setCellWidget(rowPosition, 10, scatterplot_widget)
+            self.setCurrentCell(rowPosition, 0)
+            QApplication.processEvents()
+
         self.saveToExcel()
         
 
     def saveToExcel(self):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
-        for row in range(self.table_widget.rowCount()):
-            row_data = [self.table_widget.item(row, col).text() if col < 11 else None for col in range(self.table_widget.columnCount())]
+        for row in range(self.rowCount()):
+            row_data = [self.item(row, col).text() if col < 11 else None for col in range(self.columnCount())]
             table_data.append(row_data)
 
-        columns = ['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope', 'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'Graph']
+        columns = ['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope',
+                   'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'Graph']
         df = pd.DataFrame(table_data, columns=columns)
 
         wb = Workbook()
@@ -196,7 +207,8 @@ class DoseResponseTable(QTableWidget):
         file_path = 'DR_Excel.xlsx'
 
 
-        headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope", "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
+        headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope",
+                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
 
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
@@ -215,10 +227,12 @@ class DoseResponseTable(QTableWidget):
                         ws.cell(row=r_idx, column=c_idx, value=value)
                 else:
                     ws.cell(row=r_idx, column=c_idx, value=value)
-                
+
+        imgDir = 'img'
+
         # Add scatterplots to Excel
         for i, canvas in enumerate(df['Graph']):
-            image_path = f"img/{i}.png"
+            image_path = f"{imgDir}/{i}.png"
             img = Image(image_path)
                         
             ws.add_image(img)
