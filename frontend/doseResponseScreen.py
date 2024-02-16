@@ -1,7 +1,7 @@
 import re, sys, os, logging, glob, csv
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit, QDialog, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit, QDialog, QPushButton, QCheckBox, QSpacerItem, QSizePolicy
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -46,15 +46,43 @@ class DoseResponseScreen(QMainWindow):
         self.dataColumn_lab.setText('')
 
         self.calculateDR_btn.clicked.connect(self.calcDR)
-        self.goto_sp_btn.clicked.connect(self.gotoSP)        
+        self.goto_sp_btn.clicked.connect(self.gotoSP)
+        self.dataPointCheckboxes = []
 
+
+        self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.dataPoints_layout.addItem(self.bottom_spacer)
+
+        #spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        #self.dataPoints_layout.addItem(spacer)
+        
 
     def calcDR(self):
-        self.doseResponseTable.generate_scatterplots(self.drInputFile_lab.text())
+        new_checkbox = QCheckBox(f"Checkbox {len(self.dataPointCheckboxes) + 1}")
+        self.dataPoints_layout.insertWidget(len(self.dataPointCheckboxes), new_checkbox)
+        self.dataPointCheckboxes.append(new_checkbox)
+
+        
+
+        return
+        
+        file = self.drInputFile_lab.text()
+        if file == '':
+            pass
+        else:
+            self.doseResponseTable.generate_scatterplots(file)
         
         
     def selectDRInputFile(self):
-        print('DR input clicked')
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file_name, _ = QFileDialog.getOpenFileName(self,
+                                                   "QFileDialog.getOpenFileName()",
+                                                   "",
+                                                   "Excel Files (*.xlsx);;All Files (*)",
+                                                   options=options)
+        if file_name:
+            self.drInputFile_lab.setText(file_name)
         
 
     def wellVolumeChanged(self, sVolume):

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1348</width>
-    <height>703</height>
+    <width>1590</width>
+    <height>783</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -212,63 +212,84 @@
            </layout>
           </item>
           <item>
-           <widget class="DoseResponseTable" name="doseResponseTable">
-            <column>
-             <property name="text">
-              <string>Batch</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Compound</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>IC50</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>IC50 Std</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Slope</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Bottom</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Top</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Min Conc nM</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Max Conc nM</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>AUC</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Graph</string>
-             </property>
-            </column>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="DoseResponseTable" name="doseResponseTable">
+              <column>
+               <property name="text">
+                <string>Batch</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Compound</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>IC50</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>IC50 Std</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Slope</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Bottom</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Top</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Min Conc nM</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Max Conc nM</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>AUC</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Graph</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="dataPoints_layout">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="maximumSize">
+                 <size>
+                  <width>300</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Data points:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

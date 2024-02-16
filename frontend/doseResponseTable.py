@@ -110,7 +110,6 @@ class ScatterplotWidget(QWidget):
         if not os.path.exists(imgDir):
             # If it doesn't exist, create it
             os.makedirs(imgDir)
-
         
         self.figure.savefig(f'img/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
         plt.legend()
@@ -128,7 +127,10 @@ class DoseResponseTable(QTableWidget):
         super(DoseResponseTable, self).__init__()
 
     def generate_scatterplots(self, file_path):
+        print('populating data')
         # Set the graph column to be 600 wide
+        self.clearContents()
+        self.setRowCount(0)
         self.setColumnWidth(10, 600)
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
