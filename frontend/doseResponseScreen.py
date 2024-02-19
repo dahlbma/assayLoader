@@ -14,7 +14,7 @@ from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
 from selectDataColumn import *
-from doseResponseTable import DoseResponseTable
+from doseResponseTable import DoseResponseTable, ScatterplotWidget
 import platform
 from inhibitionScatter import ScatterPlotWindow
 
@@ -50,28 +50,51 @@ class DoseResponseScreen(QMainWindow):
         self.dataPointCheckboxes = []
 
 
+    def rowChanged(self, currentRowIndex):
+        # Remove the old checkboxes
+        for i in reversed(range(self.dataPoints_layout.count())):
+            item = self.dataPoints_layout.itemAt(i)
+            
+            widg = item.widget()
+            self.dataPoints_layout.removeWidget(widg)
+            try:
+                widg.setParent(None)
+            except:
+                pass
+
+        
+        iCurrentRow = currentRowIndex.row()
+        df = pd.DataFrame()
+        widget = self.doseResponseTable.cellWidget(iCurrentRow, 10)
+        if isinstance(widget, ScatterplotWidget):
+            df = widget.data_dict
+        else:
+            print('No data')
+        # Insert new checkboxes here
+        for index, row in df.iterrows():
+            print("Selected Row:", currentRowIndex.row())
+            conc = "{:.1f}".format(row['finalConc_nL'])
+            new_checkbox = QCheckBox(f"{conc}")
+            self.dataPoints_layout.insertWidget(len(self.dataPointCheckboxes), new_checkbox)
+            self.dataPointCheckboxes.append(new_checkbox)
+
+        widget = self.doseResponseTable.cellWidget(iCurrentRow, 10)
+        if isinstance(widget, ScatterplotWidget):
+            print(df)
         self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.dataPoints_layout.addItem(self.bottom_spacer)
 
-        #spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        #self.dataPoints_layout.addItem(spacer)
-        
+            
 
     def calcDR(self):
-        new_checkbox = QCheckBox(f"Checkbox {len(self.dataPointCheckboxes) + 1}")
-        self.dataPoints_layout.insertWidget(len(self.dataPointCheckboxes), new_checkbox)
-        self.dataPointCheckboxes.append(new_checkbox)
-
-        
-
-        return
-        
         file = self.drInputFile_lab.text()
         if file == '':
             pass
         else:
-            self.doseResponseTable.generate_scatterplots(file)
-        
+            self.batch_df = self.doseResponseTable.generate_scatterplots(file)
+            self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
+
+            
         
     def selectDRInputFile(self):
         options = QFileDialog.Options()
@@ -113,8 +136,6 @@ class DoseResponseScreen(QMainWindow):
         subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
         if subdirectory_path == "preparedHaronyFiles":
             return
-
-        assaylib.resetPrepLog(self)
         
         platemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
@@ -134,7 +155,8 @@ class DoseResponseScreen(QMainWindow):
         # Final volume in nano liter (nL)
         final_volume = float(self.finalWellVolumeMicroliter_eb.text())*1000.0
         platemapDf['finalConc_nL'] = (platemapDf['Conc mM']* 1000000 * platemapDf['volume nL']) / final_volume
-
+        print(rawDataFilesDf)
+        
         rawDatafile = rawDataFilesDf.iloc[0]['file']
         saDataColumns = assaylib.findDataColumns(rawDatafile)
         dataColDialog = SelectDataColumn(saDataColumns)

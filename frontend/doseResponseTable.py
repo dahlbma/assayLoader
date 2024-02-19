@@ -34,6 +34,7 @@ class ScatterplotWidget(QWidget):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
         slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict)
+        self.data_dict = data_dict
         self.auc = auc
         self.ic50 = ic50
         self.ic50_std = ic50_std
@@ -183,14 +184,14 @@ class DoseResponseTable(QTableWidget):
 
 
             item = QTableWidgetItem()
-            #item.setSizeHint(scatterplot_widget.sizeHint())
             self.setItem(rowPosition, 10, item)
             self.setCellWidget(rowPosition, 10, scatterplot_widget)
             self.setCurrentCell(rowPosition, 0)
             QApplication.processEvents()
 
         self.saveToExcel()
-        
+        return batch_df
+    
 
     def saveToExcel(self):
         # Convert QTableWidget data to a pandas DataFrame
