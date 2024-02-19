@@ -20,7 +20,7 @@ def find_plate_results(directory):
                                     break
                     break
 # Specify the directory where you want to start searching
-starting_directory = '.'
+starting_directory = './vicky'
 
 
 
