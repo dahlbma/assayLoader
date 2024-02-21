@@ -116,7 +116,7 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
             match = re.search(pattern, content)
             if match:
                 sPlate = match.group()
-                assaylib.printPrepLog(self, f"Found plate: {sPlate}")
+                assaylib.printPrepLog(self, f"{sPlate}")
                 preparedFile = parseHarmonyFile(self, subdirectory_path, file_name, sPlate)
                 data['plate'].append(sPlate)
                 data['file'].append(preparedFile)

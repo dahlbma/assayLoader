@@ -72,11 +72,12 @@ class DoseResponseScreen(QMainWindow):
             print('No data')
         # Insert new checkboxes here
         for index, row in df.iterrows():
-            print("Selected Row:", currentRowIndex.row())
             conc = "{:.1f}".format(row['finalConc_nL'])
             new_checkbox = QCheckBox(f"{conc}")
+            new_checkbox.setChecked(True)
             self.dataPoints_layout.insertWidget(len(self.dataPointCheckboxes), new_checkbox)
             self.dataPointCheckboxes.append(new_checkbox)
+
 
         widget = self.doseResponseTable.cellWidget(iCurrentRow, 10)
         if isinstance(widget, ScatterplotWidget):

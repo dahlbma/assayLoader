@@ -12,10 +12,10 @@ def find_plate_results(directory):
                     for line in f:
                         
                         if line.startswith('Plate Name'):
-                            print(f'################## Found Plate ############# {line.strip()}')
+                            #print(f'################## Found Plate ############# {line.strip()}')
                             for keyword in keywords:
                                 if keyword in line:
-                                    print("Filename:", filepath)
+                                    print("################### Filename:", filepath)
                                     print("Line containing 'Plate Name':", line.strip())
                                     break
                     break
@@ -25,5 +25,3 @@ starting_directory = './vicky'
 
 
 find_plate_results(starting_directory)
-
-
