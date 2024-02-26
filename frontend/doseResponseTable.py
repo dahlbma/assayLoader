@@ -23,17 +23,17 @@ def fourpl(x, slope, ic50, bottom, top):
 file_path = "finalPreparedDR.xlsx"
 
 class ScatterplotWidget(QWidget):
-    def __init__(self, data_dict, rowPosition, parent=None):
+    def __init__(self, data_dict, rowPosition, yScale, parent=None):
         super(ScatterplotWidget, self).__init__(parent)
         self.rowPosition = rowPosition
 
         self.figure, self.ax = plt.subplots(figsize=(3, 2))
         self.canvas = FigureCanvas(self.figure)
-
+        self.yScale = yScale
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict)
+        slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict, self.yScale)
         self.data_dict = data_dict
         self.auc = auc
         self.ic50 = ic50
@@ -44,7 +44,8 @@ class ScatterplotWidget(QWidget):
         self.minConc = data_dict['finalConc_nL'].iloc[0]
         self.maxConc = data_dict['finalConc_nL'].iloc[-1]
 
-    def plot_scatter(self, df):
+
+    def plot_scatter(self, df, yScale):
 
         # Extract the 'x' and 'y' arrays
         x_values = np.array(df['finalConc_nL'].values/1000000000, dtype=np.float64)
@@ -101,7 +102,7 @@ class ScatterplotWidget(QWidget):
             plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
         plt.xscale('log')  # Set x-axis to logarithmic scale
         plt.xlabel('Concentration')
-        plt.ylabel('Inhibition %')
+        plt.ylabel(yScale)
         self.canvas.draw()
 
         # Create sub dir for images of the DR-curves (for Excel)
@@ -127,7 +128,7 @@ class DoseResponseTable(QTableWidget):
         
         super(DoseResponseTable, self).__init__()
 
-    def generate_scatterplots(self, file_path):
+    def generate_scatterplots(self, file_path, yScale):
         print('populating data')
         # Set the graph column to be 600 wide
         self.clearContents()
@@ -150,7 +151,7 @@ class DoseResponseTable(QTableWidget):
             
             print(f'Plot nr: {rowPosition}')
             # Call the scatter function for each batch
-            scatterplot_widget = ScatterplotWidget(batch_df, rowPosition)
+            scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale)
 
             item = QTableWidgetItem(batch)
             self.setItem(rowPosition, 0, item)

@@ -49,6 +49,18 @@ class DoseResponseScreen(QMainWindow):
         self.goto_sp_btn.clicked.connect(self.gotoSP)
         self.dataPointCheckboxes = []
 
+        self.activation_rb.clicked.connect(self.toggleInhibition)
+        self.inhibition_rb.clicked.connect(self.toggleInhibition)
+        self.inhibition_rb.setChecked(True)
+        
+
+    def toggleInhibition(self):
+        sender = self.sender()
+        if sender == self.inhibition_rb and sender.isChecked():
+            self.activation_rb.setChecked(False)
+        elif sender == self.inhibition_rb and sender.isChecked():
+            self.inhibition_rb.setChecked(False)
+
 
     def rowChanged(self, currentRowIndex):
         # Remove the old checkboxes
@@ -59,9 +71,9 @@ class DoseResponseScreen(QMainWindow):
             self.dataPoints_layout.removeWidget(widg)
             try:
                 widg.setParent(None)
-            except:
+                widg.deleteLater()
+            except Exception as e:
                 pass
-
         
         iCurrentRow = currentRowIndex.row()
         df = pd.DataFrame()
@@ -77,7 +89,7 @@ class DoseResponseScreen(QMainWindow):
             new_checkbox.setChecked(True)
             self.dataPoints_layout.insertWidget(len(self.dataPointCheckboxes), new_checkbox)
             self.dataPointCheckboxes.append(new_checkbox)
-
+            new_checkbox.stateChanged.connect(lambda state: self.checkbox_changed(new_checkbox, state, iCurrentRow))
 
         widget = self.doseResponseTable.cellWidget(iCurrentRow, 10)
         if isinstance(widget, ScatterplotWidget):
@@ -85,17 +97,40 @@ class DoseResponseScreen(QMainWindow):
         self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.dataPoints_layout.addItem(self.bottom_spacer)
 
+
+    def checkbox_changed(self, checkbox, state, iCurrentRow):
+        if state == 2:
+            print(checkbox.text(), "checked")
+        else:
+            print(checkbox.text(), "unchecked")
+        self.updatePlot(iCurrentRow, [1,2])
+
+        res = []
+        for i in reversed(range(self.dataPoints_layout.count())):
+            item = self.dataPoints_layout.itemAt(i)
+            widg = item.widget()
+            if widg.isChecked():
+                res.append(True)
+            else:
+                re.append(False)
+        
+
             
+    def updatePlot(self, row, includedPoints):
+        print(f'update {row} {includedPoints}')
+    
 
     def calcDR(self):
         file = self.drInputFile_lab.text()
         if file == '':
             pass
         else:
-            self.batch_df = self.doseResponseTable.generate_scatterplots(file)
+            yScale = 'Inhibition %'
+            if self.activation_rb.isChecked():
+                yScale = 'Activation %'
+            self.batch_df = self.doseResponseTable.generate_scatterplots(file, yScale)
             self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
 
-            
         
     def selectDRInputFile(self):
         options = QFileDialog.Options()

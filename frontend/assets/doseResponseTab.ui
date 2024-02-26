@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1590</width>
-    <height>783</height>
+    <width>1658</width>
+    <height>827</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -124,7 +124,7 @@
          <attribute name="title">
           <string>Curve fitting</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
@@ -193,6 +193,20 @@
              <widget class="QPushButton" name="calculateDR_btn">
               <property name="text">
                <string>Calculate dose response</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="inhibition_rb">
+              <property name="text">
+               <string>Inhibition</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="activation_rb">
+              <property name="text">
+               <string>Activation</string>
               </property>
              </widget>
             </item>
@@ -273,7 +287,7 @@
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="dataPoints_layout">
+             <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <widget class="QLabel" name="label_3">
                 <property name="maximumSize">
@@ -283,9 +297,12 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Data points:</string>
+                 <string>Concentration nL</string>
                 </property>
                </widget>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="dataPoints_layout"/>
               </item>
              </layout>
             </item>
