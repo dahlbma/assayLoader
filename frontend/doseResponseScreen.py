@@ -99,36 +99,44 @@ class DoseResponseScreen(QMainWindow):
 
 
     def checkbox_changed(self, checkbox, state, iCurrentRow):
-        if state == 2:
-            print(checkbox.text(), "checked")
-        else:
-            print(checkbox.text(), "unchecked")
-        self.updatePlot(iCurrentRow, [1,2])
-
+        # state == 2   => checked
         res = []
-        for i in reversed(range(self.dataPoints_layout.count())):
+        for i in range(self.dataPoints_layout.count()):
             item = self.dataPoints_layout.itemAt(i)
             widg = item.widget()
-            if widg.isChecked():
-                res.append(True)
-            else:
-                re.append(False)
-        
+            try:
+                if widg.isChecked():
+                    res.append(True)
+                else:
+                    res.append(False)
+            except:
+                pass
+        self.updatePlot(iCurrentRow, res)
 
-            
+
     def updatePlot(self, row, includedPoints):
+        df = None
+        widget = self.doseResponseTable.cellWidget(row, 10)
+        if isinstance(widget, ScatterplotWidget):
+            df = widget.data_dict
+        else:
+            return
+
         print(f'update {row} {includedPoints}')
-    
+        selected_rows = df[includedPoints]
+        print(selected_rows)
+        print(row)
+        widget.plot_scatter(selected_rows, self.yScale)
 
     def calcDR(self):
         file = self.drInputFile_lab.text()
         if file == '':
             pass
         else:
-            yScale = 'Inhibition %'
+            self.yScale = 'Inhibition %'
             if self.activation_rb.isChecked():
-                yScale = 'Activation %'
-            self.batch_df = self.doseResponseTable.generate_scatterplots(file, yScale)
+                self.yScale = 'Activation %'
+            self.batch_df = self.doseResponseTable.generate_scatterplots(file, self.yScale)
             self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
 
         

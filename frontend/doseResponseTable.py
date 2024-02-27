@@ -5,7 +5,6 @@ import json
 import sys
 import numpy as np
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication
-#from PyQt5.QtCore import Qt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -46,6 +45,7 @@ class ScatterplotWidget(QWidget):
 
 
     def plot_scatter(self, df, yScale):
+        self.ax.clear()
 
         # Extract the 'x' and 'y' arrays
         x_values = np.array(df['finalConc_nL'].values/1000000000, dtype=np.float64)
@@ -103,7 +103,6 @@ class ScatterplotWidget(QWidget):
         plt.xscale('log')  # Set x-axis to logarithmic scale
         plt.xlabel('Concentration')
         plt.ylabel(yScale)
-        self.canvas.draw()
 
         # Create sub dir for images of the DR-curves (for Excel)
         imgDir = 'img'
@@ -136,63 +135,62 @@ class DoseResponseTable(QTableWidget):
         self.setColumnWidth(10, 600)
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
-            
-            # "Batch nr" "Compound ID" "finalConc_nL" "yMean" "yStd"
-            batch = batch_df['Batch nr'].iloc[0]
-            compound = batch_df['Compound ID'].iloc[0]
-            
             rowPosition = self.rowCount()
-
             if rowPosition > 40:
                 continue
-
             self.insertRow(rowPosition)
             self.setRowHeight(rowPosition, 425)
             
             print(f'Plot nr: {rowPosition}')
             # Call the scatter function for each batch
-            scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale)
-
-            item = QTableWidgetItem(batch)
-            self.setItem(rowPosition, 0, item)
-
-            item = QTableWidgetItem(compound)
-            self.setItem(rowPosition, 1, item)
-
-            item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
-            self.setItem(rowPosition, 2, item)
-
-            item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
-            self.setItem(rowPosition, 3, item)
-
-            item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
-            self.setItem(rowPosition, 4, item)
-
-            item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
-            self.setItem(rowPosition, 5, item)
-
-            item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
-            self.setItem(rowPosition, 6, item)            
-
-            item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
-            self.setItem(rowPosition, 7, item)
-
-            item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
-            self.setItem(rowPosition, 8, item)
-
-            item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
-            self.setItem(rowPosition, 9, item)
-
-
-            item = QTableWidgetItem()
-            self.setItem(rowPosition, 10, item)
-            self.setCellWidget(rowPosition, 10, scatterplot_widget)
-            self.setCurrentCell(rowPosition, 0)
-            QApplication.processEvents()
+            self.plotCurve(batch_df, rowPosition, yScale)
 
         self.saveToExcel()
         return batch_df
-    
+
+    def plotCurve(self, batch_df, rowPosition, yScale):
+        # "Batch nr" "Compound ID" "finalConc_nL" "yMean" "yStd"
+        batch = batch_df['Batch nr'].iloc[0]
+        compound = batch_df['Compound ID'].iloc[0]
+
+        scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale)
+
+        item = QTableWidgetItem(batch)
+        self.setItem(rowPosition, 0, item)
+
+        item = QTableWidgetItem(compound)
+        self.setItem(rowPosition, 1, item)
+
+        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
+        self.setItem(rowPosition, 2, item)
+
+        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
+        self.setItem(rowPosition, 3, item)
+
+        item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
+        self.setItem(rowPosition, 4, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
+        self.setItem(rowPosition, 5, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
+        self.setItem(rowPosition, 6, item)            
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
+        self.setItem(rowPosition, 7, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
+        self.setItem(rowPosition, 8, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
+        self.setItem(rowPosition, 9, item)
+
+        item = QTableWidgetItem()
+        self.setItem(rowPosition, 10, item)
+        self.setCellWidget(rowPosition, 10, scatterplot_widget)
+        self.setCurrentCell(rowPosition, 10)
+        QApplication.processEvents()
+
 
     def saveToExcel(self):
         # Convert QTableWidget data to a pandas DataFrame
