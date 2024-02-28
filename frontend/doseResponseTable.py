@@ -32,21 +32,17 @@ class ScatterplotWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict, self.yScale)
+        # self.data_dict contains the original data for each plot, so we can reconstruct the original curve at all times
         self.data_dict = data_dict
-        self.auc = auc
-        self.ic50 = ic50
-        self.ic50_std = ic50_std
-        self.slope = slope
-        self.top = top
-        self.bottom = bottom
-        self.minConc = data_dict['finalConc_nL'].iloc[0]
-        self.maxConc = data_dict['finalConc_nL'].iloc[-1]
+        # self.plotted_data contains the datapoints that are plottedt (in case some points are de-selected in the GUI)
+        self.plotted_data = data_dict
 
+        slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict, self.yScale)
+        
 
     def plot_scatter(self, df, yScale):
         self.ax.clear()
-
+        self.plotted_data = df
         # Extract the 'x' and 'y' arrays
         x_values = np.array(df['finalConc_nL'].values/1000000000, dtype=np.float64)
         y_values = np.array(df['inhibition'].values, dtype=np.float64)
@@ -88,21 +84,21 @@ class ScatterplotWidget(QWidget):
         # Plot the original data and the fitted curve with a logarithmic x-axis
         #plt.scatter(x_values, y_values, label='Original Data')
 
-        plt.errorbar(x_values, y_values, yerr=y_err_values, fmt='o', label='Raw data')
+        self.ax.errorbar(x_values, y_values, yerr=y_err_values, fmt='o', label='Raw data')
 
-        plt.ylim(min(min(y_values), 0) - 10, max(max(y_values), 100) + 10)
+        self.ax.set_ylim(min(min(y_values), 0) - 10, max(max(y_values), 100) + 10)
         
         if fitOk == True:
-            plt.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
+            self.ax.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
         if ic50 == -1:
             pass
         elif ic50 > 0.001:
-            plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50:.2f} M')
+            self.ax.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50:.2f} M')
         else:
-            plt.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
-        plt.xscale('log')  # Set x-axis to logarithmic scale
-        plt.xlabel('Concentration')
-        plt.ylabel(yScale)
+            self.ax.axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
+        self.ax.set_xscale('log')  # Set x-axis to logarithmic scale
+        self.ax.set_xlabel('Concentration')
+        self.ax.set_ylabel(yScale)
 
         # Create sub dir for images of the DR-curves (for Excel)
         imgDir = 'img'
@@ -113,19 +109,38 @@ class ScatterplotWidget(QWidget):
             os.makedirs(imgDir)
         
         self.figure.savefig(f'img/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
-        plt.legend()
+        self.ax.legend()
         self.canvas.draw()
 
         (auc, err) = quad(fourpl, min(x_values), max(x_values), args=(slope, ic50, bottom, top))
         
+        # Save all the parameters for the curve fitting
+        self.auc = auc
+        self.ic50 = ic50
+        self.ic50_std = ic50_std
+        self.slope = slope
+        self.top = top
+        self.bottom = bottom
+        self.minConc = self.data_dict['finalConc_nL'].iloc[0]
+        self.maxConc = self.data_dict['finalConc_nL'].iloc[-1]
+
         return slope, ic50, bottom, top, ic50_std, auc
 
 
 class DoseResponseTable(QTableWidget):
     def __init__(self, inputWidget):
         # What is the inputWidget, it has type QWidget ??????
-        
         super(DoseResponseTable, self).__init__()
+        self.ic50_col = 2
+        self.ic50std_col = 3
+        self.slope_col = 4
+        self.bottom_col = 5
+        self.top_col = 6
+        self.minConc_col = 7
+        self.maxConc_col = 8
+        self.auc_col = 9
+        self.graph_col = 10
+        
 
     def generate_scatterplots(self, file_path, yScale):
         print('populating data')
@@ -136,7 +151,7 @@ class DoseResponseTable(QTableWidget):
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             rowPosition = self.rowCount()
-            if rowPosition > 40:
+            if rowPosition > 30:
                 continue
             self.insertRow(rowPosition)
             self.setRowHeight(rowPosition, 425)
@@ -161,37 +176,40 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(compound)
         self.setItem(rowPosition, 1, item)
 
-        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
-        self.setItem(rowPosition, 2, item)
-
-        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
-        self.setItem(rowPosition, 3, item)
-
-        item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
-        self.setItem(rowPosition, 4, item)
-
-        item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
-        self.setItem(rowPosition, 5, item)
-
-        item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
-        self.setItem(rowPosition, 6, item)            
-
-        item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
-        self.setItem(rowPosition, 7, item)
-
-        item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
-        self.setItem(rowPosition, 8, item)
-
-        item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
-        self.setItem(rowPosition, 9, item)
-
         item = QTableWidgetItem()
-        self.setItem(rowPosition, 10, item)
-        self.setCellWidget(rowPosition, 10, scatterplot_widget)
-        self.setCurrentCell(rowPosition, 10)
+        self.setItem(rowPosition, self.graph_col, item)
+        self.setCellWidget(rowPosition, self.graph_col, scatterplot_widget)
+        self.setCurrentCell(rowPosition, self.graph_col)
+        self.updateTable(rowPosition, scatterplot_widget)
         QApplication.processEvents()
 
 
+    def updateTable(self, rowPosition, scatterplot_widget):
+        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
+        self.setItem(rowPosition, self.ic50_col, item) # 2
+
+        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
+        self.setItem(rowPosition, self.ic50std_col, item) # 3
+
+        item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
+        self.setItem(rowPosition, self.slope_col, item) #4
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
+        self.setItem(rowPosition, self.bottom_col, item) # 5
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.top:.2f}"))
+        self.setItem(rowPosition, self.top_col, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.minConc:.1f}"))
+        self.setItem(rowPosition, self.minConc_col, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
+        self.setItem(rowPosition, self.maxConc_col, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
+        self.setItem(rowPosition, self.auc_col, item)
+
+        
     def saveToExcel(self):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []

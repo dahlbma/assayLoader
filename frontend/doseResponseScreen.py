@@ -77,7 +77,7 @@ class DoseResponseScreen(QMainWindow):
         
         iCurrentRow = currentRowIndex.row()
         df = pd.DataFrame()
-        widget = self.doseResponseTable.cellWidget(iCurrentRow, 10)
+        widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
         if isinstance(widget, ScatterplotWidget):
             df = widget.data_dict
         else:
@@ -91,9 +91,10 @@ class DoseResponseScreen(QMainWindow):
             self.dataPointCheckboxes.append(new_checkbox)
             new_checkbox.stateChanged.connect(lambda state: self.checkbox_changed(new_checkbox, state, iCurrentRow))
 
-        widget = self.doseResponseTable.cellWidget(iCurrentRow, 10)
+        widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
         if isinstance(widget, ScatterplotWidget):
-            print(df)
+            #print(df)
+            pass
         self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.dataPoints_layout.addItem(self.bottom_spacer)
 
@@ -122,11 +123,11 @@ class DoseResponseScreen(QMainWindow):
         else:
             return
 
-        print(f'update {row} {includedPoints}')
         selected_rows = df[includedPoints]
-        print(selected_rows)
-        print(row)
+        #print(selected_rows)
         widget.plot_scatter(selected_rows, self.yScale)
+        self.doseResponseTable.updateTable(row, widget)
+
 
     def calcDR(self):
         file = self.drInputFile_lab.text()
