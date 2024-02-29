@@ -151,7 +151,7 @@ class DoseResponseTable(QTableWidget):
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             rowPosition = self.rowCount()
-            if rowPosition > 30:
+            if rowPosition > 200:
                 continue
             self.insertRow(rowPosition)
             self.setRowHeight(rowPosition, 425)

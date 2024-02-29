@@ -16,7 +16,6 @@ from prepareHarmonyFile import *
 import platform
 from inhibitionScatter import ScatterPlotWindow
 
-
 # Get the operating system name
 os_name = platform.system()
 
@@ -480,34 +479,13 @@ class SinglePointScreen(QMainWindow):
     def selectFileToPlateMap(self):
         self.inputFiles_tab.setRowCount(0)
         file_paht = ''
-        if self.instrument_cb.currentText() == 'Harmony':
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog  # Use the native file dialog
 
-            directory_dialog = QFileDialog()
-            directory_dialog.setOptions(options)
-
-            # Set the file mode to DirectoryOnly to allow selecting directories only
-            directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
-
-            # Show the directory dialog
-            file_path = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
-
-        else:
-            file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")      
+        file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")      
  
         if not file_path:
             return
 
         path_to_data_dir = os.path.dirname(file_path)
-
-        # If the instrument is Harmony we need to prepare the rawdata files.
-        if self.instrument_cb.currentText() == 'Harmony':
-            file_path = self.prepareHarmonyFiles(file_path)
-
-            if file_path == "":
-                return
-
         self.fileToPlatemapFile = file_path
         df = pd.read_excel(file_path)
 
