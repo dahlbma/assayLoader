@@ -40,7 +40,8 @@ class DoseResponseScreen(QMainWindow):
 
         self.selectHarmonyDirectory_btn.setEnabled(False)
         self.selectHarmonyDirectory_btn.clicked.connect(self.selectHarmonyDirectory)
-
+        self.workingDirectory = ''
+        
         self.drInputFile_lab.setText('')
         self.selectDRInput_btn.clicked.connect(self.selectDRInputFile)
         self.dataColumn_lab.setText('')
@@ -181,7 +182,8 @@ class DoseResponseScreen(QMainWindow):
         subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
         if subdirectory_path == "preparedHaronyFiles":
             return
-        
+
+        self.workingDirectory = subdirectory_path
         platemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
         
@@ -241,7 +243,7 @@ class DoseResponseScreen(QMainWindow):
         columns_to_remove = ['Conc mM', 'volume nL']
         platemapDf = platemapDf.drop(columns=columns_to_remove)
         
-        excel_file_path = 'prepare_platemap.xlsx'
+        excel_file_path = os.path.join(self.workingDirectory, 'dose_response_platemap.xlsx')
         platemapDf.to_excel(excel_file_path, index=False)
         
         # Group by 'Batch' and calculate mean and yVariance
@@ -263,11 +265,11 @@ class DoseResponseScreen(QMainWindow):
         # Rename columns if needed
         resultDf = resultDf.rename(columns={'Batch': 'Batch', 'rawData': 'yMean'})
 
-        excel_file_path = 'finalPreparedDR.xlsx'
+        excel_file_path = os.path.join(self.workingDirectory, 'finalPreparedDR.xlsx')
         
-        fullPath = os.path.join(sBasePath, excel_file_path)
-        resultDf.to_excel(fullPath, index=False)
+        #fullPath = os.path.join(sBasePath, excel_file_path)
+        resultDf.to_excel(excel_file_path, index=False)
         assaylib.printPrepLog(self, f'File prepared for dose response computation saved:')
-        assaylib.printPrepLog(self, f'{fullPath}', type='bold')
-        self.drInputFile_lab.setText(fullPath)
+        assaylib.printPrepLog(self, f'{excel_file_path}', type='bold')
+        self.drInputFile_lab.setText(excel_file_path)
 

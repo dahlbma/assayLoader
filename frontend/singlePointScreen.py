@@ -28,6 +28,10 @@ class SinglePointScreen(QMainWindow):
         self.logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/singlePointTab.ui"), self)
 
+        self.preparedZinput = 'preparedZinput.csv'
+        self.QCoutput = 'screenQC.xlsx'
+        self.workingDirectory = ''
+        
         #####################
         # Prep data screen
         self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
@@ -62,7 +66,7 @@ class SinglePointScreen(QMainWindow):
         self.generateQcInput_btn.clicked.connect(self.generateQcInput)
 
         self.outputFile_eb.editingFinished.connect(self.checkDataColumn)
-        self.outputFile_eb.setText('screenQC.xlsx')
+        self.outputFile_eb.setText(self.QCoutput)
 
         self.posCtrl_eb.editingFinished.connect(self.checkDataColumn)
         self.posCtrl_eb.setText('CTRL')
@@ -164,7 +168,8 @@ class SinglePointScreen(QMainWindow):
                 iCol = col
                 break
         return iCol
-        
+
+
     def populateColumn(self, sCol, sValue):        
         iNrRows = self.sp_table.rowCount()
         iCol = self.findColumnNumber(sCol)
@@ -270,11 +275,11 @@ class SinglePointScreen(QMainWindow):
         directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
-
         subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
+        self.workingDirectory = subdirectory_path
         if subdirectory_path == "preparedHaronyFiles":
             return
-        print(subdirectory_path)
+        #print(subdirectory_path)
         findHarmonyFiles(self, subdirectory_path, selected_directory)
         
 
@@ -520,10 +525,7 @@ class SinglePointScreen(QMainWindow):
 
 
     def selectPlatemap(self):
-        options = QFileDialog.Options()
-        platemap, _ = QFileDialog.getOpenFileName(
-            None, "Open File", "", "All Files (*);;CSV Files (*.csv)", options=options
-        )
+        platemap, _ = QFileDialog.getOpenFileName(self, "Open File", self.workingDirectory)
 
         if platemap:
             self.platemapDf = pd.read_excel(platemap)
@@ -608,9 +610,9 @@ class SinglePointScreen(QMainWindow):
                             beep=True)
             QApplication.restoreOverrideCursor()
             return
-        
-        resDf.to_csv("preparedZinput.csv", sep='\t', index=False)  # Set index=False to exclude the index column
-        self.qcInputFile_lab.setText('preparedZinput.csv')
+        sOutput = os.path.join(self.workingDirectory, self.preparedZinput)
+        resDf.to_csv(sOutput, sep='\t', index=False)  # Set index=False to exclude the index column
+        self.qcInputFile_lab.setText(sOutput)
         self.generateQcInput_btn.setEnabled(True)
         QApplication.restoreOverrideCursor()
 
@@ -676,8 +678,8 @@ class SinglePointScreen(QMainWindow):
         
     def runQc(self):
         self.printQcLog('running QC')
-        sOutput = self.outputFile_eb.text()
-        
+        sOutput = os.path.join(self.workingDirectory, self.outputFile_eb.text())
+        self.QCoutput = sOutput
         iMinPosCtrl = int(self.minPosCtrl_eb.text())
         iMaxNegCtrl = int(self.maxNegCtrl_eb.text())
 
@@ -689,8 +691,8 @@ class SinglePointScreen(QMainWindow):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             newHitThreshold, dfQcData = calcQc(self,
-                                               "preparedZinput.csv",
-                                               sOutput,
+                                               os.path.join(self.workingDirectory, self.preparedZinput),
+                                               self.QCoutput,
                                                iHitThreshold,
                                                iMinPosCtrl,
                                                iMaxNegCtrl)
@@ -710,11 +712,11 @@ class SinglePointScreen(QMainWindow):
         dfQcData = dfQcData[mask].reset_index(drop=True)
 
         if os_name == "Windows":
-            subprocess.run(['start', '', sOutput], shell=True, check=True)  # On Windows
+            subprocess.run(['start', '', self.QCoutput], shell=True, check=True)  # On Windows
         elif os_name == "Darwin":
-            subprocess.run(['open', sOutput], check=True)  # On macOS
+            subprocess.run(['open', self.QCoutput], check=True)  # On macOS
         elif os_name == "Linux":
-            subprocess.run(['xdg-open', sOutput], check=True) # Linux
+            subprocess.run(['xdg-open', self.QCoutput], check=True) # Linux
 
         self.sp_table.setRowCount(0)
         self.populate_table(dfQcData, 'compound_id', insertRows=True)

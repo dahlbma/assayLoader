@@ -22,10 +22,11 @@ def fourpl(x, slope, ic50, bottom, top):
 file_path = "finalPreparedDR.xlsx"
 
 class ScatterplotWidget(QWidget):
-    def __init__(self, data_dict, rowPosition, yScale, parent=None):
+    def __init__(self, data_dict, rowPosition, yScale, workingDir, parent=None):
         super(ScatterplotWidget, self).__init__(parent)
         self.rowPosition = rowPosition
 
+        self.workingDirectory = workingDir
         self.figure, self.ax = plt.subplots(figsize=(3, 2))
         self.canvas = FigureCanvas(self.figure)
         self.yScale = yScale
@@ -101,14 +102,14 @@ class ScatterplotWidget(QWidget):
         self.ax.set_ylabel(yScale)
 
         # Create sub dir for images of the DR-curves (for Excel)
-        imgDir = 'img'
+        imgDir = self.workingDirectory + '/img'
         
         # Check if the directory exists
         if not os.path.exists(imgDir):
             # If it doesn't exist, create it
             os.makedirs(imgDir)
         
-        self.figure.savefig(f'img/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
+        self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
         self.ax.legend()
         self.canvas.draw()
 
@@ -140,10 +141,12 @@ class DoseResponseTable(QTableWidget):
         self.maxConc_col = 8
         self.auc_col = 9
         self.graph_col = 10
-        
+        self.workingDirectory = ''
 
     def generate_scatterplots(self, file_path, yScale):
         print('populating data')
+        outputDir = os.path.dirname(file_path)
+        self.workingDirectory = outputDir
         # Set the graph column to be 600 wide
         self.clearContents()
         self.setRowCount(0)
@@ -151,7 +154,7 @@ class DoseResponseTable(QTableWidget):
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             rowPosition = self.rowCount()
-            if rowPosition > 200:
+            if rowPosition > 30:
                 continue
             self.insertRow(rowPosition)
             self.setRowHeight(rowPosition, 425)
@@ -160,7 +163,7 @@ class DoseResponseTable(QTableWidget):
             # Call the scatter function for each batch
             self.plotCurve(batch_df, rowPosition, yScale)
 
-        self.saveToExcel()
+        self.saveToExcel(outputDir)
         return batch_df
 
     def plotCurve(self, batch_df, rowPosition, yScale):
@@ -168,7 +171,7 @@ class DoseResponseTable(QTableWidget):
         batch = batch_df['Batch nr'].iloc[0]
         compound = batch_df['Compound ID'].iloc[0]
 
-        scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale)
+        scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale, self.workingDirectory)
 
         item = QTableWidgetItem(batch)
         self.setItem(rowPosition, 0, item)
@@ -210,7 +213,7 @@ class DoseResponseTable(QTableWidget):
         self.setItem(rowPosition, self.auc_col, item)
 
         
-    def saveToExcel(self):
+    def saveToExcel(self, sDir):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
         for row in range(self.rowCount()):
@@ -224,9 +227,7 @@ class DoseResponseTable(QTableWidget):
         wb = Workbook()
         ws = wb.active
 
-        file_path = 'DR_Excel.xlsx'
-
-
+        file_path = os.path.join(sDir, 'DR_Excel.xlsx')
         headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope",
                     "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
 
@@ -248,11 +249,16 @@ class DoseResponseTable(QTableWidget):
                 else:
                     ws.cell(row=r_idx, column=c_idx, value=value)
 
-        imgDir = 'img'
+        imgDir = sDir + '/img'
+        print(imgDir)
+        if not os.path.exists(imgDir):
+            # Create the directory and any missing parent directories
+            os.makedirs(imgDir)
 
         # Add scatterplots to Excel
         for i, canvas in enumerate(df['Graph']):
             image_path = f"{imgDir}/{i}.png"
+            print()
             img = Image(image_path)
                         
             ws.add_image(img)

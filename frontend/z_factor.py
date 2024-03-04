@@ -530,7 +530,7 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
             cell.font = whiteFont
 
 def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtrl):
-    
+    print(input_file)
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
     self.printQcLog(f"Reading input")
