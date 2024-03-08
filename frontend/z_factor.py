@@ -138,6 +138,53 @@ def plotZfactor(df):
     return image_buffer
 
 
+def plotNegPosCtrl(df_summary):
+    df = df_summary.copy()
+    num_rows = df.shape[0]
+
+    # Find the min and max values of meanNegCtrl, meanPosCtrl, stdNegCtrl, and stdPosCtrl
+    min_value = min(df[['meanNegCtrl', 'meanPosCtrl', 'stdNegCtrl', 'stdPosCtrl']].values.min(), 0)
+    max_value = df[['meanNegCtrl', 'meanPosCtrl']].values.max()
+
+    # Normalize meanNegCtrl, meanPosCtrl, stdNegCtrl, and stdPosCtrl to values between 0 and 1
+    df['norm_meanNegCtrl'] = (df['meanNegCtrl'] - min_value) / (max_value - min_value)
+    df['norm_meanPosCtrl'] = (df['meanPosCtrl'] - min_value) / (max_value - min_value)
+    df['norm_stdNegCtrl'] = df['stdNegCtrl'] / (max_value - min_value)
+    df['norm_stdPosCtrl'] = df['stdPosCtrl'] / (max_value - min_value)
+
+    fig, ax = plt.subplots(figsize=(21, 8))
+
+    # Plot the normalized values along with the scaled standard deviations
+    plt.errorbar(df.index, df['norm_meanNegCtrl'], yerr=df['norm_stdNegCtrl'], fmt='o', label='Normalized meanNegCtrl')
+    plt.errorbar(df.index, df['norm_meanPosCtrl'], yerr=df['norm_stdPosCtrl'], fmt='o', label='Normalized meanPosCtrl')
+
+
+    labels = df['Plate'].tolist()
+    ticks = list(range(num_rows))
+
+    # Set labels and title
+    plt.xlabel('Plate')
+    plt.ylabel('Normalized Value')
+    plt.title('Normalized Values with Normalized Standard Deviations')
+    ax.xaxis.set_ticks(ticks, minor=False)
+    ax.set_xticklabels(labels, minor=False, rotation=90)
+    plt.legend()
+    plt.grid(True)
+
+    canvas = FigureCanvasAgg(fig)
+    canvas.draw()
+    
+    # Extract the image buffer as a numpy array
+    image_buffer = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
+    image_buffer = image_buffer.reshape(canvas.get_width_height()[::-1] + (3,))
+
+    image_io = io.BytesIO()
+    # Save the image buffer to the virtual file-like object
+    plt.imsave(image_io, image_buffer, format='png')
+    image_io.seek(0)
+    return image_io
+
+    
 def inhibitionScatterPlotNew(df_inhibition, hitLimit):
     # Create a scatterplot of the "inhibition" columns
     fig, ax = plt.subplots()
@@ -317,6 +364,8 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     zFactorPlt = plotZfactor(df_summary)
     inhibitionHistogramPlt = plotInhibitionHistogram(df_inhibition)
     inhibitionScatterPlt = inhibitionScatterPlot(df_inhibition_calculated, hitLimit)
+
+    combinedNegPosCtrlPlt = plotNegPosCtrl(df_summary)
     
     addPlotToSheet(ws, 'V1', inhibPlt)
     addPlotToSheet(ws, 'V40', negPlt)
@@ -324,6 +373,7 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     addPlotToSheet(ws, 'V120', inhibitionHistogramPlt)
     addPlotToSheet(ws, 'V160', inhibitionScatterPlt)
     addPlotToSheet(ws, 'V200', zFactorPlt)
+    addPlotToSheet(ws, 'V290', combinedNegPosCtrlPlt)
     
     start_column = 'M'
     #light_red_3_fill = PatternFill(start_color="FF5050", end_color="FF5050", fill_type="solid")
