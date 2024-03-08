@@ -299,11 +299,11 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     for row in dataframe_to_rows(df_inhibition_calculated, index=False, header=True):
         ws.append(row)
     
-    ws['K1'] = ' Hit limit: {:.2f}'.format(hitLimit)
-    ws['K2'] = ' Min inhib: {:.2f}'.format(minInhib)
-    ws['K3'] = ' Max inhib: {:.2f}'.format(maxInhib)
-    ws['K4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
-    ws['K5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
+    ws['L1'] = ' Hit limit: {:.2f}'.format(hitLimit)
+    ws['L2'] = ' Min inhib: {:.2f}'.format(minInhib)
+    ws['L3'] = ' Max inhib: {:.2f}'.format(maxInhib)
+    ws['L4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
+    ws['L5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
 
     ##############################
     # Next two lines are used to avoid a bug with image in "io.BytesIO". Without these lines the wrong images appear if you runQc
@@ -311,7 +311,6 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     ##############################
-    
     inhibPlt = plotMeanStd(df_summary['meanRaw'], df_summary['stdRaw'], 'Raw data')
     negPlt = plotMeanStd(df_summary['meanNegCtrl'], df_summary['stdNegCtrl'], 'NegCtrl')
     posPlt = plotMeanStd(df_summary['meanPosCtrl'], df_summary['stdPosCtrl'], 'PosCtrl')
@@ -319,14 +318,14 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     inhibitionHistogramPlt = plotInhibitionHistogram(df_inhibition)
     inhibitionScatterPlt = inhibitionScatterPlot(df_inhibition_calculated, hitLimit)
     
-    addPlotToSheet(ws, 'U1', inhibPlt)
-    addPlotToSheet(ws, 'U40', negPlt)
-    addPlotToSheet(ws, 'U80', posPlt)
-    addPlotToSheet(ws, 'U120', inhibitionHistogramPlt)
-    addPlotToSheet(ws, 'U160', inhibitionScatterPlt)
-    addPlotToSheet(ws, 'U200', zFactorPlt)
+    addPlotToSheet(ws, 'V1', inhibPlt)
+    addPlotToSheet(ws, 'V40', negPlt)
+    addPlotToSheet(ws, 'V80', posPlt)
+    addPlotToSheet(ws, 'V120', inhibitionHistogramPlt)
+    addPlotToSheet(ws, 'V160', inhibitionScatterPlt)
+    addPlotToSheet(ws, 'V200', zFactorPlt)
     
-    start_column = 'L'
+    start_column = 'M'
     #light_red_3_fill = PatternFill(start_color="FF5050", end_color="FF5050", fill_type="solid")
     light_red_3_fill = PatternFill(start_color="11FF5050", end_color="11FF5050", fill_type="solid")
     # Convert the DataFrame to rows and write them to the Excel sheet
@@ -662,8 +661,8 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
     ##
     ######################################################
 
-    setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='K1', end_cell='K5')
-    setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='L1', end_cell='S' + str(len(listOfPlatesDf) + 1))
+    setBackgroundColor(ws=screenDataWs, color="32CD32", start_cell='L1', end_cell='L5')
+    setBackgroundColor(ws=screenDataWs, color="ffd7d7", start_cell='M1', end_cell='T' + str(len(listOfPlatesDf) + 1))
 
     wb.save(excel_file_path)
 
