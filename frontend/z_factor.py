@@ -158,7 +158,8 @@ def plotNegPosCtrl(df_summary):
     plt.errorbar(df.index, df['norm_meanNegCtrl'], yerr=df['norm_stdNegCtrl'], fmt='o', label='Normalized meanNegCtrl')
     plt.errorbar(df.index, df['norm_meanPosCtrl'], yerr=df['norm_stdPosCtrl'], fmt='o', label='Normalized meanPosCtrl')
 
-
+    plt.bar(df.index, df['Z-factor'], alpha=0.5, color='green', label='Z-factor')
+    
     labels = df['Plate'].tolist()
     ticks = list(range(num_rows))
 
