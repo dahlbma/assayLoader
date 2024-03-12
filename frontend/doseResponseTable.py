@@ -39,13 +39,13 @@ class ScatterplotWidget(QWidget):
         self.plotted_data = data_dict
 
         slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict, self.yScale)
-        
+
 
     def plot_scatter(self, df, yScale):
         self.ax.clear()
         self.plotted_data = df
         # Extract the 'x' and 'y' arrays
-        x_values = np.array(df['finalConc_nL'].values/1000000000, dtype=np.float64)
+        x_values = np.array(df['finalConc_nM'].values/1000000000, dtype=np.float64)
         y_values = np.array(df['inhibition'].values, dtype=np.float64)
         y_err_values = np.array(df['yStd'].values, dtype=np.float64)
         
@@ -122,8 +122,8 @@ class ScatterplotWidget(QWidget):
         self.slope = slope
         self.top = top
         self.bottom = bottom
-        self.minConc = self.data_dict['finalConc_nL'].iloc[0]
-        self.maxConc = self.data_dict['finalConc_nL'].iloc[-1]
+        self.minConc = self.data_dict['finalConc_nM'].iloc[0]
+        self.maxConc = self.data_dict['finalConc_nM'].iloc[-1]
 
         return slope, ic50, bottom, top, ic50_std, auc
 
@@ -166,8 +166,9 @@ class DoseResponseTable(QTableWidget):
         self.saveToExcel(outputDir)
         return batch_df
 
+
     def plotCurve(self, batch_df, rowPosition, yScale):
-        # "Batch nr" "Compound ID" "finalConc_nL" "yMean" "yStd"
+        # "Batch nr" "Compound ID" "finalConc_nM" "yMean" "yStd"
         batch = batch_df['Batch nr'].iloc[0]
         compound = batch_df['Compound ID'].iloc[0]
 
@@ -212,7 +213,7 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
         self.setItem(rowPosition, self.auc_col, item)
 
-        
+
     def saveToExcel(self, sDir):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
@@ -250,7 +251,6 @@ class DoseResponseTable(QTableWidget):
                     ws.cell(row=r_idx, column=c_idx, value=value)
 
         imgDir = sDir + '/img'
-        print(imgDir)
         if not os.path.exists(imgDir):
             # Create the directory and any missing parent directories
             os.makedirs(imgDir)
@@ -258,7 +258,6 @@ class DoseResponseTable(QTableWidget):
         # Add scatterplots to Excel
         for i, canvas in enumerate(df['Graph']):
             image_path = f"{imgDir}/{i}.png"
-            print()
             img = Image(image_path)
                         
             ws.add_image(img)

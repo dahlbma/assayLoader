@@ -22,6 +22,30 @@ from inhibitionScatter import ScatterPlotWindow
 # Get the operating system name
 os_name = platform.system()
 
+'''
+{{name='raw' style='dot' x_label='conc' x_unit='M' x_values={1.25E-04,4.17E-05,1.39E-05,4.63E-06,1.54E-06,5.14E-07,1.71E-07,5.72E-08,1.91E-08,6.35E-09,2.12E-09} y_label='Inhibition' y_unit='%' y_values={105.07,94.19,65.84,23.12,1.48,-9.46,-13.04,-11.79,-10.53,-12.85,-15.35} y_error={0.42,1.23,3.24,2.85,1.32,1.18,0.28,0.93,1.27,1.53,1.12} }{name='fitsigmoidal' style='line' x_label='conc' x_unit='M' x_values={1.25E-04,4.17E-05,1.39E-05,4.63E-06,1.54E-06,5.14E-07,1.71E-07,5.72E-08,1.91E-08,6.35E-09,2.12E-09} y_label='inhibition' y_unit='%' logic50=-5.0512 hillslope=1.252 bottom=-12.8 top=109.6}}
+
+{
+   {
+      name='raw' style='dot' x_label='conc' x_unit='M'
+      x_values={1.25E-04, 4.17E-05, 1.39E-05, 4.63E-06, 1.54E-06, 5.14E-07, 1.71E-07, 5.72E-08, 1.91E-08, 6.35E-09, 2.12E-09 }
+      y_label='Inhibition'
+      y_unit='%'
+      y_values={105.07, 94.19, 65.84, 23.12, 1.48, -9.46, -13.04, -11.79, -10.53, -12.85, -15.35 }
+      y_error={0.42, 1.23, 3.24, 2.85, 1.32, 1.18, 0.28, 0.93, 1.27, 1.53, 1.12 }
+   }{
+      name='fitsigmoidal' style='line' x_label='conc' x_unit='M'
+      x_values={1.25E-04, 4.17E-05, 1.39E-05, 4.63E-06, 1.54E-06, 5.14E-07, 1.71E-07, 5.72E-08, 1.91E-08, 6.35E-09, 2.12E-09 }
+      y_label='inhibition'
+      y_unit='%'
+      logic50=-5.0512
+      hillslope=1.252
+      bottom=-12.8
+      top=109.6
+   }
+}
+'''
+
 
 class DoseResponseScreen(QMainWindow):
     from assaylib import gotoSP
@@ -85,7 +109,7 @@ class DoseResponseScreen(QMainWindow):
             print('No data')
         # Insert new checkboxes here
         for index, row in df.iterrows():
-            conc = "{:.1f}".format(row['finalConc_nL'])
+            conc = "{:.1f}".format(row['finalConc_nM'])
             new_checkbox = QCheckBox(f"{conc}")
             new_checkbox.setChecked(True)
             self.dataPoints_layout.insertWidget(len(self.dataPointCheckboxes), new_checkbox)
@@ -163,11 +187,14 @@ class DoseResponseScreen(QMainWindow):
             return
         self.selectHarmonyDirectory_btn.setEnabled(True)
         
-
+    '''
     def generatePlatemap(self):
         print('generate platemap here')
         #self.generateCurvefittingInput_btn.setEnabled(True)
-
+        
+    def generateCurvefittingInput(self):
+        print('generate curvefitting input here')
+    '''
 
     def selectHarmonyDirectory(self):
         options = QFileDialog.Options()
@@ -188,10 +215,6 @@ class DoseResponseScreen(QMainWindow):
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
         
 
-    def generateCurvefittingInput(self):
-        print('generate curvefitting input here')
-        
-
     def generateDoseResponseInputFile(self, platemapFile, plateIdToFileMapping):
         platemap_xlsx = os.path.abspath(platemapFile)
         sBasePath = os.path.dirname(platemap_xlsx)
@@ -201,7 +224,7 @@ class DoseResponseScreen(QMainWindow):
         
         # Final volume in nano liter (nL)
         final_volume = float(self.finalWellVolumeMicroliter_eb.text())*1000.0
-        platemapDf['finalConc_nL'] = (platemapDf['Conc mM']* 1000000 * platemapDf['volume nL']) / final_volume
+        platemapDf['finalConc_nM'] = (platemapDf['Conc mM']* 1000000 * platemapDf['volume nL']) / final_volume
         print(rawDataFilesDf)
         
         rawDatafile = rawDataFilesDf.iloc[0]['file']
@@ -249,7 +272,7 @@ class DoseResponseScreen(QMainWindow):
         # Group by 'Batch' and calculate mean and yVariance
         grouped_df = platemapDf.groupby(['Batch nr',
                                          'Compound ID',
-                                         'finalConc_nL'])['rawData'].agg(['mean', 'std']).reset_index()
+                                         'finalConc_nM'])['rawData'].agg(['mean', 'std']).reset_index()
         resultDf = grouped_df.rename(columns={'mean': 'yMean', 'std': 'yStd'})
         
         ### Do proper calculation here instead!!!
