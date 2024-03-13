@@ -5,17 +5,17 @@ Required package versions listed in `requirements.txt`. Install the required ver
 
 ## Frontend
 ### PyInstaller How-To
-Currently only builds on `Python 3.8`, with required package versions listed in `requirements.txt`.
+Currently builds on `Python` with required package versions listed in `requirements.txt`.
 With `frontend` as current directory, build the main assayLoader executable with:
 
     <pyinstaller> main.spec
-    py -3.8 -m PyInstaller main.spec
+    python -m PyInstaller main.spec
 
 which will build the main executable `al`(.exe)
 </br>or
 
     <pyinstaller> launcher.spec
-    py -3.8 -m PyInstaller launcher.spec
+    py -m PyInstaller launcher.spec
 
 which will build the launcher executable `assayLoader`(.exe).
 
