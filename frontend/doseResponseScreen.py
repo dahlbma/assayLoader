@@ -78,6 +78,9 @@ class DoseResponseScreen(QMainWindow):
         self.inhibition_rb.clicked.connect(self.toggleInhibition)
         self.inhibition_rb.setChecked(True)
         
+        self.saveExcel_btn.clicked.connect(self.doseResponseTable.saveToExcel)
+        self.saveExcel_btn.setEnabled(False)
+        
 
     def toggleInhibition(self):
         sender = self.sender()
@@ -148,8 +151,8 @@ class DoseResponseScreen(QMainWindow):
         else:
             return
 
+        self.saveExcel_btn.setEnabled(True)
         selected_rows = df[includedPoints]
-        #print(selected_rows)
         widget.plot_scatter(selected_rows, self.yScale)
         self.doseResponseTable.updateTable(row, widget)
 
@@ -162,7 +165,7 @@ class DoseResponseScreen(QMainWindow):
             self.yScale = 'Inhibition %'
             if self.activation_rb.isChecked():
                 self.yScale = 'Activation %'
-            self.batch_df = self.doseResponseTable.generate_scatterplots(file, self.yScale)
+            self.batch_df = self.doseResponseTable.generate_scatterplots(file, self.yScale, self)
             self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
 
         
@@ -278,7 +281,8 @@ class DoseResponseScreen(QMainWindow):
         ### Do proper calculation here instead!!!
         ### This is just some dummy scaling 12 (max inhibition value) to be close to 100.
         ### Need proper calculation here
-        resultDf['yStd'] = resultDf['yStd'] * 12
+        resultDf['yStd'] = resultDf['yStd'] / 5
+        #resultDf['yStd'] = resultDf['yStd'] * 12
         
         meanPosCtrl = resultDf.loc[resultDf["Compound ID"] == "CTRL", "yMean"].values[0]
         meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]

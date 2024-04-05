@@ -58,12 +58,13 @@ class ScatterplotWidget(QWidget):
             top = 100
             bottom = 0
             # Fit the data to the 4-PL model
+            max_top = max(max(y_values) + 50 , 120)
             params, covariance = curve_fit(fourpl,
                                            x_values,
                                            y_values,
                                            maxfev = 10000,
                                            p0=[slope, ic50, bottom, top],
-                                           bounds=([-100, 0, -20, 50], [10, 0.01, 40, 120])
+                                           bounds=([-100, 0, -20, 50], [10, 0.01, 40, max_top])
                                            )
             perr = np.sqrt(np.diag(covariance))
             slope_std, ic50_std, bottom_std, top_std = perr
@@ -76,6 +77,7 @@ class ScatterplotWidget(QWidget):
             ic50 = -1
             bottom = -1
             top = -1
+            ic50_std = -1
 
         # Generate a curve using the fitted parameters
         x_curve = np.logspace(np.log10(min(x_values)), np.log10(max(x_values)), 100)
@@ -108,10 +110,12 @@ class ScatterplotWidget(QWidget):
         if not os.path.exists(imgDir):
             # If it doesn't exist, create it
             os.makedirs(imgDir)
-        
+
+        self.figure.set_size_inches(3, 2)
         self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
         self.ax.legend()
         self.canvas.draw()
+        self.figure.set_size_inches(5.81, 4.06)
 
         (auc, err) = quad(fourpl, min(x_values), max(x_values), args=(slope, ic50, bottom, top))
         
@@ -143,8 +147,9 @@ class DoseResponseTable(QTableWidget):
         self.graph_col = 10
         self.workingDirectory = ''
 
-    def generate_scatterplots(self, file_path, yScale):
+    def generate_scatterplots(self, file_path, yScale, parent):
         print('populating data')
+        self.parent = parent
         outputDir = os.path.dirname(file_path)
         self.workingDirectory = outputDir
         # Set the graph column to be 600 wide
@@ -154,8 +159,8 @@ class DoseResponseTable(QTableWidget):
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             rowPosition = self.rowCount()
-            if rowPosition > 300:
-                continue
+            #if rowPosition > 20:
+            #    continue
             self.insertRow(rowPosition)
             self.setRowHeight(rowPosition, 425)
             
@@ -163,7 +168,7 @@ class DoseResponseTable(QTableWidget):
             # Call the scatter function for each batch
             self.plotCurve(batch_df, rowPosition, yScale)
 
-        self.saveToExcel(outputDir)
+        self.saveToExcel()
         return batch_df
 
 
@@ -173,20 +178,22 @@ class DoseResponseTable(QTableWidget):
         compound = batch_df['Compound ID'].iloc[0]
 
         scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale, self.workingDirectory)
-
         item = QTableWidgetItem(batch)
         self.setItem(rowPosition, 0, item)
 
         item = QTableWidgetItem(compound)
         self.setItem(rowPosition, 1, item)
 
+        self.org_figsize = scatterplot_widget.figure.get_size_inches()
+        
         item = QTableWidgetItem()
         self.setItem(rowPosition, self.graph_col, item)
         self.setCellWidget(rowPosition, self.graph_col, scatterplot_widget)
         self.setCurrentCell(rowPosition, self.graph_col)
+        #print(f'Figsize: {scatterplot_widget.figure.get_size_inches()}')
         self.updateTable(rowPosition, scatterplot_widget)
         QApplication.processEvents()
-
+        print('##################################################')
 
     def updateTable(self, rowPosition, scatterplot_widget):
         item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
@@ -214,7 +221,8 @@ class DoseResponseTable(QTableWidget):
         self.setItem(rowPosition, self.auc_col, item)
 
 
-    def saveToExcel(self, sDir):
+    def saveToExcel(self):
+        sDir = self.workingDirectory
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
         for row in range(self.rowCount()):
@@ -274,4 +282,4 @@ class DoseResponseTable(QTableWidget):
         # Save the Excel workbook
 
         wb.save(file_path)
-
+        self.parent.saveExcel_btn.setEnabled(False)
