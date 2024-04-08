@@ -193,7 +193,6 @@ class DoseResponseTable(QTableWidget):
         #print(f'Figsize: {scatterplot_widget.figure.get_size_inches()}')
         self.updateTable(rowPosition, scatterplot_widget)
         QApplication.processEvents()
-        print('##################################################')
 
     def updateTable(self, rowPosition, scatterplot_widget):
         item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))

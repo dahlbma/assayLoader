@@ -272,22 +272,25 @@ class DoseResponseScreen(QMainWindow):
         excel_file_path = os.path.join(self.workingDirectory, 'dose_response_platemap.xlsx')
         platemapDf.to_excel(excel_file_path, index=False)
         
-        # Group by 'Batch' and calculate mean and yVariance
+        # Group by 'Batch' and calculate mean and yStd
         grouped_df = platemapDf.groupby(['Batch nr',
                                          'Compound ID',
                                          'finalConc_nM'])['rawData'].agg(['mean', 'std']).reset_index()
         resultDf = grouped_df.rename(columns={'mean': 'yMean', 'std': 'yStd'})
-        
-        ### Do proper calculation here instead!!!
-        ### This is just some dummy scaling 12 (max inhibition value) to be close to 100.
-        ### Need proper calculation here
-        resultDf['yStd'] = resultDf['yStd'] / 5
-        #resultDf['yStd'] = resultDf['yStd'] * 12
-        
+                
         meanPosCtrl = resultDf.loc[resultDf["Compound ID"] == "CTRL", "yMean"].values[0]
         meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]
         
         resultDf['inhibition'] = 100*(1-(resultDf['yMean']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl))
+
+        # Calculate the scalingfactor between the raw data and the inhibition values
+        first_CBK_row = resultDf[resultDf['Compound ID'].str.startswith('CBK')].head(1)
+        print(first_CBK_row)
+        yVal = first_CBK_row['yMean'].values[0]
+        yInhib = first_CBK_row['inhibition'].values[0]
+        scaleFactor = abs(yVal / yInhib)
+        print(f'Scale factor: {scaleFactor}')
+        resultDf['yStd'] = resultDf['yStd'] / scaleFactor
         
         # Rename columns if needed
         resultDf = resultDf.rename(columns={'Batch': 'Batch', 'rawData': 'yMean'})
