@@ -179,7 +179,7 @@ class GetPlate(tornado.web.RequestHandler):
         sSql = f'''select p.plate_id PLATE,
         c.well WELL,
         IF(c.notebook_ref='CTRL', 'POS', c.notebook_ref) DRUG_NAME,
-        c.CONC CONCENTRATION
+        c.CONC CONCENTRATION, volume
         from cool.config c, cool.plate p
         where p.plate_id = '{sPlate}' and p.config_id = c.config_id
         '''
@@ -444,7 +444,7 @@ class PrintPlateLabel(tornado.web.RequestHandler):
 @jwtauth
 class GetPlate(tornado.web.RequestHandler):
     def get(self, sPlate):
-        # Platt ID	Well	Compound ID	Batch nr	Form	Conc (mM)
+        # Platt ID	Well	Compound ID	Batch nr	Form	Conc (mM)	volume
 
 
         sSql = f'''select
@@ -452,7 +452,8 @@ class GetPlate(tornado.web.RequestHandler):
         well,
         compound_id,
         notebook_ref batch_id,
-        conc
+        conc,
+        volume
         from cool.config where config_id = '{sPlate}'
         '''
         cur.execute(sSql)

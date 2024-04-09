@@ -10,6 +10,7 @@ dist/
 *.mol
 error_msg.txt
 log_assayLoader.txt
+scarabSqlError.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
