@@ -284,7 +284,7 @@ class DoseResponseScreen(QMainWindow):
         resultDf['inhibition'] = 100*(1-(resultDf['yMean']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl))
 
         # Calculate the scalingfactor between the raw data and the inhibition values
-        first_CBK_row = resultDf[resultDf['Compound ID'].str.startswith('CBK')].head(1)
+        first_CBK_row = resultDf[resultDf['Compound ID'].str.startswith('CTRL')].head(1)
         print(first_CBK_row)
         yVal = first_CBK_row['yMean'].values[0]
         yInhib = first_CBK_row['inhibition'].values[0]

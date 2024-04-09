@@ -58,13 +58,13 @@ class ScatterplotWidget(QWidget):
             top = 100
             bottom = 0
             # Fit the data to the 4-PL model
-            max_top = max(max(y_values) + 50 , 120)
+            max_top = max(max(y_values) + 70 , 120)
             params, covariance = curve_fit(fourpl,
                                            x_values,
                                            y_values,
-                                           maxfev = 10000,
+                                           maxfev = 100000,
                                            p0=[slope, ic50, bottom, top],
-                                           bounds=([-100, 0, -20, 50], [10, 0.01, 40, max_top])
+                                           bounds=([-100, 0, -20, 40], [30, 0.01, 40, max_top])
                                            )
             perr = np.sqrt(np.diag(covariance))
             slope_std, ic50_std, bottom_std, top_std = perr
@@ -159,8 +159,8 @@ class DoseResponseTable(QTableWidget):
         df = pd.read_excel(file_path)
         for batch_nr, batch_df in df.groupby('Batch nr'):
             rowPosition = self.rowCount()
-            #if rowPosition > 20:
-            #    continue
+            if rowPosition > 20:
+                continue
             self.insertRow(rowPosition)
             self.setRowHeight(rowPosition, 425)
             
