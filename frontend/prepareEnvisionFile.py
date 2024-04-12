@@ -4,6 +4,7 @@ import pandas as pd
 import assaylib
 import dbInterface
 import openpyxl
+import csv
 
 def createPlatemap(self, platesDf, subdirectory_path):
     columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
@@ -88,9 +89,26 @@ def find_files(directory, filename_start, filename_end):
     return matching_files
             
 
-def getData(file, sDataColumn, plateId):
-    print(plateId)
-    #file, 'Signal', plateId
+def extractPlate(file, preparedDirectory, plateId):
+    saLines = []
+    
+    # Skip the first line
+    next(file)
+    
+    # Read lines until an empty row
+    for line in file:
+        line = line.strip()  # Remove leading/trailing whitespace
+        if not line:  # If the line is empty
+            break
+        saLines.append(line)
+
+    sFullPath = os.path.join(preparedDirectory, f'{plateId}.txt')
+
+    with open(sFullPath, 'w', newline='') as file:
+        writer = csv.writer(file, delimiter=',')
+        for line in saLines:
+            writer.writerow(line.split(','))
+    return plateId, sFullPath
 
 
 def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
@@ -120,21 +138,31 @@ def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
         plate, file = row[0], row[1]  # Assuming "Plate" is in the first column and "File" is in the second column
         plate_file_pairs.append((plate, file))
 
+    saPreparedPlateMapping = {
+        "plate": [],
+        "file": []
+    }
+
     # Loop over the plate:file pairs and print each pair to the terminal
     for plate, plate_file in plate_file_pairs:
-        data['plate'].append(plate)
-        data['file'].append(plate_file)
-
         with open(envision_dir + '/' + plate_file, 'r') as file:
-            tmpDf = getData(file, 'Signal', plate)
-            #frames.append(tmpDf)
+            sPlate, sPlateFile = extractPlate(file, subdirectory_path, plate)
 
-    df = pd.DataFrame(data)
+            saPreparedPlateMapping['plate'].append(sPlate)
+            saPreparedPlateMapping['file'].append(sPlateFile)
+
+
+    df = pd.DataFrame(saPreparedPlateMapping)
     df = df.sort_values(by='plate')
     sPlatemapFile = assaylib.createPlatemap(self, df, subdirectory_path)
     # Close the workbook
     workbook.close()
+    fileName = "prepared_plate_to_file.xlsx"
+    fullFileName = os.path.join(subdirectory_path, fileName)
+    df.to_excel(fullFileName, index=False)
     return
+
+
     # Harmony names all raw datafiles to 'PlateResults.txt'
     filename_start = 'PlateResults'
     filename_end = '.txt'
