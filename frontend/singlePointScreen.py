@@ -13,6 +13,7 @@ import subprocess
 from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
+from prepareEnvisionFile import *
 import platform
 from inhibitionScatter import ScatterPlotWindow
 
@@ -35,6 +36,7 @@ class SinglePointScreen(QMainWindow):
         #####################
         # Prep data screen
         self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
+        self.envision_plateID_to_file_btn.clicked.connect(self.prepareEnvisionFiles)
         #self.nrOfPlateCopies_sp           # spin box
         #self.plates_te.                   # text edit
         self.printPlates_btn.clicked.connect(self.printPlates)
@@ -266,6 +268,22 @@ class SinglePointScreen(QMainWindow):
                 self.printPrepLog(f"Print label {sCurrentPlate}")
 
         
+    def prepareEnvisionFiles(self):
+        subdirectory_path = ''
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xlsx *.xls)", options=options)
+        if fileName:
+            subdirectory_path = os.path.dirname(fileName)
+        print(f'subdirectory_path: {subdirectory_path}')
+        prepared_path = os.path.join(subdirectory_path, "preparedEnvisionFiles")
+        self.workingDirectory = prepared_path
+        if prepared_path == "preparedEnvisionFiles":
+            return
+
+        findEnvisionFiles(self, prepared_path, fileName)
+
+        
     def prepareHarmonyFiles(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog  # Use the native file dialog
@@ -279,7 +297,7 @@ class SinglePointScreen(QMainWindow):
         self.workingDirectory = subdirectory_path
         if subdirectory_path == "preparedHaronyFiles":
             return
-        #print(subdirectory_path)
+
         findHarmonyFiles(self, subdirectory_path, selected_directory)
         
 

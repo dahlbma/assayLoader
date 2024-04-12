@@ -3,13 +3,37 @@ import os
 import pandas as pd
 import assaylib
 import dbInterface
+import openpyxl
 
-def number_to_alphabet(sRow):
-    if 1 <= sRow <= 26:
-        alphabet_letter = chr(64 + sRow)
-        return alphabet_letter
-    else:
-        return "Invalid input"
+def createPlatemap(self, platesDf, subdirectory_path):
+    columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
+    platemapDf = pd.DataFrame(columns=columns)
+    
+    assaylib.printPrepLog(self, f'Fetching plate data for plates:')
+    iNrOfPlates = 0
+    for index, row in platesDf.iterrows():
+        df = pd.DataFrame()
+        plate_value = row['plate']
+        plate_data, lSuccess = dbInterface.getPlate(self.token, plate_value)
+        if lSuccess:
+            iNrOfPlates += 1
+            assaylib.printPrepLog(self, f'{plate_value}')
+
+            df = pd.DataFrame(plate_data, columns=columns)
+        else:
+            assaylib.printPrepLog(self, f'Error getting plate {plate_value} {plate_data}', 'error')
+        platemapDf = pd.concat([platemapDf if not platemapDf.empty else None, df], ignore_index=True)
+
+    assaylib.printPrepLog(self, f'Found {iNrOfPlates} plate files')
+
+    excel_filename = 'PLATEMAP.xlsx'
+    full_path = os.path.join(subdirectory_path, excel_filename)
+    platemapDf.to_excel(full_path, index=False)
+    assaylib.printPrepLog(self, f'Created platemap-file:')
+    assaylib.printPrepLog(self, f'{full_path}', type='bold')
+
+    return full_path
+    
 
 def parseHarmonyFile(self, sDestDir, sFullFileName, sPlate):
     pattern = r'(\d+)\t(\d+)'
@@ -64,7 +88,14 @@ def find_files(directory, filename_start, filename_end):
     return matching_files
             
 
-def findHarmonyFiles(self, subdirectory_path, selected_directory):
+def getData(file, sDataColumn, plateId):
+    print(plateId)
+    #file, 'Signal', plateId
+
+
+def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
+    print(subdirectory_path, plate_to_file_mapping)
+    envision_dir = os.path.dirname(plate_to_file_mapping)
     data = {
         "plate": [],
         "file": []
@@ -75,6 +106,35 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
     except:
         pass
 
+    # Load the Excel file
+    workbook = openpyxl.load_workbook(plate_to_file_mapping)
+
+    # Select the worksheet by name
+    worksheet = workbook.worksheets[0]
+
+    # Initialize a list to store plate:file pairs
+    plate_file_pairs = []
+
+    # Iterate over rows in the worksheet, starting from the second row (assuming the first row is header)
+    for row in worksheet.iter_rows(min_row=2, values_only=True):
+        plate, file = row[0], row[1]  # Assuming "Plate" is in the first column and "File" is in the second column
+        plate_file_pairs.append((plate, file))
+
+    # Loop over the plate:file pairs and print each pair to the terminal
+    for plate, plate_file in plate_file_pairs:
+        data['plate'].append(plate)
+        data['file'].append(plate_file)
+
+        with open(envision_dir + '/' + plate_file, 'r') as file:
+            tmpDf = getData(file, 'Signal', plate)
+            #frames.append(tmpDf)
+
+    df = pd.DataFrame(data)
+    df = df.sort_values(by='plate')
+    sPlatemapFile = assaylib.createPlatemap(self, df, subdirectory_path)
+    # Close the workbook
+    workbook.close()
+    return
     # Harmony names all raw datafiles to 'PlateResults.txt'
     filename_start = 'PlateResults'
     filename_end = '.txt'
@@ -103,7 +163,7 @@ def findHarmonyFiles(self, subdirectory_path, selected_directory):
 
     df = pd.DataFrame(data)
     df = df.sort_values(by='plate')
-    sPlatemapFile = assaylib.createPlatemap(self, df, subdirectory_path)
+    sPlatemapFile = createPlatemap(self, df, subdirectory_path)
     excel_writer = pd.ExcelWriter(plateIdToFileMapping, engine="openpyxl")
     df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
     excel_writer.close()

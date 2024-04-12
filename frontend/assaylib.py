@@ -1,5 +1,6 @@
 import sys, requests, json, os, subprocess, platform, datetime, logging, dbInterface, re
 from unittest import result
+import pandas as pd
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidgetItem, QWidget
 from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
@@ -125,3 +126,33 @@ def findDataColumns(sFileName):
     # This is an error
     return None
         
+
+def createPlatemap(self, platesDf, subdirectory_path):
+    columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
+    platemapDf = pd.DataFrame(columns=columns)
+    
+    printPrepLog(self, f'Fetching plate data for plates:')
+    iNrOfPlates = 0
+    for index, row in platesDf.iterrows():
+        df = pd.DataFrame()
+        plate_value = row['plate']
+        plate_data, lSuccess = dbInterface.getPlate(self.token, plate_value)
+        if lSuccess:
+            iNrOfPlates += 1
+            printPrepLog(self, f'{plate_value}')
+
+            df = pd.DataFrame(plate_data, columns=columns)
+        else:
+            printPrepLog(self, f'Error getting plate {plate_value} {plate_data}', 'error')
+        platemapDf = pd.concat([platemapDf if not platemapDf.empty else None, df], ignore_index=True)
+
+    printPrepLog(self, f'Found {iNrOfPlates} plate files')
+
+    excel_filename = 'PLATEMAP.xlsx'
+    full_path = os.path.join(subdirectory_path, excel_filename)
+    platemapDf.to_excel(full_path, index=False)
+    printPrepLog(self, f'Created platemap-file:')
+    printPrepLog(self, f'{full_path}', type='bold')
+
+    return full_path
+    
