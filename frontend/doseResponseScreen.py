@@ -13,11 +13,11 @@ import subprocess
 from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
+from prepareEnvisionFile import *
 from selectDataColumn import *
 from doseResponseTable import DoseResponseTable, ScatterplotWidget
 import platform
 from inhibitionScatter import ScatterPlotWindow
-
 
 # Get the operating system name
 os_name = platform.system()
@@ -46,7 +46,6 @@ os_name = platform.system()
 }
 '''
 
-
 class DoseResponseScreen(QMainWindow):
     from assaylib import gotoSP
     def __init__(self, token, test):
@@ -64,6 +63,10 @@ class DoseResponseScreen(QMainWindow):
 
         self.selectHarmonyDirectory_btn.setEnabled(False)
         self.selectHarmonyDirectory_btn.clicked.connect(self.selectHarmonyDirectory)
+        self.workingDirectory = ''
+
+        self.selectEnvisionPlateToFile_btn.setEnabled(False)
+        self.selectEnvisionPlateToFile_btn.clicked.connect(self.selectEnvisionPlateToFile)
         self.workingDirectory = ''
         
         self.drInputFile_lab.setText('')
@@ -189,6 +192,7 @@ class DoseResponseScreen(QMainWindow):
             self.rVolume = None
             return
         self.selectHarmonyDirectory_btn.setEnabled(True)
+        self.selectEnvisionPlateToFile_btn.setEnabled(True)
         
     '''
     def generatePlatemap(self):
@@ -198,6 +202,23 @@ class DoseResponseScreen(QMainWindow):
     def generateCurvefittingInput(self):
         print('generate curvefitting input here')
     '''
+
+    def selectEnvisionPlateToFile(self):
+        subdirectory_path = ''
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xlsx *.xls)", options=options)
+        if fileName:
+            subdirectory_path = os.path.dirname(fileName)
+        print(f'subdirectory_path: {subdirectory_path}')
+        prepared_path = os.path.join(subdirectory_path, "preparedEnvisionFiles")
+        self.workingDirectory = prepared_path
+        if prepared_path == "preparedEnvisionFiles":
+            return
+
+        platemapFile, plateIdToFileMapping = findEnvisionFiles(self, prepared_path, fileName)
+        self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
+
 
     def selectHarmonyDirectory(self):
         options = QFileDialog.Options()
@@ -216,7 +237,7 @@ class DoseResponseScreen(QMainWindow):
         self.workingDirectory = subdirectory_path
         platemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
-        
+
 
     def generateDoseResponseInputFile(self, platemapFile, plateIdToFileMapping):
         platemap_xlsx = os.path.abspath(platemapFile)

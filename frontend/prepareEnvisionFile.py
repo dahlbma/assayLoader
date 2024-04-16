@@ -159,39 +159,4 @@ def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
     fileName = "prepared_plate_to_file.xlsx"
     fullFileName = os.path.join(subdirectory_path, fileName)
     df.to_excel(fullFileName, index=False)
-    return
-
-
-    # Harmony names all raw datafiles to 'PlateResults.txt'
-    filename_start = 'PlateResults'
-    filename_end = '.txt'
-    harmony_files = find_files(selected_directory, filename_start, filename_end)
-
-    pattern = re.compile(r'P\d{6}')
-    assaylib.printPrepLog(self, f"Searching for Harmony files in {selected_directory}")
-    iCount = 0
-    for file_name in harmony_files:
-        with open(file_name, 'r') as file:
-            content = file.read()
-            match = re.search(pattern, content)
-            if match:
-                sPlate = match.group()
-                assaylib.printPrepLog(self, f"{sPlate}")
-                preparedFile = parseHarmonyFile(self, subdirectory_path, file_name, sPlate)
-                data['plate'].append(sPlate)
-                data['file'].append(preparedFile)
-                iCount += 1
-            else:
-                assaylib.printPrepLog(self, f"No plate in {file_name}", 'error')
-
-    plateIdToFileMapping = os.path.join('/', subdirectory_path, "prepared_plate_to_file.xlsx")
-    assaylib.printPrepLog(self, f'Created file to platemapping-file with {iCount} plates:')
-    assaylib.printPrepLog(self, f'{plateIdToFileMapping}\n', type='bold')
-
-    df = pd.DataFrame(data)
-    df = df.sort_values(by='plate')
-    sPlatemapFile = createPlatemap(self, df, subdirectory_path)
-    excel_writer = pd.ExcelWriter(plateIdToFileMapping, engine="openpyxl")
-    df.to_excel(excel_writer, sheet_name="Sheet1", index=False)
-    excel_writer.close()
-    return sPlatemapFile, plateIdToFileMapping
+    return sPlatemapFile, fullFileName
