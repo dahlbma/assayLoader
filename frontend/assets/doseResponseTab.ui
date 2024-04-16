@@ -47,7 +47,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QTabWidget" name="module_tab_wg">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="dr_prep_data_tab">
          <attribute name="title">
@@ -60,6 +60,13 @@
              <widget class="QPushButton" name="selectHarmonyDirectory_btn">
               <property name="text">
                <string>Harmony top directory</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="selectEnvisionPlateToFile_btn">
+              <property name="text">
+               <string>Envision plate to file</string>
               </property>
              </widget>
             </item>

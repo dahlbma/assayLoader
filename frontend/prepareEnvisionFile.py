@@ -151,7 +151,6 @@ def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
             saPreparedPlateMapping['plate'].append(sPlate)
             saPreparedPlateMapping['file'].append(sPlateFile)
 
-
     df = pd.DataFrame(saPreparedPlateMapping)
     df = df.sort_values(by='plate')
     sPlatemapFile = assaylib.createPlatemap(self, df, subdirectory_path)
