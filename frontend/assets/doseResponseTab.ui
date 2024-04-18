@@ -71,6 +71,23 @@
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Pos Ctrl:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="posCtrl_eb">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="label">
               <property name="text">
                <string>Final well volume μL</string>

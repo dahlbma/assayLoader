@@ -24,6 +24,7 @@ class SinglePointScreen(QMainWindow):
     from assaylib import gotoDR
     def __init__(self, token, test):
         super(SinglePointScreen, self).__init__()
+        self.test = test
         self.token = token
         self.mod_name = "loader"
         self.logger = logging.getLogger(self.mod_name)

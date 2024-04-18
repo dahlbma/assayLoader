@@ -1,7 +1,7 @@
 import re, sys, os, logging, glob, csv
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit, QDialog, QPushButton, QCheckBox, QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit, QDialog, QPushButton, QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -46,10 +46,26 @@ os_name = platform.system()
 }
 '''
 
+def userInfo(sMessage):
+    info_dialog = QMessageBox()
+
+    # Set the icon and text of the dialog
+    info_dialog.setIcon(QMessageBox.Information)
+    info_dialog.setText(sMessage)
+    info_dialog.setWindowTitle("Information")
+    
+    # Add a button to the dialog
+    info_dialog.addButton(QMessageBox.Ok)
+    
+    # Show the dialog
+    info_dialog.exec_()
+
+
 class DoseResponseScreen(QMainWindow):
     from assaylib import gotoSP
     def __init__(self, token, test):
         super(DoseResponseScreen, self).__init__()
+        self.test = test
         self.token = token
         self.mod_name = "loader"
         self.logger = logging.getLogger(self.mod_name)
@@ -61,6 +77,8 @@ class DoseResponseScreen(QMainWindow):
         validator = QRegExpValidator(regex, self.finalWellVolumeMicroliter_eb)
         self.finalWellVolumeMicroliter_eb.setValidator(validator)
 
+        self.posCtrl_eb.setText('CTRL')
+        
         self.selectHarmonyDirectory_btn.setEnabled(False)
         self.selectHarmonyDirectory_btn.clicked.connect(self.selectHarmonyDirectory)
         self.workingDirectory = ''
@@ -206,8 +224,10 @@ class DoseResponseScreen(QMainWindow):
     def selectEnvisionPlateToFile(self):
         subdirectory_path = ''
         options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xlsx *.xls)", options=options)
+        #options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self,
+                                                  "Select Excel File", "", "Excel Files (*.xlsx *.xls)",
+                                                  options=options)
         if fileName:
             subdirectory_path = os.path.dirname(fileName)
         print(f'subdirectory_path: {subdirectory_path}')
@@ -298,14 +318,18 @@ class DoseResponseScreen(QMainWindow):
                                          'Compound ID',
                                          'finalConc_nM'])['rawData'].agg(['mean', 'std']).reset_index()
         resultDf = grouped_df.rename(columns={'mean': 'yMean', 'std': 'yStd'})
-                
-        meanPosCtrl = resultDf.loc[resultDf["Compound ID"] == "CTRL", "yMean"].values[0]
-        meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]
+        sCtrl = self.posCtrl_eb.text()
+        try:
+            meanPosCtrl = resultDf.loc[resultDf["Compound ID"] == sCtrl, "yMean"].values[0]
+            meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]
+        except:
+            userInfo(f'''No controls named {sCtrl} in the dataset''')
+            return
         
         resultDf['inhibition'] = 100*(1-(resultDf['yMean']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl))
 
         # Calculate the scalingfactor between the raw data and the inhibition values
-        first_CBK_row = resultDf[resultDf['Compound ID'].str.startswith('CTRL')].head(1)
+        first_CBK_row = resultDf[resultDf['Compound ID'].str.startswith('CBK')].head(1)
         print(first_CBK_row)
         yVal = first_CBK_row['yMean'].values[0]
         yInhib = first_CBK_row['inhibition'].values[0]
