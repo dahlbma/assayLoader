@@ -76,6 +76,7 @@ class ScatterplotWidget(QWidget):
                                            maxfev = 10000,
                                            p0=[slope, ic50, bottom, top],
                                            bounds=([min_slope, min_ic50, min_bot, min_top], [max_slope, max_ic50, max_bot, max_top])
+
                                            )
             perr = np.sqrt(np.diag(covariance))
             slope_std, ic50_std, bottom_std, top_std = perr
