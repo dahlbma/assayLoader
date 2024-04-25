@@ -58,13 +58,24 @@ class ScatterplotWidget(QWidget):
             top = 100
             bottom = 0
             # Fit the data to the 4-PL model
-            max_top = max(max(y_values) + 70 , 120)
+            max_top = max(y_values) + abs(max(y_values)) * 0.5
+            min_top = max(y_values) - abs(max(y_values)) * 0.5
+            max_bot = 50
+            min_bot = min(min(y_values) - abs(min(y_values)) * 0.5 , -50)
+
+            max_slope = 20
+            min_slope = -20
+            
+            max_ic50 = 0.01
+            min_ic50 = 1e-10
+            
+            print(f'top {top}\n bottom {bottom}\nic50 {ic50}\n max_top {max_top}\n min_top {min_top}\n max_bot {max_bot}\n min_bot {min_bot}\n')
             params, covariance = curve_fit(fourpl,
                                            x_values,
                                            y_values,
-                                           maxfev = 100000,
+                                           maxfev = 10000,
                                            p0=[slope, ic50, bottom, top],
-                                           bounds=([-100, 0, -20, 40], [30, 0.01, 40, max_top])
+                                           bounds=([min_slope, min_ic50, min_bot, min_top], [max_slope, max_ic50, max_bot, max_top])
                                            )
             perr = np.sqrt(np.diag(covariance))
             slope_std, ic50_std, bottom_std, top_std = perr

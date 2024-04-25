@@ -62,7 +62,7 @@ def find_files(directory, filename_start, filename_end):
             if file.startswith(filename_start) and file.endswith(filename_end):
                 matching_files.append(os.path.join(root, file))
     return matching_files
-            
+
 
 def findHarmonyFiles(self, subdirectory_path, selected_directory):
     data = {
