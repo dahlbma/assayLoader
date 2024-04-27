@@ -11,6 +11,7 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Font
+from gradientDescent import fit_curve
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -51,36 +52,43 @@ class ScatterplotWidget(QWidget):
         
         fitOk = True
         try:
-            top = np.max(y_values)
-            bottom = np.min(y_values)
-            slope = -1
-            ic50 = np.mean(x_values)/10
-            bottom = 0
+            if 1 == 2:
+                top = np.max(y_values)
+                bottom = np.min(y_values)
+                slope = -1
+                ic50 = np.mean(x_values)/10
+                bottom = 0
             
-            # Fit the data to the 4-PL model
-            max_top = 300
-            min_top = 0
+                # Fit the data to the 4-PL model
+                max_top = 300
+                min_top = 0
             
-            max_bot = 60
-            min_bot = -50
+                max_bot = 60
+                min_bot = -50
             
-            max_slope = 30
-            min_slope = -30
+                max_slope = 30
+                min_slope = -30
             
-            max_ic50 = 0.01
-            min_ic50 = 1e-12
-            
-            params, covariance = curve_fit(fourpl,
-                                           x_values,
-                                           y_values,
-                                           maxfev = 100000,
-                                           p0=[slope, ic50, bottom, top],
-                                           bounds=([min_slope, min_ic50, min_bot, min_top], [max_slope, max_ic50, max_bot, max_top])
-                                           )
-            perr = np.sqrt(np.diag(covariance))
-            slope_std, ic50_std, bottom_std, top_std = perr
-            # Extract the fitted parameters
-            slope, ic50, bottom, top = params
+                max_ic50 = 0.01
+                min_ic50 = 1e-12
+
+                params, covariance = curve_fit(fourpl,
+                                               x_values,
+                                               y_values,
+                                               maxfev = 100000,
+                                               p0=[slope, ic50, bottom, top],
+                                               bounds=([min_slope, min_ic50, min_bot, min_top], [max_slope, max_ic50, max_bot, max_top])
+                                               )
+                perr = np.sqrt(np.diag(covariance))
+                slope_std, ic50_std, bottom_std, top_std = perr
+                slope, ic50, bottom, top = params
+                print(f'SciPy slope {slope} ic50 {ic50} bottom {bottom} top {top}')
+                slope, ic50, bottom, top = fit_curve(x_values, y_values)
+                print(f'Mats slope {slope} ic50 {ic50} bottom {bottom} top {top}')
+            else:
+                slope, ic50, bottom, top = fit_curve(x_values, y_values)
+                # Extract the fitted parameters
+                slope_std = ic50_std = bottom_std = top_std = -1
         except Exception as e:
             print(f'''Can't fit parameters {str(e)} {x_values[0]}''')
             fitOk = False
@@ -188,6 +196,7 @@ class DoseResponseTable(QTableWidget):
         # "Batch nr" "Compound ID" "finalConc_nM" "yMean" "yStd"
         batch = batch_df['Batch nr'].iloc[0]
         compound = batch_df['Compound ID'].iloc[0]
+        print(f'Compound_id: {compound}')      
 
         scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale, self.workingDirectory)
         item = QTableWidgetItem(batch)

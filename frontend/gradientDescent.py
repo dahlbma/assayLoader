@@ -1,0 +1,336 @@
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+from itertools import product
+import pandas as pd
+
+import ctypes
+import pathlib
+
+
+BOUNDS = {
+    'slope': {'MIN': -90.1, 'MAX': 100},
+    'ic50': {'MIN': 5.00e-08, 'MAX': 0.01},
+    'top': {'MIN': 129, 'MAX': 300},
+    'bot': {'MIN': 0.0, 'MAX': 5}
+}
+
+
+parameters = ['grad_slope', 'grad_ic50', 'grad_bottom', 'grad_top']
+
+# Generate all possible combinations of signs (+ or -)
+sign_combinations = product([-1, 0, 1], repeat=len(parameters))
+
+# List to store permutations of parameter values
+permutations = []
+
+# Loop through each sign combination
+for signs in sign_combinations:
+    # Create a dictionary to hold the parameter values for this combination of signs
+    params = {}
+    # Loop through each parameter and assign the value with the corresponding sign
+    for param, sign in zip(parameters, signs):
+        params[param] = sign
+        # Append the parameter values to the permutations list
+    permutations.append(params)
+
+
+def calculate_distr(val, x):
+    distr = []
+    lower_bound = val - 0.2 * val
+    upper_bound = val + 0.2 * val
+    distr =  [lower_bound, val, upper_bound]
+    return distr
+
+def getLinReg(x, y):
+    # Perform linear regression
+    coefficients = np.polyfit(x, y, 1)
+    slope, intercept = coefficients  # m is the slope, b is the intercept
+    
+    # Create fitted line
+    fitted_line_x = np.linspace(min(x), max(x), 100)
+    fitted_line_y = slope * fitted_line_x + intercept
+
+    # Find the x value where (max(y) - min(y))/2 occurs
+    midpoint_y = ((max(y) - min(y)) / 2) + intercept
+    # Use numpy's interp function to find the corresponding x value
+    x_midpoint = np.interp(midpoint_y, y, x)
+
+    if slope > 0:
+        slope = 1
+    else:
+        slope = -1
+    return slope, x_midpoint
+
+
+def check_bounds(val, param):
+    min = BOUNDS[param]['MIN']
+    max = BOUNDS[param]['MAX']
+
+    if val > max: return max
+    if val < min: return min
+
+    return val
+    
+# Step 1: Define the 4-PL model
+def four_parameter_logistic(x, slope, ic50, bottom, top):
+    return bottom + (top - bottom) / (1 + (x / ic50) ** -slope)
+
+# Step 2: Define the cost function
+def cost_function(y_true, y_pred):
+    return ((y_true - y_pred) ** 2).mean()
+
+# Step 3: Compute the gradient analytically
+def compute_gradient(iCount, x, y, slope, ic50, bottom, top, learning_rate):
+    # Compute predictions
+    y_pred = four_parameter_logistic(x, slope, ic50, bottom, top)
+    #print(f'y_pred {y_pred}')
+    # Compute errors
+    error = abs_error = cost_function(y, y_pred)
+    print(f'error: {abs_error}')
+    if iCount % 10 == 0:
+        axs[1, 2].scatter([iCount], [abs_error], color='b')
+        axs[1, 2].set_title(f'RMSE {abs_error:.2f}')
+
+    if abs_error < 10:
+        learning_rate *= 0.95
+    
+    # Compute partial derivatives of the cost function with respect to each parameter
+    grad_slope = (2 / len(x)) * np.sum(error * ((top - bottom) / (1 + (x / ic50) ** -slope) ** 2) * (1 + (x / ic50) ** -slope))
+    grad_ic50 = (2 / len(x)) * np.sum(error * ((top - bottom) / (1 + (x / ic50) ** -slope) ** 2) * (-slope * (x / ic50) ** -(-slope - 1)) * (-x / (ic50 ** -2)))
+    grad_bottom = (2 / len(x)) * np.sum(error)
+    grad_top = (2 / len(x)) * np.sum(error * (1 / (1 + (x / ic50) ** -slope)))
+
+    #print(f'grad_top {grad_top} grad_slope: {grad_slope} grad_bottom: {grad_bottom} grad_ic50: {grad_ic50}')
+    return grad_slope, grad_ic50, grad_bottom, grad_top, learning_rate
+
+# Step 4: Update parameters using gradient descent
+def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic50_step):
+    # Compute gradients
+    #grad_slope, grad_ic50, grad_bottom, grad_top, learning_rate = compute_gradient(iCount, x, y, slope, ic50, bottom, top, learning_rate)
+
+    y_pred = four_parameter_logistic(x, slope, ic50, bottom, top)
+    org_error = old_error = abs_error = cost_function(y, y_pred)
+
+    best_slope = slope
+    best_ic50 = ic50
+    best_bottom = bottom
+    best_top = top
+    if iCount < 2:
+        old_error *= 2
+    
+    for perm in permutations:
+        new_slope = check_bounds(slope - learning_rate * 0.03 * perm['grad_slope'], 'slope')
+        new_ic50 = check_bounds(ic50 - learning_rate * ic50_step * 2 * perm['grad_ic50'], 'ic50')
+        new_bottom = check_bounds(bottom - learning_rate * 3 * perm['grad_bottom'], 'bot')
+        
+        new_top = check_bounds(top - learning_rate * 5 * perm['grad_top'], 'top')
+        y_pred = four_parameter_logistic(x, new_slope, new_ic50, new_bottom, new_top)
+        error = cost_function(y, y_pred)
+        if error < old_error:
+            best_slope = new_slope
+            best_ic50 = new_ic50
+            best_bottom = new_bottom
+            best_top = new_top
+            old_error = error
+    '''
+    if iCount % 10 == 0:
+        axs[0, 1].scatter([iCount], [grad_slope], color='b')
+        axs[0, 2].scatter([iCount], [grad_ic50], color='b')
+        axs[1, 0].scatter([iCount], [grad_bottom], color='b')
+        axs[1, 1].scatter([iCount], [grad_top], color='b')
+        axs[0, 1].set_title(f'grad_slope {grad_slope:.2f}')
+        axs[0, 2].set_title(f'grad_ic50 {grad_ic50:.2f}')
+        axs[1, 0].set_title(f'grad_bottom {grad_bottom:.2f}')
+        axs[1, 1].set_title(f'grad_top {grad_top:.2f}')
+    '''
+    stop = False
+    if org_error == old_error:
+        stop = True
+    if abs_error < 10:
+        learning_rate *= 0.94
+    else:
+        learning_rate = learning_rate * 0.98
+    #ic50_step = ic50_step * 0.99
+    return best_slope, best_ic50, best_bottom, best_top, learning_rate, stop, abs_error
+
+# Step 5: Implement gradient descent
+def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, top):
+    ic50_step = ic50
+    old_rmse = np.inf
+    x_curve = np.logspace(np.log10(min(x)), np.log10(max(x)), 100)
+    iCount = 0
+
+    for _ in range(num_iterations):
+        iCount += 1
+        #print(iCount)
+        # Compute predictions
+        y_pred = four_parameter_logistic(x, slope, ic50, bottom, top)
+        
+        # Compute gradients (analytically or numerically)
+        new_slope, new_ic50, new_bottom, new_top, learning_rate, lStop, rmse = update_parameters(iCount,
+                                                                                                 x,
+                                                                                                 y,
+                                                                                                 slope,
+                                                                                                 ic50,
+                                                                                                 bottom,
+                                                                                                 top,
+                                                                                                 learning_rate,
+                                                                                                 ic50_step)
+        if abs(old_rmse - rmse) < 0.01:
+            learning_rate *= 0.95
+        if lStop:
+            learning_rate = learning_rate / 1.1
+        if learning_rate < 0.001:
+            break
+        
+        # Update parameters using gradient descent
+        slope = new_slope
+        ic50 = new_ic50
+        ic50 = abs(ic50)
+        bottom = new_bottom
+        top = new_top
+
+        #print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
+        y_curve_fit = four_parameter_logistic(x_curve, slope, ic50, bottom, top)
+
+        '''
+        if iCount % 1 == 0:
+            axs[0,0].cla()
+            axs[0,0].plot(x_curve, y_curve_fit, color='g', label='Fitted')
+            axs[0,0].scatter(x, y, label='Measured Data')
+            axs[0,0].axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
+            axs[0,0].set_xscale('log')
+            plt.pause(0.001)
+        '''
+    return slope, ic50, bottom, top
+
+def fit_curve(x, y):
+    BOUNDS['top']['MIN'] = max(y) * 0.7
+    BOUNDS['top']['MAX'] = max(y) * 1.8
+    BOUNDS['bot']['MIN'] = min(min(y) - 0.4 * abs(min(y)), -50)
+    BOUNDS['bot']['MAX'] =  min(y) + 0.4 * abs(min(y))
+    BOUNDS['ic50']['MIN'] = min(x) * 0.7
+    BOUNDS['ic50']['MAX'] = max(x) * 1.5
+
+    BOUNDS['slope']['MIN'] = -30
+    BOUNDS['slope']['MAX'] = 30
+
+    learning_rate = 10
+    num_iterations = 500
+
+    slope, ic50 = getLinReg(x, y)
+    bottom, top = min(y), max(y)
+
+    slopes = calculate_distr(slope, x)
+    tops = calculate_distr(max(y), x)
+    bottoms = calculate_distr(min(y), x)
+    ic50s = x
+
+    min_cost = float('inf')
+    best_combination = None
+
+    # Iterate over all combinations of parameters
+    for slope_val in slopes:
+        for ic50_val in ic50s:
+            for bottom_val in bottoms:
+                for top_val in tops:
+                    # Calculate y_pred using four_parameter_logistic function
+                    y_pred = four_parameter_logistic(x, slope_val, ic50_val, bottom_val, top_val)
+                    # Calculate cost using cost_function
+                    cost = cost_function(y, y_pred)
+                    # Check if current combination gives lower cost
+                    if cost < min_cost:
+                        min_cost = cost
+                        best_combination = (slope_val, ic50_val, bottom_val, top_val)
+                    
+    slope = best_combination[0]
+    ic50 = best_combination[1]
+    bottom = best_combination[2]
+    top = best_combination[3]
+
+    slope, ic50, bottom, top = gradient_descent(x, y, learning_rate, num_iterations, slope, ic50/10, bottom, top)
+    '''
+    print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
+    axs[0,0].cla()
+    axs[0,1].cla()
+    axs[0,2].cla()
+    axs[1,0].cla()
+    axs[1,1].cla()
+    axs[1,2].cla()
+    print(f'slope {slope} ic50 {ic50} bottom {bottom} top {top}')
+    '''
+    return -slope, ic50, bottom, top
+    
+if __name__ == "__main__":
+
+    # Read the tab-separated file
+    df = pd.read_excel('finalPreparedDR.xlsx')
+    df['finalConc_nM'] /= 1000000
+    df.drop(columns=['Batch nr', 'yMean', 'yStd'], inplace=True)
+
+
+    # Group by 'Compound_id' and aggregate the 'Conc' and 'Inhibition' columns
+    grouped = df.groupby('Compound ID').agg(lambda x: tuple(x))
+
+    # Save the transformed data to a CSV file
+    grouped.to_csv('transformed.csv', sep='\t')
+
+    BOUNDS = {
+        'slope': {'MIN': -90.1, 'MAX': 100},
+        'ic50': {'MIN': 5.00e-08, 'MAX': 0.01},
+        'top': {'MIN': 129, 'MAX': 300},
+        'bot': {'MIN': 0.0, 'MAX': 5}
+    }
+
+    parameters = ['grad_slope', 'grad_ic50', 'grad_bottom', 'grad_top']
+
+    # Generate all possible combinations of signs (+ or -)
+    sign_combinations = product([-1, 0, 1], repeat=len(parameters))
+
+    # List to store permutations of parameter values
+    permutations = []
+
+    # Loop through each sign combination
+    for signs in sign_combinations:
+        # Create a dictionary to hold the parameter values for this combination of signs
+        params = {}
+        # Loop through each parameter and assign the value with the corresponding sign
+        for param, sign in zip(parameters, signs):
+            params[param] = sign
+            # Append the parameter values to the permutations list
+        permutations.append(params)
+
+    fig, axs = plt.subplots(2, 3, figsize=(15, 8))
+
+    axs[0, 0].set_xscale('log')
+    axs[0, 1].set_title('grad_slope')
+    axs[0, 2].set_title('grad_ic50')
+    axs[1, 0].set_title('grad_bottom')
+    axs[1, 1].set_title('grad_top')
+    axs[1, 2].set_title('RMSE')
+
+    iPlotNr = 0
+    with open('transformed.csv', 'r') as file:
+        # Skip the header line
+        next(file)
+
+        # Iterate over each line
+        for line in file:
+            iPlotNr += 1
+            print(f'Plot nr: {iPlotNr}')
+            # Split the line based on the tab character
+            parts = line.strip().split('\t')
+            # Extract compound ID
+            compound_id = parts[0]
+            # Convert concentrations to a numpy array of floats
+            conc = np.array([float(value) for value in parts[1].strip("()").split(", ")])
+            # Convert y values to a numpy array of floats
+            y_val = np.array([float(value) for value in parts[-1].strip("()").split(", ")])
+        
+            # Print or do whatever you want with the variables
+            print("Compound ID:", compound_id)
+            print("Concentration:", conc)
+            print("Y Value:", y_val)
+            fit_curve(conc, y_val)
+
