@@ -39,7 +39,7 @@ class ScatterplotWidget(QWidget):
         # self.plotted_data contains the datapoints that are plottedt (in case some points are de-selected in the GUI)
         self.plotted_data = data_dict
 
-        slope, ic50, bottom, top, ic50_std, auc = self.plot_scatter(data_dict, self.yScale)
+        slope, ic50, bottom, top, ic50_std, auc, sInfo = self.plot_scatter(data_dict, self.yScale)
 
 
     def plot_scatter(self, df, yScale):
@@ -86,7 +86,7 @@ class ScatterplotWidget(QWidget):
                 slope, ic50, bottom, top = fit_curve(x_values, y_values)
                 print(f'Mats slope {slope} ic50 {ic50} bottom {bottom} top {top}')
             else:
-                slope, ic50, bottom, top = fit_curve(x_values, y_values)
+                slope, ic50, bottom, top, sInfo = fit_curve(x_values, y_values)
                 # Extract the fitted parameters
                 slope_std = ic50_std = bottom_std = top_std = -1
         except Exception as e:
@@ -141,14 +141,14 @@ class ScatterplotWidget(QWidget):
         # Save all the parameters for the curve fitting
         self.auc = auc
         self.ic50 = ic50
-        self.ic50_std = ic50_std
+        self.fit_quality = sInfo
         self.slope = slope
         self.top = top
         self.bottom = bottom
         self.minConc = self.data_dict['finalConc_nM'].iloc[0]
         self.maxConc = self.data_dict['finalConc_nM'].iloc[-1]
 
-        return slope, ic50, bottom, top, ic50_std, auc
+        return slope, ic50, bottom, top, ic50_std, auc, sInfo
 
 
 class DoseResponseTable(QTableWidget):
@@ -219,7 +219,8 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
         self.setItem(rowPosition, self.ic50_col, item) # 2
 
-        item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
+        #item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50_std)))
+        item = QTableWidgetItem(scatterplot_widget.fit_quality)
         self.setItem(rowPosition, self.ic50std_col, item) # 3
 
         item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
@@ -249,7 +250,7 @@ class DoseResponseTable(QTableWidget):
             row_data = [self.item(row, col).text() if col < 11 else None for col in range(self.columnCount())]
             table_data.append(row_data)
 
-        columns = ['Batch', 'Compound', 'IC50', 'IC50_std', 'Slope',
+        columns = ['Batch', 'Compound', 'IC50', 'Quality', 'Slope',
                    'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'Graph']
         df = pd.DataFrame(table_data, columns=columns)
 
@@ -257,7 +258,7 @@ class DoseResponseTable(QTableWidget):
         ws = wb.active
 
         file_path = os.path.join(sDir, 'DR_Excel.xlsx')
-        headings = ["Batch", "Compound", "IC50", "IC50 std", "Slope",
+        headings = ["Batch", "Compound", "IC50", "Fit quality", "Slope",
                     "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
 
         for col_num, heading in enumerate(headings, 1):

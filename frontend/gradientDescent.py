@@ -203,7 +203,7 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
             axs[0,0].set_xscale('log')
             plt.pause(0.001)
         '''
-    return slope, ic50, bottom, top
+    return slope, ic50, bottom, top, f'RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n'
 
 def fit_curve(x, y):
     BOUNDS['top']['MIN'] = max(y) * 0.7
@@ -249,7 +249,13 @@ def fit_curve(x, y):
     bottom = best_combination[2]
     top = best_combination[3]
 
-    slope, ic50, bottom, top = gradient_descent(x, y, learning_rate, num_iterations, slope, ic50/10, bottom, top)
+    slope, ic50, bottom, top, sInfo = gradient_descent(x,
+                                                       y,
+                                                       learning_rate,
+                                                       num_iterations,
+                                                       slope,
+                                                       ic50/10,
+                                                       bottom, top)
     '''
     print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
     axs[0,0].cla()
@@ -260,7 +266,7 @@ def fit_curve(x, y):
     axs[1,2].cla()
     print(f'slope {slope} ic50 {ic50} bottom {bottom} top {top}')
     '''
-    return -slope, ic50, bottom, top
+    return -slope, ic50, bottom, top, sInfo
     
 if __name__ == "__main__":
 

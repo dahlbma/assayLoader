@@ -47,7 +47,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QTabWidget" name="module_tab_wg">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="dr_prep_data_tab">
          <attribute name="title">
@@ -277,7 +277,7 @@
               </column>
               <column>
                <property name="text">
-                <string>IC50 Std</string>
+                <string>Fit quality</string>
                </property>
               </column>
               <column>
