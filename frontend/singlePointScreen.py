@@ -150,7 +150,6 @@ class SinglePointScreen(QMainWindow):
             plate_data, lSuccess = dbInterface.getPlate(self.token, plate_value)
             if lSuccess:
                 self.printPrepLog(f'Got plate data for {plate_value}')
-
                 df = pd.DataFrame(plate_data, columns=columns)
             else:
                 self.printPrepLog(f'Error getting plate {plate_value} {plate_data}', 'error')

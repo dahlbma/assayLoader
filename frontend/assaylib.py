@@ -140,7 +140,6 @@ def createPlatemap(self, platesDf, subdirectory_path):
         if lSuccess:
             iNrOfPlates += 1
             printPrepLog(self, f'{plate_value}')
-
             df = pd.DataFrame(plate_data, columns=columns)
         else:
             printPrepLog(self, f'Error getting plate {plate_value} {plate_data}', 'error')

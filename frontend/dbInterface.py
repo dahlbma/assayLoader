@@ -101,13 +101,6 @@ def getBatchCompound(token, sBatchCompound):
     cleanList = listify(r, False)
     return cleanList
 
-def getPlate(token, sPlate):
-    r = requests.get(f'{baseUrl}getPlate/{sPlate}',
-                     headers={'token':token})
-    if r.status_code != 200:
-        return r.content.decode(), False
-    else:
-        return r.content.decode(), True
 
 def getSinglePointConfig(token):
     r = requests.get(f'{baseUrl}getSinglePointConfig',
@@ -178,3 +171,4 @@ def getPlate(token, plate):
         res = json.loads(res)
 
         return res, True
+
