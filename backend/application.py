@@ -172,7 +172,7 @@ class GetOperators(tornado.web.RequestHandler):
         res = res2json()
         self.finish(res)
 
-
+"""
 @jwtauth
 class GetPlate(tornado.web.RequestHandler):
     def get(self, sPlate):
@@ -195,7 +195,7 @@ class GetPlate(tornado.web.RequestHandler):
             logging.error(sError)
             self.set_status(400)
             self.finish(sError)
-
+"""
 
 @jwtauth
 class GetBatchCompound(tornado.web.RequestHandler):
