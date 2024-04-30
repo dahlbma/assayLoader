@@ -239,6 +239,7 @@ def fit_curve(x, y):
                     y_pred = four_parameter_logistic(x, slope_val, ic50_val, bottom_val, top_val)
                     # Calculate cost using cost_function
                     cost = cost_function(y, y_pred)
+                    #print(f'#######\ncost {cost}\nslope_val {slope_val}\n ic50_val {ic50_val}\n bottom_val {bottom_val}\n top_val {top_val}\n')
                     # Check if current combination gives lower cost
                     if cost < min_cost:
                         min_cost = cost
@@ -274,7 +275,6 @@ if __name__ == "__main__":
     df = pd.read_excel('finalPreparedDR.xlsx')
     df['finalConc_nM'] /= 1000000
     df.drop(columns=['Batch nr', 'yMean', 'yStd'], inplace=True)
-
 
     # Group by 'Compound_id' and aggregate the 'Conc' and 'Inhibition' columns
     grouped = df.groupby('Compound ID').agg(lambda x: tuple(x))
@@ -339,4 +339,4 @@ if __name__ == "__main__":
             print("Concentration:", conc)
             print("Y Value:", y_val)
             fit_curve(conc, y_val)
-
+            quit()
