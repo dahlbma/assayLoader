@@ -50,25 +50,41 @@ def extractPlate(file, preparedDirectory, plateId):
     
     # Skip the first line
     next(file)
-    
-    # Read lines until an empty row
+
+    # Read lines until we find the word "well"
+    for line in file:
+        if "well" in line.lower():  # If the line is empty
+            saLines.append(line.rstrip() + '\n')
+            break
+
+    # Read lines until we find empty lines
     for line in file:
         line = line.strip()  # Remove leading/trailing whitespace
         if not line:  # If the line is empty
             break
+        #saLines.append(line.rstrip(','))
         saLines.append(line)
 
     sFullPath = os.path.join(preparedDirectory, f'{plateId}.txt')
 
+    #with open(sFullPath, 'w', newline='') as file:
+    #    writer = csv.writer(file, delimiter=',')
+    #    for line in saLines:
+    #        writer.writerow(line.split(','))
+
     with open(sFullPath, 'w', newline='') as file:
-        writer = csv.writer(file, delimiter=',')
+        iCount = 0
         for line in saLines:
-            writer.writerow(line.split(','))
+            if iCount == 0:
+                file.write(line)
+            else:
+                file.write(line + '\n')
+            iCount += 1
+            
     return plateId, sFullPath
 
 
 def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
-    print(subdirectory_path, plate_to_file_mapping)
     envision_dir = os.path.dirname(plate_to_file_mapping)
     data = {
         "plate": [],
@@ -92,14 +108,14 @@ def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
     # Iterate over rows in the worksheet, starting from the second row (assuming the first row is header)
     for row in worksheet.iter_rows(min_row=2, values_only=True):
         plate, file = row[0], row[1]  # Assuming "Plate" is in the first column and "File" is in the second column
-        plate_file_pairs.append((plate, file))
+        if isinstance(plate, str) and plate.lower().startswith('p'):
+            plate_file_pairs.append((plate, file))
 
     saPreparedPlateMapping = {
         "plate": [],
         "file": []
     }
 
-    # Loop over the plate:file pairs and print each pair to the terminal
     for plate, plate_file in plate_file_pairs:
         with open(envision_dir + '/' + plate_file, 'r') as file:
             sPlate, sPlateFile = extractPlate(file, subdirectory_path, plate)

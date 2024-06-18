@@ -115,14 +115,15 @@ def printPrepLog(self, s, type=''):
 
 
 def findDataColumns(sFileName):
+    print(sFileName)
     with open(sFileName, 'r') as sFile:
         saLines = sFile.readlines()
         # Skip all the lines in the start of the file, look for where the 'Well' appears
         for line in saLines:
             saLine = line.split(',')
+            print(saLine)
             if 'Well' in saLine:
                 return saLine
-
     # This is an error
     return None
         

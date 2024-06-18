@@ -272,10 +272,13 @@ class SinglePointScreen(QMainWindow):
         subdirectory_path = ''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xlsx *.xls)", options=options)
+
+        envision_dialog = QFileDialog()
+        envision_dialog.setOptions(options)
+
+        fileName, _ = envision_dialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xlsx *.xls)")
         if fileName:
             subdirectory_path = os.path.dirname(fileName)
-        print(f'subdirectory_path: {subdirectory_path}')
         prepared_path = os.path.join(subdirectory_path, "preparedEnvisionFiles")
         self.workingDirectory = prepared_path
         if prepared_path == "preparedEnvisionFiles":
@@ -429,12 +432,7 @@ class SinglePointScreen(QMainWindow):
                 well = saLine[iWellColPosition]
                 raw_data = float(saLine[iDataColPosition])
             except Exception as e:
-                #print(f'{saLine}')
-                #print(f'{iDataColPosition}')
-                #print(f'{str(e)}')
                 self.printQcLog(f'The raw data value is not numeric in plate {sPlate} well {well}', 'error', beep=False)
-                #return df
-                #raw_data = 0
                 continue
             
             data = {'plate': sPlate,
@@ -476,8 +474,6 @@ class SinglePointScreen(QMainWindow):
                     self.printQcLog(f'Data column {sDataColumn} not present in datafile {file}', 'error')
                     sFile = os.path.basename(file.name)
                     self.updateRawdataStatus(sFile, f"Could not find column {sDataColumn} in file", 'error')
-                    #print(sDataColumn)
-                    #print(saLine)
                 iWellColPosition = saLine.index('Well')
                 saDataLines = saLines[iLineNumber:]
                 iLineNumber = 0
@@ -555,7 +551,6 @@ class SinglePointScreen(QMainWindow):
             saColOrder = ['Platt ID', 'Well', 'Compound ID', 'Batch nr']
             for sCol in saColOrder:
                 if platemapColumns[iCol] != sCol:
-                    print(platemapColumns[iCol], sCol)
                     self.printQcLog(f'Platemap has wrong columns, looking for columns in this order {saColOrder}', 'error')
                     return
                 iCol += 1
@@ -593,7 +588,6 @@ class SinglePointScreen(QMainWindow):
                     try:
                         iDataColPosition = int(iDataColPosition)
                     except:
-                        print(f'iDataColPosition ', iDataColPosition)
                         continue
                     
                     dfPlate = self.extractData(sFile,
@@ -603,8 +597,7 @@ class SinglePointScreen(QMainWindow):
                                                iWellColPosition)
                     frames.append(dfPlate)
             except Exception as e:
-                print(str(e))
-                self.printQcLog(f"Can't open {full_path}", 'error', beep=True)
+                self.printQcLog(f"Can't open {full_path} str(e)", 'error', beep=True)
                 QApplication.restoreOverrideCursor()
                 return
         resDf = pd.concat(frames)
@@ -715,8 +708,7 @@ class SinglePointScreen(QMainWindow):
                                                iMinPosCtrl,
                                                iMaxNegCtrl)
         except Exception as e:
-            print(f"{str(e)}")
-            self.printQcLog(f"Error calculating QC", 'error')
+            self.printQcLog(f"Error calculating QC {str(e)}", 'error')
             QApplication.restoreOverrideCursor()
             return
         
