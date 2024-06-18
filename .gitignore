@@ -74,7 +74,6 @@ tools/doseResponse/txt/PLATEMAP.xlsx
 tools/doseResponse/PLATEMAP.xlsx
 tools/doseResponse/DR_Excel.xlsx
 tools/doseResponse/DR_Excel.xlsx
-tools/doseResponse/preparedHaronyFiles/PLATEMAP.xlsx
 tools/doseResponse/prepared_plate_to_file.xlsx
 *.xlsx
 *.xlsx
@@ -82,8 +81,6 @@ tools/doseResponse/prepared_plate_to_file.xlsx
 *.xlsx
 *.xlsx
 frontend/t.py
-tools/doseResponse/preparedHaronyFiles/PLATEMAP.xlsx
-tools/doseResponse/preparedHaronyFiles/prepared_plate_to_file.xlsx
 frontend/al.exe
 tools/doseResponse/preparedHaronyFiles/
 
