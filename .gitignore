@@ -76,10 +76,6 @@ tools/doseResponse/DR_Excel.xlsx
 tools/doseResponse/DR_Excel.xlsx
 tools/doseResponse/prepared_plate_to_file.xlsx
 *.xlsx
-*.xlsx
-*.xlsx
-*.xlsx
-*.xlsx
 frontend/t.py
 frontend/al.exe
 tools/doseResponse/preparedHaronyFiles/
