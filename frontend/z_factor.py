@@ -535,7 +535,7 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
     start_row = current_row
     
     # Extract the numeric part as "col" and the letter part as "row"
-    plateDf['col'] = plateDf['well'].str.extract('(\d+)').astype(int)
+    plateDf['col'] = plateDf['well'].str.extract(r'(\d+)').astype(int)
     plateDf['row'] = plateDf['well'].str.extract('([A-Z])').iloc[:, 0].apply(lambda x: ord(x[0]) - ord('A') + 1)
 
     if(lDebug):
