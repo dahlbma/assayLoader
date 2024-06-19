@@ -580,10 +580,9 @@ def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, d
             cell.font = whiteFont
 
 def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtrl):
-    print(input_file)
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
-    self.printQcLog(f"Reading input")
+    self.printQcLog(f"Reading input, using {input_file}")
     
     # Generate the gradient from white to red in 10 steps
     #gradient_white_to_red = generate_gradient(start_color="#FFFFFF", end_color="#AF0000", num_steps=24)
