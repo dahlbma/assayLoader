@@ -1,11 +1,9 @@
-import sys, requests, json, os, subprocess, platform, datetime, logging, dbInterface, re
-from unittest import result
+import sys, requests, json, os, subprocess, platform, logging, dbInterface, re
 import pandas as pd
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidgetItem, QWidget
 from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
-from PyQt5 import sip
 
 def gotoSP(self):
     resize_window(self)
@@ -93,10 +91,6 @@ def resize_window(self, height=800, width=1200):
     windowWidth = int(round((width/height) * windowHeight, -1))
 
     self.window().resize(windowWidth, windowHeight)
-
-
-def resetPrepLog(self):
-    self.prepLog_te.setText('')
 
     
 def printPrepLog(self, s, type=''):

@@ -1,9 +1,9 @@
-import re, sys, os, logging, glob, csv
+import re, sys, os, logging, csv
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit, QDialog, QPushButton, QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton, QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QRegExpValidator
+from PyQt5.QtGui import QIntValidator, QBrush, QColor, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import openpyxl
 from pathlib import Path
