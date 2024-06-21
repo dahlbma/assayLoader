@@ -706,7 +706,7 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
     create_plate_frame(screenDataWs, 'Well Avg', "", start_cell, num_columns, num_rows)
     populate_plate_data(excelSettings, screenDataWs, 1, df_avg_well, start_cell, 'avgDataValue', lDebug=True)
 
-    self.printQcLog(f"Generate Excel file")
+    self.printQcLog(f"Creating Excel file")
 
     ##
     ######################################################
@@ -717,3 +717,4 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
     wb.save(excel_file_path)
 
     return hitLimt, dfCalcData
+

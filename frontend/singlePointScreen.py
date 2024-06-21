@@ -221,11 +221,35 @@ class SinglePointScreen(QMainWindow):
         saTargets = dbInterface.getTargets(self.token)
         self.target_cb.addItems(saTargets)
 
-        saAssayType = dbInterface.getAssayTypes(self.token)
-        self.assayType_cb.addItems(saAssayType)
+        saModelTypes = [
+            'Cell_Line',
+            'Protein',
+            'Primary_Cell',
+            'Organism'            
+            ]
+        self.screenType_cb.addItems(saModelTypes)
 
-        saDetectionType = dbInterface.getDetectionTypes(self.token)
-        self.detectionType_cb.addItems(saDetectionType)
+        saAssayTypes = [
+            "Phenotypic_2D",
+            "Phenotypic_Suspension",
+            "Phenotypic_3D",
+            "Targeted_Cell-based_2D",
+            "Targeted_Cell-based_Suspension",
+            "Targeted_Cell-based_3D",
+            "Protein_Binding",
+            "Protein_Enzymatic"
+        ]
+        #saAssayTypes = dbInterface.getAssayTypes(self.token)
+        self.assayType_cb.addItems(saAssayTypes)
+
+        #saDetectionType = dbInterface.getDetectionTypes(self.token)
+        saViabilityMeasurement = [
+            'Imaging',
+            'Luminescence',
+            'Other',
+            'No'
+        ]
+        self.detectionType_cb.addItems(saViabilityMeasurement)
 
         #saScreenType = dbInterface.getScreenTypes(self.token)
         #self.screenType_cb.addItems(saScreenType)
