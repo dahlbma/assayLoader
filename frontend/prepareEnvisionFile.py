@@ -60,7 +60,7 @@ def extractPlate(file, preparedDirectory, plateId):
     # Read lines until we find empty lines
     for line in file:
         line = line.strip()  # Remove leading/trailing whitespace
-        if not line:  # If the line is empty
+        if not line or line.startswith('Plate info'):  # If the line is empty
             break
         #saLines.append(line.rstrip(','))
         saLines.append(line)
