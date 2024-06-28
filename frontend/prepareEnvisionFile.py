@@ -43,7 +43,7 @@ def find_files(directory, filename_start, filename_end):
             if file.startswith(filename_start) and file.endswith(filename_end):
                 matching_files.append(os.path.join(root, file))
     return matching_files
-            
+
 
 def extractPlate(file, preparedDirectory, plateId):
     saLines = []
@@ -62,15 +62,9 @@ def extractPlate(file, preparedDirectory, plateId):
         line = line.strip()  # Remove leading/trailing whitespace
         if not line or line.startswith('Plate info'):  # If the line is empty
             break
-        #saLines.append(line.rstrip(','))
         saLines.append(line)
 
     sFullPath = os.path.join(preparedDirectory, f'{plateId}.txt')
-
-    #with open(sFullPath, 'w', newline='') as file:
-    #    writer = csv.writer(file, delimiter=',')
-    #    for line in saLines:
-    #        writer.writerow(line.split(','))
 
     with open(sFullPath, 'w', newline='') as file:
         iCount = 0

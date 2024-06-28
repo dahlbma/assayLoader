@@ -149,10 +149,11 @@ def printPlateLabel(token, sPlate):
         return True
 
 
-def saveSpRowToDb(token, row):
+def saveSpRowToDb(token, rows, targetTable):
+    data = {'rows': rows, 'targetTable': targetTable}
     r = requests.post(f'{baseUrl}saveSpRowToDb',
                       headers={'token':token},
-                      data = row)
+                      json = data)
     
     if r.status_code != 200:
         return r.content.decode(), False

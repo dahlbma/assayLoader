@@ -115,12 +115,24 @@ class SinglePointScreen(QMainWindow):
 
 
     def saveSpToDb(self):
+
         def color_row_red(row):
             for col in range(self.sp_table.columnCount()):
                 item = self.sp_table.item(row, col)
                 if item:
                     item.setBackground(QColor('red'))
-        
+
+        def uploadRows(rows, targetTable):
+            sRes, lStatus = dbInterface.saveSpRowToDb(self.token, accumulated_rows, targetTable)
+            
+            if lStatus == False:
+                color_row_red(row)
+
+        accumulated_rows = []
+        iAccumulator_count = 0
+        iRowsBatch = 8
+        targetTable = self.targetTable_cb.currentText()
+
         QApplication.setOverrideCursor(Qt.WaitCursor)
         for row in range(self.sp_table.rowCount()):
             row_dict = {}
@@ -131,12 +143,18 @@ class SinglePointScreen(QMainWindow):
                     column_name = header_item.text()
                     cell_value = item.text()
                     row_dict[column_name] = cell_value
-            
-            sRes, lStatus = dbInterface.saveSpRowToDb(self.token, row_dict)
-            if lStatus == False:
-                color_row_red(row)
-            
+            accumulated_rows.append(row_dict)
+            iAccumulator_count += 1
+
+            if iAccumulator_count == iRowsBatch:
+                uploadRows(accumulated_rows, targetTable)
+                accumulated_rows = []
+                iAccumulator_count = 0
+                
             QApplication.processEvents()
+
+        if iAccumulator_count > 0:
+            uploadRows(accumulated_rows, targetTable)
         QApplication.restoreOverrideCursor()
         
 
@@ -242,6 +260,13 @@ class SinglePointScreen(QMainWindow):
         #saAssayTypes = dbInterface.getAssayTypes(self.token)
         self.assayType_cb.addItems(saAssayTypes)
 
+        saTargetTables = [
+            "Primary screen",
+            "Confirmation screen",
+            "Counter screen"
+        ]
+        self.targetTable_cb.addItems(saTargetTables)
+        
         #saDetectionType = dbInterface.getDetectionTypes(self.token)
         saViabilityMeasurement = [
             'Imaging',
