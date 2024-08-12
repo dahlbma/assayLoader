@@ -79,5 +79,5 @@ tools/doseResponse/prepared_plate_to_file.xlsx
 frontend/t.py
 frontend/al.exe
 tools/doseResponse/preparedHaronyFiles/
-tools/screen_raw_data/preparedEnvisionFiles/
-/tools/doseResponse/preparedHaronyFiles/
+tools/screen_raw_data/preparedEnvisionFiles/*
+/tools/doseResponse/preparedHaronyFiles/*
