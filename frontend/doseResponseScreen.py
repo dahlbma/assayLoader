@@ -232,6 +232,7 @@ class DoseResponseScreen(QMainWindow):
             subdirectory_path = os.path.dirname(fileName)
         print(f'subdirectory_path: {subdirectory_path}')
         prepared_path = os.path.join(subdirectory_path, "preparedEnvisionFiles")
+        delete_all_files_in_directory(prepared_path)
         self.workingDirectory = prepared_path
         if prepared_path == "preparedEnvisionFiles":
             return

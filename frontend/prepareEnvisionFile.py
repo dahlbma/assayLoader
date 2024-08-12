@@ -111,6 +111,7 @@ def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
     }
 
     for plate, plate_file in plate_file_pairs:
+        print(plate_file)
         with open(envision_dir + '/' + plate_file, 'r') as file:
             sPlate, sPlateFile = extractPlate(file, subdirectory_path, plate)
 
