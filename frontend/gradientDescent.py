@@ -71,7 +71,7 @@ def check_bounds(val, param):
     if val < min: return min
 
     return val
-    
+
 # Step 1: Define the 4-PL model
 def four_parameter_logistic(x, slope, ic50, bottom, top):
     return bottom + (top - bottom) / (1 + (x / ic50) ** -slope)

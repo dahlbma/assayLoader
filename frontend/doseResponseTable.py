@@ -12,6 +12,7 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Font
 from gradientDescent import fit_curve
+import assaylib
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -176,7 +177,15 @@ class DoseResponseTable(QTableWidget):
         self.setRowCount(0)
         self.setColumnWidth(10, 600)
         df = pd.read_excel(file_path)
+
+        dialog = assaylib.CancelDialog(self)
+        dialog.show()
+
         for batch_nr, batch_df in df.groupby('Batch nr'):
+            if dialog.cancelled:
+                print("Calculation cancelled!")
+                break
+            
             rowPosition = self.rowCount()
             if parent.test == 'true':
                 if rowPosition > 20:
@@ -188,6 +197,7 @@ class DoseResponseTable(QTableWidget):
             # Call the scatter function for each batch
             self.plotCurve(batch_df, rowPosition, yScale)
 
+        dialog.close()
         self.saveToExcel()
         return batch_df
 

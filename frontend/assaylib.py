@@ -2,7 +2,7 @@ import sys, requests, json, os, subprocess, platform, logging, dbInterface, re, 
 import pandas as pd
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidgetItem, QWidget
-from PyQt5.QtWidgets import QProgressBar, QVBoxLayout
+from PyQt5.QtWidgets import QProgressBar, QVBoxLayout, QDialog, QLabel, QDialogButtonBox, QPushButton, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
 def gotoSP(self):
@@ -166,4 +166,24 @@ def createPlatemap(self, platesDf, subdirectory_path):
     printPrepLog(self, f'{full_path}', type='bold')
 
     return full_path
-    
+
+
+class CancelDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('Curve fitting calculation')
+
+        self.label = QLabel('Press cancel to stop calculation', self)
+
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Cancel, self)
+        self.buttonBox.rejected.connect(self.cancel)
+
+        self.cancelled = False
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        layout.addWidget(self.buttonBox)
+        self.setLayout(layout)
+
+    def cancel(self):
+        self.cancelled = True
+        self.close()
