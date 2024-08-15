@@ -184,6 +184,9 @@ class CancelDialog(QDialog):
         layout.addWidget(self.buttonBox)
         self.setLayout(layout)
 
+    def update_label(self, text):
+        self.label.setText(text)
+
     def cancel(self):
         self.cancelled = True
         self.close()

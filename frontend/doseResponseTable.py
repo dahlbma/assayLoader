@@ -181,7 +181,11 @@ class DoseResponseTable(QTableWidget):
         dialog = assaylib.CancelDialog(self)
         dialog.show()
 
+        iTotPlotNum = len(df.groupby('Batch nr'))
+        iCount = 0
         for batch_nr, batch_df in df.groupby('Batch nr'):
+            iCount += 1
+            dialog.update_label(f"{iCount + 1} of {iTotPlotNum} curves")
             if dialog.cancelled:
                 print("Calculation cancelled!")
                 break
