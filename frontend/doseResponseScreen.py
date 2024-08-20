@@ -100,7 +100,7 @@ class DoseResponseScreen(QMainWindow):
         self.inhibition_rb.setChecked(True)
         
         self.saveExcel_btn.clicked.connect(self.doseResponseTable.saveToExcel)
-        self.saveExcel_btn.setEnabled(False)
+        self.saveExcel_btn.setEnabled(True)
         
 
     def toggleInhibition(self):
@@ -172,13 +172,13 @@ class DoseResponseScreen(QMainWindow):
         else:
             return
 
-        self.saveExcel_btn.setEnabled(True)
         selected_rows = df[includedPoints]
         widget.plot_scatter(selected_rows, self.yScale)
         self.doseResponseTable.updateTable(row, widget)
 
 
     def calcDR(self):
+        self.saveExcel_btn.setEnabled(True)
         file = self.drInputFile_lab.text()
         if file == '':
             pass

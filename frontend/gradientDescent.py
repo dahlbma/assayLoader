@@ -150,7 +150,7 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
     if abs_error < 10:
         learning_rate *= 0.94
     else:
-        learning_rate = learning_rate * 0.98
+        learning_rate = learning_rate * 0.995
     #ic50_step = ic50_step * 0.99
     return best_slope, best_ic50, best_bottom, best_top, learning_rate, stop, abs_error
 
@@ -217,7 +217,7 @@ def fit_curve(x, y):
     BOUNDS['slope']['MAX'] = 30
 
     learning_rate = 10
-    num_iterations = 500
+    num_iterations = 2000
 
     slope, ic50 = getLinReg(x, y)
     bottom, top = min(y), max(y)

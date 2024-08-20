@@ -112,11 +112,14 @@ def findEnvisionFiles(self, subdirectory_path, plate_to_file_mapping):
 
     for plate, plate_file in plate_file_pairs:
         print(plate_file)
-        with open(envision_dir + '/' + plate_file, 'r') as file:
-            sPlate, sPlateFile = extractPlate(file, subdirectory_path, plate)
-
+        try:
+            with open(envision_dir + '/' + plate_file, 'r') as file:
+                sPlate, sPlateFile = extractPlate(file, subdirectory_path, plate)
             saPreparedPlateMapping['plate'].append(sPlate)
             saPreparedPlateMapping['file'].append(sPlateFile)
+        except:
+            assaylib.printPrepLog(self, f'Failed to open file: {plate_file}', 'error')
+
 
     df = pd.DataFrame(saPreparedPlateMapping)
     df = df.sort_values(by='plate')
