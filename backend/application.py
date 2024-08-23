@@ -227,7 +227,6 @@ class PingDB(tornado.web.RequestHandler):
 
 
 def implSaveSpRowToDb(self, row, targetTable):
-    return 1, 2
     def nullifyNumeric(sString):
         if sString == '':
             return 'NULL'
@@ -235,39 +234,29 @@ def implSaveSpRowToDb(self, row, targetTable):
             return sString
         
     assayDB = getDatabase(self)
-    arg_dict = {}
-    file_dict = {}
-    try:
-        tornado.httputil.parse_body_arguments(self.request.headers["Content-Type"],
-                                              self.request.body,
-                                              arg_dict,
-                                              file_dict)
-    except:
-        self.set_status(400)
-        self.finish('Decode failed')
-        return
 
-    sCompound = arg_dict['compound_id'][0].decode('utf-8')
-    sBatch = arg_dict['batch_id'][0].decode('utf-8')
-    sTarget = arg_dict['target'][0].decode('utf-8')
-    sProject = arg_dict['project'][0].decode('utf-8')
-    sPlate = arg_dict['plate'][0].decode('utf-8')
-    sWell = arg_dict['well'][0].decode('utf-8')
-    sAssay_type = arg_dict['assay_type'][0].decode('utf-8')
-    sDetection_type = arg_dict['detection_type'][0].decode('utf-8')
-    sConcentration = nullifyNumeric(arg_dict['concentration'][0].decode('utf-8'))
-    sInhibition = nullifyNumeric(arg_dict['inhibition'][0].decode('utf-8'))
-    sActivation = nullifyNumeric(arg_dict['activation'][0].decode('utf-8'))
-    sHit = arg_dict['hit'][0].decode('utf-8')
-    sHit_threshold = nullifyNumeric(arg_dict['hit_threshold'][0].decode('utf-8'))
-    sExperiment_date = arg_dict['experiment_date'][0].decode('utf-8')
-    sOperator = arg_dict['operator'][0].decode('utf-8')
-    sEln = arg_dict['eln'][0].decode('utf-8')
-    sComment = arg_dict['comment'][0].decode('utf-8')
+    sCompound = row['compound_id']
+    #return 1, 2
+    sBatch = row['batch_id']
+    sTarget = row['target']
+    sProject = row['project']
+    sPlate = row['plate']
+    sWell = row['well']
+    sAssay_type = row['assay_type']
+    sDetection_type = row['detection_type']
+    sConcentration = nullifyNumeric(row['concentration'])
+    sInhibition = nullifyNumeric(row['inhibition'])
+    sActivation = nullifyNumeric(row['activation'])
+    sHit = row['hit']
+    sHit_threshold = nullifyNumeric(row['hit_threshold'])
+    sExperiment_date = row['experiment_date']
+    sOperator = row['operator']
+    sEln = row['eln']
+    sComment = row['comment']
         
     #sSql = f'''insert into {assayDB}.lcb_sp
     # Replace the next with the line above when we go live
-    sSql = f'''insert into assay_test.lcb_sp
+    sSql = f'''insert into assay_test.{targetTable}
     (compound_id,
     compound_batch,
     project,
@@ -307,14 +296,17 @@ def implSaveSpRowToDb(self, row, targetTable):
     now())
     '''
 
+    sError = ''
+    sStatus = 200
     try:
-        #cur.execute(sSql)
-        pass
+        cur.execute(sSql)
+        #logging.info(f"{sSql}")
     except Exception as e:
         sError = f"{str(e)}"
         logging.error(sError)
         self.set_status(400)
-        self.finish(sError)
+        sStatus = 400
+    return sStatus, sError
 
 
 @jwtauth
@@ -322,19 +314,26 @@ class SaveSpRowToDb(tornado.web.RequestHandler):
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body)
         saRows = data.get('rows')
-        logging.info(f"Type of saRows: {type(saRows[0])}")
-        return
-        saRows = ast.literal_eval(saRows)
-
         targetTable = data.get("targetTable")
-        logging.info(targetTable)
 
+        if targetTable == 'Primary screen':
+            targetTable = 'lcb_sp'
+        elif targetTable == 'Confirmation screen':
+            targetTable = ''
+        elif targetTable == 'Counter screen':
+            targetTable = ''
+        else:
+            self.set_status(400)
+            self.finish()
+            return
+            
         saError = []
+        iRowIndex = 0
         for row in saRows:
-            logging.info(f'Error {row[0]}')
-            status, sMessage = implUploadWellInformation(self, row, targetTable)
+            status, sMessage = implSaveSpRowToDb(self, row, targetTable)
             if status != 200:
                 saError.append(row)
+            iRowIndex += 1
                 
         self.set_header("Content-Type", "application/json")
         if len(saError) != 0:
