@@ -115,6 +115,7 @@ class SinglePointScreen(QMainWindow):
 
 
     def saveSpToDb(self):
+        self.updateGrid()
         
         def repopulate_errors(df):
             self.populate_table(df, 'compound_id', insertRows=True, error=True)
