@@ -19,6 +19,12 @@ from os.path import exists
 
 db = mydb.disconnectSafeConnect()
 cur = db.cursor()
+'''
+logging.basicConfig(level=logging.ERROR, 
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.StreamHandler(), 
+                              logging.FileHandler('app.log', encoding='utf-8')])
+'''
 
 def res2json():
     result = [list(i) for i in cur.fetchall()]
@@ -298,11 +304,12 @@ def implSaveSpRowToDb(self, row, targetTable):
 
     sError = ''
     sStatus = 200
+    
     try:
+        sSql = sSql.encode('utf-8', 'replace').decode('utf-8')
         cur.execute(sSql)
-        #logging.info(f"{sSql}")
     except Exception as e:
-        sError = f"{str(e)}"
+        sError = f"{str(e).encode('utf-8', 'replace').decode('utf-8')}"
         logging.error(sError)
         self.set_status(400)
         sStatus = 400
