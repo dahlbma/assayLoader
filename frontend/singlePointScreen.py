@@ -115,18 +115,38 @@ class SinglePointScreen(QMainWindow):
 
 
     def saveSpToDb(self):
+        
+        def repopulate_errors(df):
+            self.populate_table(df, 'compound_id', insertRows=True, error=True)
+            self.populate_table(df, 'batch_id', error=True)
+            self.populate_table(df, 'target', error=True)
+            self.populate_table(df, 'project', error=True)
+            self.populate_table(df, 'plate', error=True)
+            self.populate_table(df, 'well', error=True)
+            self.populate_table(df, 'assay_type', error=True)
+            self.populate_table(df, 'detection_type', error=True)
+            self.populate_table(df, 'concentration', error=True)
+            self.populate_table(df, 'inhibition', error=True)
+            self.populate_table(df, 'activation', error=True)
+            self.populate_table(df, 'hit', error=True)
+            self.populate_table(df, 'hit_threshold', error=True)
+            self.populate_table(df, 'experiment_date', error=True)
+            self.populate_table(df, 'operator', error=True)
+            self.populate_table(df, 'eln', error=True)
+            self.populate_table(df, 'comment', error=True)
 
-        def color_row_red(row):
-            for col in range(self.sp_table.columnCount()):
-                item = self.sp_table.item(row, col)
-                if item:
-                    item.setBackground(QColor('red'))
+        
+        repopulate_data = []
 
         def uploadRows(rows, targetTable):
+            if accumulated_rows == []:
+                return
+
             sRes, lStatus = dbInterface.saveSpRowToDb(self.token, accumulated_rows, targetTable)
             
             if lStatus == False:
-                color_row_red(row)
+                for ro in sRes:
+                    repopulate_data.append(ro)
 
         accumulated_rows = []
         iAccumulator_count = 0
@@ -150,11 +170,15 @@ class SinglePointScreen(QMainWindow):
                 uploadRows(accumulated_rows, targetTable)
                 accumulated_rows = []
                 iAccumulator_count = 0
-                
+            
             QApplication.processEvents()
 
         if iAccumulator_count > 0:
             uploadRows(accumulated_rows, targetTable)
+
+        self.sp_table.setRowCount(0)
+        dfRepopulate = pd.DataFrame(repopulate_data)
+        repopulate_errors(dfRepopulate)
         QApplication.restoreOverrideCursor()
         
 
@@ -680,8 +704,7 @@ class SinglePointScreen(QMainWindow):
         self.runQc_btn.setEnabled(True)
 
 
-    def populate_table(self, dataframe, column_name, insertRows=False):
-
+    def populate_table(self, dataframe, column_name, insertRows=False, error=False):
         def insertRow(iNrOfRows, iNrOfCols):
             iLocalCol = 0
             for iRow in range(iNrOfRows):
@@ -703,8 +726,9 @@ class SinglePointScreen(QMainWindow):
         iRow_index = 0
         for row_index, row_data in dataframe.iterrows():
             item = QTableWidgetItem(str(row_data[column_name]))
-
             self.sp_table.setItem(iRow_index, iCol, item)
+            if error == True:
+                item.setBackground(QBrush(QColor('red')))
             iRow_index += 1
 
 
@@ -786,7 +810,7 @@ class SinglePointScreen(QMainWindow):
         self.populate_table(dfQcData, 'plate')
         self.populate_table(dfQcData, 'well')
         self.populate_table(dfQcData, 'concentration')
-
+        
         self.populateColumn('hit_threshold', newHitThreshold)
 
         QApplication.restoreOverrideCursor()

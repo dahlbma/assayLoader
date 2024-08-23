@@ -1,5 +1,6 @@
 import requests
 import json
+import ast
 
 baseUrl = 'http://esox3.scilifelab.se:8084/'
 
@@ -156,7 +157,8 @@ def saveSpRowToDb(token, rows, targetTable):
                       json = data)
     
     if r.status_code != 200:
-        return r.content.decode(), False
+        data = ast.literal_eval(r.content.decode())
+        return data, False
     else:
         return r.content.decode(), True
 
