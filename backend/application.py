@@ -151,7 +151,9 @@ class GetProjects(tornado.web.RequestHandler):
 @jwtauth
 class GetTargets(tornado.web.RequestHandler):
     def get(self):
-        sSql = f'select target_id from hive.target_details order by target_id'
+        sSql = f'''select target_id from hive.target_details
+        where hive.target_details.terminated is null
+        order by target_id'''
         cur.execute(sSql)
         res = res2json()
         self.finish(res)
