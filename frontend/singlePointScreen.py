@@ -242,7 +242,7 @@ class SinglePointScreen(QMainWindow):
     def updateGrid(self):
         self.populateColumn('project', self.project_cb.currentText())
         self.populateColumn('operator', self.operator_cb.currentText())
-        self.populateColumn('target', self.target_eb.text())
+        self.populateColumn('target', self.target_cb.currentText())
         self.populateColumn('assay_type', self.assayType_cb.currentText())
         self.populateColumn('detection_type', self.detectionType_cb.currentText())
         testDate = self.testDate.date()
@@ -261,8 +261,8 @@ class SinglePointScreen(QMainWindow):
         saOperators = dbInterface.getOperators(self.token)
         self.operator_cb.addItems(saOperators)
 
-        #saTargets = dbInterface.getTargets(self.token)
-        #self.target_eb.addItems(saTargets)
+        saTargets = dbInterface.getTargets(self.token)
+        self.target_cb.addItems(saTargets)
 
         saModelTypes = [
             'Cell_Line',
