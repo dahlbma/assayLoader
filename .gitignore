@@ -64,6 +64,7 @@ coverage.xml
 docs/_build/
 
 # Excluded Files
+backend/scarabSqlError.txt
 nohup.out
 frontend/export_tubeids.txt
 backend/R/.Rhistory
