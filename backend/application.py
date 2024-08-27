@@ -45,6 +45,11 @@ def getDatabase(parent):
         return 'assay_test'
 
 
+class FaviconHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.set_status(204)  # No Content
+
+
 class GetDatabase(tornado.web.RequestHandler):
     def get(self):
         sRes = json.dumps([['Live'], ['Test']])
@@ -223,13 +228,15 @@ class GetBatchCompound(tornado.web.RequestHandler):
 class PingDB(tornado.web.RequestHandler):
     def get(self):
         sSql = "SELECT * FROM glass.box_sequence"
-        cur.execute(sSql)
+        #cur.execute(sSql)
+        cur.ping()
         
     def head(self):
-        sSql = "SELECT * FROM glass.box_sequence"
-        cur.execute(sSql)
-        res = cur.fetchall()
-        self.finish()
+        cur.ping()
+        #sSql = "SELECT * FROM glass.box_sequence"
+        #cur.execute(sSql)
+        #res = cur.fetchall()
+        #self.finish()
 
 
 def implSaveSpRowToDb(self, row, targetTable):

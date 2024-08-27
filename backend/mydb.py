@@ -1,4 +1,5 @@
 import MySQLdb 
+from MySQLdb import OperationalError
 import config
 import logging
 
@@ -20,8 +21,10 @@ scarabLogger = setup_logger('scara_logger', 'scarabSqlError.txt')
 class DisconnectSafeCursor(object):
     db = None
     cursor = None
+    conn = None
     scarabCursor = None
-
+    scarabConn = None
+    
     def __init__(self, db, cursor):
         self.db = db
         self.cursor = cursor
@@ -34,13 +37,13 @@ class DisconnectSafeCursor(object):
     def ping(self, *args, **kwargs):
         ret = ''
         try:
-            sScarabErr = self.scarabCursor.execute(*args, **kwargs)
-        except Exception as e:
-            scarabLogger.error(str(e))
-            scarabLogger.error(args)
+            self.db.conn.ping(True)
+            self.db.scarabConn.ping(True)
+        except OperationalError as e:
+            scarabLogger.error(f"OperationalError: {e}")
+            if e.args[0] == 2006:  # MySQL server has gone away
+                scarabLogger.error(str(e))
             ret = 'error'
-        self.cursor.execute(*args, **kwargs)
-
         return ret
             
 
@@ -115,7 +118,6 @@ class DisconnectSafeConnection(object):
         self.scarabConn.query('SET GLOBAL connect_timeout=28800')
         self.scarabConn.query('SET GLOBAL interactive_timeout=28800')
         self.scarabConn.query('SET GLOBAL wait_timeout=28800')
-
 
         
   

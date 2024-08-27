@@ -120,6 +120,7 @@ def make_app():
     return tornado.web.Application([
         (r"/getDatabase", application.GetDatabase),
         (r"/login", login),
+        (r"/favicon.ico", application.FaviconHandler),
         (r"/pingDB", application.PingDB),
         (r"/getVersionData", GetVersionData),
         (r"/getSinglePointConfig", application.GetSinglePointConfig),
