@@ -13958,4 +13958,4 @@
 2024-04-09 10:42:33,055 ERROR ("select\n        config_id plate,\n        well,\n        compound_id,\n        notebook_ref batch_id,\n        conc,\n        volume\n        from cool.config where config_id = 'P104779'\n        ",)
 2024-04-09 10:42:33,064 ERROR (2006, 'MySQL server has gone away')
 2024-04-09 10:42:33,064 ERROR ("select\n        config_id plate,\n        well,\n        compound_id,\n        notebook_ref batch_id,\n        conc,\n        volume\n        from cool.config where config_id = 'P104781'\n        ",)
-2024-08-26 10:12:01,392 ERROR kalle
+2024-08-26 10:12:01,392 ERROR kalle 

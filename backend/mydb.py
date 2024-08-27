@@ -40,9 +40,9 @@ class DisconnectSafeCursor(object):
             self.db.conn.ping(True)
             self.db.scarabConn.ping(True)
         except OperationalError as e:
-            scarabLogger.error(f"OperationalError: {e}")
+            scarabLogger.error(f"OperationalError: {str(e)}")
             if e.args[0] == 2006:  # MySQL server has gone away
-                scarabLogger.error(str(e))
+                scarabLogger.error('Server gone away')
             ret = 'error'
         return ret
             
