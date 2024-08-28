@@ -115,7 +115,25 @@ class SinglePointScreen(QMainWindow):
 
 
     def saveSpToDb(self):
-        self.updateGrid()
+
+        def getDateColumn():
+            column_count = self.sp_table.columnCount()
+            # Initialize an empty list to store column names
+            column_names = []
+
+            # Loop through each column index
+            for col in range(column_count):
+                # Get the horizontal header item for the column
+                header_item = self.sp_table.horizontalHeaderItem(col)
+    
+                # Check if the header item is not None
+                if header_item.text() == 'experiment_date':
+                    return col
+        iDateCol = getDateColumn()
+        item = self.sp_table.item(0, iDateCol)
+        
+        if self.sp_table.rowCount() > 0 and item is not None and item.text().strip() == "":
+            self.updateGrid()
         
         def repopulate_errors(df):
             self.populate_table(df, 'compound_id', insertRows=True, error=True)
