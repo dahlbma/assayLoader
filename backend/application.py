@@ -229,19 +229,14 @@ class GetBatchCompound(tornado.web.RequestHandler):
 
 class PingDB(tornado.web.RequestHandler):
     def get(self):
-        sSql = "SELECT * FROM glass.box_sequence"
-        #cur.execute(sSql)
         cur.ping()
         
     def head(self):
         cur.ping()
-        #sSql = "SELECT * FROM glass.box_sequence"
-        #cur.execute(sSql)
-        #res = cur.fetchall()
-        #self.finish()
 
 
 def implSaveSpRowToDb(self, row, targetTable):
+    
     def nullifyNumeric(sString):
         if sString == '':
             return 'NULL'
@@ -327,6 +322,7 @@ def implSaveSpRowToDb(self, row, targetTable):
 
 @jwtauth
 class SaveSpRowToDb(tornado.web.RequestHandler):
+    
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body)
         saRows = data.get('rows')
@@ -335,9 +331,9 @@ class SaveSpRowToDb(tornado.web.RequestHandler):
         if targetTable == 'Primary screen':
             targetTable = 'lcb_sp'
         elif targetTable == 'Confirmation screen':
-            targetTable = ''
+            targetTable = 'lcb_sp_confirming'
         elif targetTable == 'Counter screen':
-            targetTable = ''
+            targetTable = 'lcb_sp_counter'
         else:
             self.set_status(400)
             self.finish()
