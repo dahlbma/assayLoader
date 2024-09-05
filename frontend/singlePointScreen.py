@@ -554,7 +554,7 @@ class SinglePointScreen(QMainWindow):
         saDataLines = None
         iNrOfCols = 0
         iLineNumber = 0
-
+        
         # Skip all the lines in the start of the file, look for where the 'Well' appears
         for line in saLines:
             saLine = line.split(',')
@@ -670,7 +670,6 @@ class SinglePointScreen(QMainWindow):
 
         for row, (sPlate, sFile) in enumerate(self.plate_file_dict.items()):
             full_path = os.path.join(path_to_data_dir, sFile)
-
             try:
                 with open(full_path, 'r') as file:
                     (saDataLines,
@@ -682,7 +681,6 @@ class SinglePointScreen(QMainWindow):
                         iDataColPosition = int(iDataColPosition)
                     except:
                         continue
-                    
                     dfPlate = self.extractData(sFile,
                                                sPlate,
                                                saDataLines,

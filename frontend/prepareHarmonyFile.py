@@ -28,6 +28,7 @@ def parseHarmonyFile(self, sDestDir, sFullFileName, sPlate):
                     break
             iLinesAgain = 0
             for line in lines:
+                line = line.replace(',', '.')
                 iLinesAgain += 1
                 if iLinesAgain > iLine:
                     number_list = line.split('\t')
