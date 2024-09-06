@@ -269,8 +269,11 @@ class DoseResponseScreen(QMainWindow):
         
         # Final volume in nano liter (nL)
         final_volume = float(self.finalWellVolumeMicroliter_eb.text())*1000.0
-        platemapDf['finalConc_nM'] = (platemapDf['Conc mM']* 1000000 * platemapDf['volume nL']) / final_volume
-        print(rawDataFilesDf)
+        if len(platemapDf) > 0:
+            platemapDf['finalConc_nM'] = (platemapDf['Conc mM']* 1000000 * platemapDf['volume nL']) / final_volume
+        else:
+            assaylib.printPrepLog(self, f'Error: No data lines in platemap, are the plates loaded into Cello?', 'error')
+            return
         
         rawDatafile = rawDataFilesDf.iloc[0]['file']
         saDataColumns = assaylib.findDataColumns(rawDatafile)
