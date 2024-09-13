@@ -170,7 +170,6 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
 
     for _ in range(num_iterations):
         iCount += 1
-        #print(iCount)
         # Compute predictions
         y_pred = four_parameter_logistic(x, slope, ic50, bottom, top)
         
@@ -184,8 +183,8 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
                                                                                                  top,
                                                                                                  learning_rate,
                                                                                                  ic50_step)
-        if abs(old_rmse - rmse) < 0.01:
-            learning_rate *= 0.95
+        if abs(old_rmse - rmse) < 1:
+            learning_rate *= 0.98
         if lStop:
             learning_rate = learning_rate / 1.1
         if learning_rate < 0.001:
@@ -197,7 +196,9 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
         ic50 = abs(ic50)
         bottom = new_bottom
         top = new_top
-
+        if rmse < old_rmse:
+            old_rmse = rmse
+        
         #print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
         y_curve_fit = four_parameter_logistic(x_curve, slope, ic50, bottom, top)
 
