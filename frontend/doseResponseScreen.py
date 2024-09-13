@@ -162,6 +162,7 @@ class DoseResponseScreen(QMainWindow):
             except:
                 pass
         self.updatePlot(iCurrentRow, res)
+        self.saveExcel_btn.setEnabled(True)
 
 
     def updatePlot(self, row, includedPoints):

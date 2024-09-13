@@ -43,10 +43,17 @@ def calculate_distr(val, x):
     return distr
 
 def getLinReg(x, y):
+    # Remove the last element in the arrays
+    if len(x) > 3:
+        x = x[:-1]
+        y = y[:-1]
+    elif len(x) == 1:
+        return 1, y[0]
+
     # Perform linear regression
     coefficients = np.polyfit(x, y, 1)
     slope, intercept = coefficients  # m is the slope, b is the intercept
-    
+
     # Create fitted line
     fitted_line_x = np.linspace(min(x), max(x), 100)
     fitted_line_y = slope * fitted_line_x + intercept
