@@ -202,7 +202,7 @@ class DoseResponseTable(QTableWidget):
             self.plotCurve(batch_df, rowPosition, yScale)
 
         dialog.close()
-        self.saveToExcel()
+        self.saveToExcel('DR_Excel.xlsx')
         return batch_df
 
 
