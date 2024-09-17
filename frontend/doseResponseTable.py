@@ -4,7 +4,7 @@ import os
 import json
 import sys
 import numpy as np
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication, QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -256,8 +256,35 @@ class DoseResponseTable(QTableWidget):
         self.setItem(rowPosition, self.auc_col, item)
 
 
-    def saveToExcel(self):
+    def saveToExcel(self, sFileName = None):
         sDir = self.workingDirectory
+        sFile = 'DR_Excel.xlsx'
+        file_path = os.path.join(sDir, sFile)
+
+        imgDir = sDir + '/img'
+        if not os.path.exists(imgDir):
+            # Create the directory and any missing parent directories
+            os.makedirs(imgDir)
+        
+        if sFileName in (None, False):
+            sDefaultFile = os.path.join(sDir, sFile)
+            # Open a file dialog to select the location and file name for saving
+            options = QFileDialog.Options()
+            file_name, _ = QFileDialog.getSaveFileName(self, "Save As", sDefaultFile,
+                                                       "Excel Files (*.xlsx *.xls)",
+                                                       options=options)
+
+            file_path = file_name
+            if file_name in ('', None):
+                return
+            sDir = os.path.dirname(file_name)
+
+            imgDir = sDir + '/img'
+            if not os.path.exists(imgDir):
+                # Create the directory and any missing parent directories
+                os.makedirs(imgDir)
+
+            
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
         for row in range(self.rowCount()):
@@ -271,7 +298,6 @@ class DoseResponseTable(QTableWidget):
         wb = Workbook()
         ws = wb.active
 
-        file_path = os.path.join(sDir, 'DR_Excel.xlsx')
         headings = ["Batch", "Compound", "IC50", "Fit quality", "Slope",
                     "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
 
@@ -292,11 +318,6 @@ class DoseResponseTable(QTableWidget):
                         ws.cell(row=r_idx, column=c_idx, value=value)
                 else:
                     ws.cell(row=r_idx, column=c_idx, value=value)
-
-        imgDir = sDir + '/img'
-        if not os.path.exists(imgDir):
-            # Create the directory and any missing parent directories
-            os.makedirs(imgDir)
 
         # Add scatterplots to Excel
         for i, canvas in enumerate(df['Graph']):

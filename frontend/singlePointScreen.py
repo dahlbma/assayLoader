@@ -389,11 +389,12 @@ class SinglePointScreen(QMainWindow):
         directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
-        subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
+        subdirectory_path = os.path.join(selected_directory, "preparedHarmonyFiles")
         self.workingDirectory = subdirectory_path
-        if subdirectory_path == "preparedHaronyFiles":
+        if subdirectory_path == "preparedHarmonyFiles":
             return
 
+        delete_all_files_in_directory(subdirectory_path)
         findHarmonyFiles(self, subdirectory_path, selected_directory)
         
 

@@ -252,10 +252,11 @@ class DoseResponseScreen(QMainWindow):
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
 
-        subdirectory_path = os.path.join(selected_directory, "preparedHaronyFiles")
-        if subdirectory_path == "preparedHaronyFiles":
+        subdirectory_path = os.path.join(selected_directory, "preparedHarmonyFiles")
+        if subdirectory_path == "preparedHarmonyFiles":
             return
 
+        delete_all_files_in_directory(subdirectory_path)
         self.workingDirectory = subdirectory_path
         platemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
