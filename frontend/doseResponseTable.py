@@ -261,7 +261,7 @@ class DoseResponseTable(QTableWidget):
         sFile = 'DR_Excel.xlsx'
         file_path = os.path.join(sDir, sFile)
 
-        imgDir = sDir + '/img'
+        imgDir = self.workingDirectory + '/img'
         if not os.path.exists(imgDir):
             # Create the directory and any missing parent directories
             os.makedirs(imgDir)
@@ -279,7 +279,7 @@ class DoseResponseTable(QTableWidget):
                 return
             sDir = os.path.dirname(file_name)
 
-            imgDir = sDir + '/img'
+            #imgDir = sDir + '/img'
             if not os.path.exists(imgDir):
                 # Create the directory and any missing parent directories
                 os.makedirs(imgDir)
