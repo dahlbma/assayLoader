@@ -21,8 +21,6 @@ warnings.filterwarnings('ignore')
 def fourpl(x, slope, ic50, bottom, top):
     return bottom + (top - bottom) / (1 + (x / ic50)**slope)
 
-file_path = "finalPreparedDR.xlsx"
-
 class ScatterplotWidget(QWidget):
     def __init__(self, data_dict, rowPosition, yScale, workingDir, parent=None):
         super(ScatterplotWidget, self).__init__(parent)
