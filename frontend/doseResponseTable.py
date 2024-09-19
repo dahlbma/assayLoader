@@ -164,6 +164,7 @@ class DoseResponseTable(QTableWidget):
         self.auc_col = 9
         self.graph_col = 10
         self.workingDirectory = ''
+        self.parent = None
 
     def generate_scatterplots(self, file_path, yScale, parent):
         print('populating data')
@@ -175,7 +176,7 @@ class DoseResponseTable(QTableWidget):
         self.setRowCount(0)
         self.setColumnWidth(10, 600)
         df = pd.read_excel(file_path)
-
+        
         dialog = assaylib.CancelDialog(self)
         dialog.show()
 
@@ -281,7 +282,6 @@ class DoseResponseTable(QTableWidget):
             if not os.path.exists(imgDir):
                 # Create the directory and any missing parent directories
                 os.makedirs(imgDir)
-
             
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
@@ -302,7 +302,7 @@ class DoseResponseTable(QTableWidget):
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
             cell.font = Font(bold=True)
-    
+        
         # Write DataFrame to Excel
         for r_idx, row in enumerate(df.itertuples(index=False), start=2):  # Start from row 2 to leave space for header
             for c_idx, value in enumerate(row, start=1):
@@ -333,7 +333,14 @@ class DoseResponseTable(QTableWidget):
             ws.column_dimensions[chr(ord('A') + c_idx - 1)].width = 13  # Adjust the width as needed
 
         ws.column_dimensions[chr(ord('K'))].width = 40
+        
         # Save the Excel workbook
-
         wb.save(file_path)
         self.parent.saveExcel_btn.setEnabled(False)
+
+        if self.parent.finalPreparedDR['deselected'].any():
+            # There are rows where 'deselected' is True
+            # Save the new dataframe without the deselected datapoints
+            df_filtered = self.parent.finalPreparedDR[self.parent.finalPreparedDR['deselected'] == False]
+            df_filtered = df_filtered.drop(columns=['deselected'])
+            df_filtered.to_excel(self.parent.pathToFinalPreparedDR_deselects, index=False)

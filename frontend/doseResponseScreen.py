@@ -77,6 +77,11 @@ class DoseResponseScreen(QMainWindow):
         validator = QRegExpValidator(regex, self.finalWellVolumeMicroliter_eb)
         self.finalWellVolumeMicroliter_eb.setValidator(validator)
 
+        # This is the dataframe holding all the data to plot
+        self.finalPreparedDR = None
+        self.pathToFinalPreparedDR = None
+        self.pathToFinalPreparedDR_deselects = None
+        
         self.posCtrl_eb.setText('CTRL')
         
         self.selectHarmonyDirectory_btn.setEnabled(False)
@@ -173,6 +178,15 @@ class DoseResponseScreen(QMainWindow):
         else:
             return
 
+        iIndex = 0
+        for checkValue in includedPoints:
+            if checkValue == False:
+                batch = df.iloc[iIndex]['Batch nr']
+                compound = df.iloc[iIndex]['Compound ID']
+                conc = df.iloc[iIndex]['finalConc_nM']
+                self.deselectRow(batch, compound, conc)
+            iIndex += 1
+                
         selected_rows = df[includedPoints]
         widget.plot_scatter(selected_rows, self.yScale)
         self.doseResponseTable.updateTable(row, widget)
@@ -189,6 +203,10 @@ class DoseResponseScreen(QMainWindow):
                 self.yScale = 'Activation %'
             self.batch_df = self.doseResponseTable.generate_scatterplots(file, self.yScale, self)
             self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
+
+
+    def deselectRow(self, batch, compound, conc):
+        self.finalPreparedDR.loc[(self.finalPreparedDR['Batch nr'] == batch) & (self.finalPreparedDR['Compound ID'] == compound) & (self.finalPreparedDR['finalConc_nM'] == conc), 'deselected'] = True
 
         
     def selectDRInputFile(self):
@@ -347,10 +365,16 @@ class DoseResponseScreen(QMainWindow):
         resultDf = resultDf.rename(columns={'Batch': 'Batch', 'rawData': 'yMean'})
 
         excel_file_path = os.path.join(self.workingDirectory, 'finalPreparedDR.xlsx')
+        self.pathToFinalPreparedDR = excel_file_path
+
+        excel_file_path_deselected = os.path.join(self.workingDirectory, 'finalPreparedDR_deselected_datapoints.xlsx')
+        self.pathToFinalPreparedDR_deselects = excel_file_path_deselected
         
         #fullPath = os.path.join(sBasePath, excel_file_path)
         resultDf.to_excel(excel_file_path, index=False)
+        resultDf['deselected'] = False
+
+        self.finalPreparedDR = resultDf
         assaylib.printPrepLog(self, f'File prepared for dose response computation saved:')
         assaylib.printPrepLog(self, f'{excel_file_path}', type='bold')
         self.drInputFile_lab.setText(excel_file_path)
-
