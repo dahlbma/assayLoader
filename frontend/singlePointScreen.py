@@ -286,7 +286,11 @@ class SinglePointScreen(QMainWindow):
             'Cell_Line',
             'Protein',
             'Primary_Cell',
-            'Organism'            
+            'Organism',
+            'IPSC',
+            'Tissue',
+            'Virus',
+            'other'
             ]
         self.screenType_cb.addItems(saModelTypes)
 
