@@ -314,15 +314,28 @@ class SinglePointScreen(QMainWindow):
         ]
         self.targetTable_cb.addItems(saTargetTables)
         
-        #saDetectionType = dbInterface.getDetectionTypes(self.token)
         saViabilityMeasurement = [
             'Imaging',
             'Luminescence',
             'Other',
             'No'
         ]
-        self.detectionType_cb.addItems(saViabilityMeasurement)
+        saViabilityMeasurement = [
+            'Yes',
+            'No'
+        ]
 
+        saDetectionType = [
+            'Imaging',
+            'Luminescence',
+            'Other',
+            'No'
+        ]
+        
+        self.detectionType_cb.addItems(saDetectionType)
+        self.viabilityMeasure_cb.addItems(saViabilityMeasurement)
+
+        
         #saScreenType = dbInterface.getScreenTypes(self.token)
         #self.screenType_cb.addItems(saScreenType)
 
