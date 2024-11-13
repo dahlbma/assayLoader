@@ -77,8 +77,10 @@ class SinglePointScreen(QMainWindow):
         self.negCtrl_eb.editingFinished.connect(self.checkDataColumn)
         self.negCtrl_eb.setText('DMSO')
 
-        int_validator = QIntValidator()
-        self.hitThreshold_eb.setValidator(int_validator)
+        double_validator = QDoubleValidator()
+        double_validator.setLocale(double_validator.locale().c())  
+        
+        self.hitThreshold_eb.setValidator(double_validator)
         
         self.platemapFile_btn.clicked.connect(self.selectPlatemap)
         self.platemapFile_lab.setText('')
@@ -805,7 +807,7 @@ class SinglePointScreen(QMainWindow):
 
         iHitThreshold = self.hitThreshold_eb.text()
         try:
-            slask = int(iHitThreshold)
+            slask = float(iHitThreshold)
         except:
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
