@@ -236,7 +236,7 @@ class PingDB(tornado.web.RequestHandler):
 
 
 def implSaveSpRowToDb(self, row, targetTable):
-    
+
     def nullifyNumeric(sString):
         if sString == '':
             return 'NULL'
@@ -246,7 +246,6 @@ def implSaveSpRowToDb(self, row, targetTable):
     assayDB = getDatabase(self)
 
     sCompound = row['compound_id']
-    #return 1, 2
     sBatch = row['batch_id']
     sTarget = row['target']
     sProject = row['project']
@@ -266,7 +265,15 @@ def implSaveSpRowToDb(self, row, targetTable):
         
     #sSql = f'''insert into {assayDB}.lcb_sp
     # Replace the next with the line above when we go live
-    sSql = f'''insert into assay_test.{targetTable}
+
+    if targetTable == "assay_test.lcb_sp":
+        tTable = targetTable
+    else:
+        tTable = f'{assayDB}.{targetTable}'
+    #logging.info(f'Table {tTable}')
+    #return 200,2
+
+    sSql = f'''insert into {tTable}
     (compound_id,
     compound_batch,
     project,
@@ -328,7 +335,9 @@ class SaveSpRowToDb(tornado.web.RequestHandler):
         saRows = data.get('rows')
         targetTable = data.get("targetTable")
 
-        if targetTable == 'Primary screen':
+        if targetTable == 'Sandbox table':
+            targetTable = 'assay_test.lcb_sp'
+        elif targetTable == 'Primary screen':
             targetTable = 'lcb_sp'
         elif targetTable == 'Confirmation screen':
             targetTable = 'lcb_sp_confirming'

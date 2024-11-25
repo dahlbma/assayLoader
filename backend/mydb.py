@@ -53,7 +53,8 @@ class DisconnectSafeCursor(object):
                 return self.cursor.execute(*args, **kwargs)
             else:
                 try:
-                    self.scarabCursor.execute(*args, **kwargs)
+                    #self.scarabCursor.execute(*args, **kwargs)
+                    pass
                 except Exception as e:
                     if '_test' in args[0]:
                         pass
