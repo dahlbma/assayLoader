@@ -156,9 +156,7 @@ class SinglePointScreen(QMainWindow):
             self.populate_table(df, 'eln', error=True)
             self.populate_table(df, 'comment', error=True)
 
-        
         repopulate_data = []
-
         def uploadRows(rows, targetTable):
             if accumulated_rows == []:
                 return
@@ -246,18 +244,41 @@ class SinglePointScreen(QMainWindow):
 
 
     def save_to_csv(self, filename):
-        with open(filename, 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            
-            # Write header
-            header = [self.sp_table.horizontalHeaderItem(col).text() for col in range(self.sp_table.columnCount())]
-            csvwriter.writerow(header)
+        # Desired column order
+        column_order = [
+            "project", "target", "plate", "batch_id", "compound_id", 
+            "assay_type", "detection_type", "concentration", "inhibition", 
+            "activation", "hit", "hit_threshold", "experiment_date", 
+            "operator", "eln", "comment", "created_date", "well"
+        ]
+    
+        # Map column names to their current index in the table
+        header_to_index = {self.sp_table.horizontalHeaderItem(col).text(): col for col in range(self.sp_table.columnCount())}
 
-            # Write data
+        # Reorder indices based on the desired column order
+        #ordered_indices = [header_to_index[col_name] for col_name in column_order]
+        ordered_indices = [
+            header_to_index[col_name] if col_name in header_to_index else None 
+            for col_name in column_order
+        ]
+        
+        # Open the CSV file for writing
+        with open(filename, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file, delimiter='\t')
+        
+            # Write the header row in the desired order
+            writer.writerow(column_order)
+
+            # Write each row of data
             for row in range(self.sp_table.rowCount()):
-                row_data = [self.sp_table.item(row, col).text() for col in range(self.sp_table.columnCount())]
-                csvwriter.writerow(row_data)
-
+                row_data = []
+                for col in ordered_indices:
+                    if col is None:  # If it's the 'created_date' column
+                        row_data.append("")  # Append a blank value
+                    else:
+                        cell = self.sp_table.item(row, col)
+                        row_data.append(cell.text() if cell else "")
+                writer.writerow(row_data)
 
     def updateGrid(self):
         self.populateColumn('project', self.project_cb.currentText())
@@ -310,6 +331,7 @@ class SinglePointScreen(QMainWindow):
         self.assayType_cb.addItems(saAssayTypes)
 
         saTargetTables = [
+            "Sandbox table",
             "Primary screen",
             "Confirmation screen",
             "Counter screen"
@@ -378,7 +400,7 @@ class SinglePointScreen(QMainWindow):
                 dbInterface.printPlateLabel(self.token, sCurrentPlate)
                 self.printPrepLog(f"Print label {sCurrentPlate}")
 
-        
+
     def prepareEnvisionFiles(self):
         subdirectory_path = ''
         options = QFileDialog.Options()

@@ -335,6 +335,7 @@ class DoseResponseScreen(QMainWindow):
         
         excel_file_path = os.path.join(self.workingDirectory, 'dose_response_platemap.xlsx')
         platemapDf.to_excel(excel_file_path, index=False)
+
         
         # Group by 'Batch' and calculate mean and yStd
         grouped_df = platemapDf.groupby(['Batch nr',
