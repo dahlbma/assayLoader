@@ -411,6 +411,7 @@ class SinglePointScreen(QMainWindow):
 
 
     def prepareEnvisionFiles(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         subdirectory_path = ''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -426,8 +427,11 @@ class SinglePointScreen(QMainWindow):
         self.workingDirectory = prepared_path
         if prepared_path == "preparedEnvisionFiles":
             return
-
-        findEnvisionFiles(self, prepared_path, fileName)
+        sPlatemapFile, fullFileName = findEnvisionFiles(self, prepared_path, fileName)
+        self.selectPlatemap(sPlatemapFile)
+        self.selectFileToPlateMap(fullFileName)
+        self.instrument_cb.setCurrentText('Envision')
+        QApplication.restoreOverrideCursor()
 
 
     def prepareHarmonyFiles(self):
@@ -639,11 +643,12 @@ class SinglePointScreen(QMainWindow):
         return saDataLines, iDataColPosition, iWellColPosition
 
 
-    def selectFileToPlateMap(self):
+    def selectFileToPlateMap(self, file_path = False):
         self.inputFiles_tab.setRowCount(0)
-        file_paht = ''
 
-        file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")      
+        if file_path == False:
+            file_paht = ''
+            file_path, _ = QFileDialog.getOpenFileName(None, "Open File", "", "All Files (*);;Text Files (*.txt)")      
  
         if not file_path:
             return
@@ -682,8 +687,9 @@ class SinglePointScreen(QMainWindow):
             self.printQcLog(f'''Can't find any data lines in file {full_path}''', 'error')
 
 
-    def selectPlatemap(self):
-        platemap, _ = QFileDialog.getOpenFileName(self, "Open File", self.workingDirectory)
+    def selectPlatemap(self, platemap = False):
+        if platemap == False:
+            platemap, _ = QFileDialog.getOpenFileName(self, "Open File", self.workingDirectory)
 
         if platemap:
             self.platemapDf = pd.read_excel(platemap)
