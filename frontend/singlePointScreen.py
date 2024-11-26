@@ -171,6 +171,11 @@ class SinglePointScreen(QMainWindow):
         iAccumulator_count = 0
         iRowsBatch = 8
         targetTable = self.targetTable_cb.currentText()
+        self.popup = PopUpProgress(f'Uploading data')
+        self.popup.show()
+        iNrOfRows = self.sp_table.rowCount()
+        iTick = 0
+        rProgressSteps = (iRowsBatch/iNrOfRows)*100
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
         for row in range(self.sp_table.rowCount()):
@@ -190,7 +195,9 @@ class SinglePointScreen(QMainWindow):
                 accumulated_rows = []
                 iAccumulator_count = 0
             
-            QApplication.processEvents()
+                iTick += rProgressSteps
+                self.popup.obj.proc_counter(int(iTick))
+                QApplication.processEvents()
 
         if iAccumulator_count > 0:
             uploadRows(accumulated_rows, targetTable)
@@ -199,7 +206,9 @@ class SinglePointScreen(QMainWindow):
         dfRepopulate = pd.DataFrame(repopulate_data)
         repopulate_errors(dfRepopulate)
         QApplication.restoreOverrideCursor()
-        
+        self.popup.obj.proc_counter(100)
+        self.popup.close()
+
 
     def createPlatemap(self, platesDf, subdirectory_path):
         columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
