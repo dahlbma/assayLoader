@@ -425,7 +425,6 @@ class SinglePointScreen(QMainWindow):
 
 
     def prepareEnvisionFiles(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
         subdirectory_path = ''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -440,9 +439,13 @@ class SinglePointScreen(QMainWindow):
         delete_all_files_in_directory(prepared_path)
         self.workingDirectory = prepared_path
         if prepared_path == "preparedEnvisionFiles":
+            return
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            sPlatemapFile, fullFileName = findEnvisionFiles(self, prepared_path, fileName)
+        except:
             QApplication.restoreOverrideCursor()
             return
-        sPlatemapFile, fullFileName = findEnvisionFiles(self, prepared_path, fileName)
         self.selectPlatemap(sPlatemapFile)
         self.selectFileToPlateMap(fullFileName)
         self.instrument_cb.setCurrentText('Envision')
