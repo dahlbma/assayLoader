@@ -440,6 +440,7 @@ class SinglePointScreen(QMainWindow):
         delete_all_files_in_directory(prepared_path)
         self.workingDirectory = prepared_path
         if prepared_path == "preparedEnvisionFiles":
+            QApplication.restoreOverrideCursor()
             return
         sPlatemapFile, fullFileName = findEnvisionFiles(self, prepared_path, fileName)
         self.selectPlatemap(sPlatemapFile)
