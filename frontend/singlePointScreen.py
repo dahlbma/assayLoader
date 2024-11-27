@@ -98,6 +98,7 @@ class SinglePointScreen(QMainWindow):
 
         self.populateScreenData()
         self.updateGrid_btn.clicked.connect(self.updateGrid)
+        self.loadAssayFile_btn.clicked.connect(self.loadAssayDataFromFile)
         self.saveData_btn.clicked.connect(self.saveSpToDb)
         
         self.form_values = {
@@ -252,43 +253,56 @@ class SinglePointScreen(QMainWindow):
             self.sp_table.setItem(iRow_index, iCol, item)
 
 
-    def save_to_csv(self, filename):
-        # Desired column order
-        column_order = [
-            "project", "target", "plate", "batch_id", "compound_id", 
-            "assay_type", "detection_type", "concentration", "inhibition", 
-            "activation", "hit", "hit_threshold", "experiment_date", 
-            "operator", "eln", "comment", "created_date", "well"
-        ]
-    
-        # Map column names to their current index in the table
-        header_to_index = {self.sp_table.horizontalHeaderItem(col).text(): col for col in range(self.sp_table.columnCount())}
-
-        # Reorder indices based on the desired column order
-        #ordered_indices = [header_to_index[col_name] for col_name in column_order]
-        ordered_indices = [
-            header_to_index[col_name] if col_name in header_to_index else None 
-            for col_name in column_order
-        ]
-        
+    def save_to_csv(self, filename):        
         # Open the CSV file for writing
         with open(filename, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file, delimiter='\t')
-        
-            # Write the header row in the desired order
-            writer.writerow(column_order)
+
+            # Write the header row
+            header = [self.sp_table.horizontalHeaderItem(col).text() for col in range(self.sp_table.columnCount())]
+            writer.writerow(header)
 
             # Write each row of data
             for row in range(self.sp_table.rowCount()):
                 row_data = []
-                for col in ordered_indices:
-                    if col is None:  # If it's the 'created_date' column
-                        row_data.append("")  # Append a blank value
-                    else:
-                        cell = self.sp_table.item(row, col)
-                        row_data.append(cell.text() if cell else "")
+                for col in range(self.sp_table.columnCount()):
+                    item = self.sp_table.item(row, col)
+                    row_data.append(item.text() if item else "")
                 writer.writerow(row_data)
 
+
+    def loadAssayDataFromFile(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+
+        loadAssayDataDialog = QFileDialog()
+        loadAssayDataDialog.setOptions(options)
+
+        fileName, _ = loadAssayDataDialog.getOpenFileName(self, "Select CSV File", "", "CSV Files (*.csv *.CSV)")
+
+        if not fileName:
+            return
+
+        # Read CSV file
+        with open(fileName, 'r') as file:
+            reader = csv.reader(file, delimiter='\t')
+            header = next(reader)  # Skip the header row
+            data = list(reader)
+
+        # Set table dimensions
+        self.sp_table.setRowCount(len(data))
+        self.sp_table.setColumnCount(len(data[0]))
+
+        # Populate table with data
+        for row in range(len(data)):
+            for col in range(len(data[0])):
+                item = QTableWidgetItem(data[row][col])
+                self.sp_table.setItem(row, col, item)
+
+        
+        print(fileName)
+
+                
     def updateGrid(self):
         self.populateColumn('project', self.project_cb.currentText())
         self.populateColumn('operator', self.operator_cb.currentText())
