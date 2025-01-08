@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1473</width>
-    <height>886</height>
+    <width>1691</width>
+    <height>878</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1364,6 +1364,11 @@
                   </column>
                   <column>
                    <property name="text">
+                    <string>viability_measurement</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
                     <string>detection_type</string>
                    </property>
                   </column>
@@ -1485,8 +1490,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1473</width>
-     <height>20</height>
+     <width>1691</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
