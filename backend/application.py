@@ -253,6 +253,7 @@ def implSaveSpRowToDb(self, row, targetTable):
     sWell = row['well']
     sAssay_type = row['assay_type']
     sDetection_type = row['detection_type']
+    sSiability_measurement = row['viability_measurement']
     sConcentration = nullifyNumeric(row['concentration'])
     sInhibition = nullifyNumeric(row['inhibition'])
     sActivation = nullifyNumeric(row['activation'])
@@ -282,6 +283,7 @@ def implSaveSpRowToDb(self, row, targetTable):
     WELL_ID,
     assay_type,
     detection_type,
+    viability_measurement,
     INHIBITION,
     ACTIVATION,
     HIT,
@@ -301,6 +303,7 @@ def implSaveSpRowToDb(self, row, targetTable):
     '{sWell}',
     '{sAssay_type}',
     '{sDetection_type}',
+    '{sSiability_measurement}',
     {sInhibition},
     {sActivation},
     '{sHit}',
