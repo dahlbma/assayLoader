@@ -121,7 +121,8 @@ class DoseResponseScreen(QMainWindow):
             item = self.dataPoints_layout.itemAt(i)
             
             widg = item.widget()
-            self.dataPoints_layout.removeWidget(widg)
+            if widg != None:
+                self.dataPoints_layout.removeWidget(widg)
             try:
                 widg.setParent(None)
                 widg.deleteLater()

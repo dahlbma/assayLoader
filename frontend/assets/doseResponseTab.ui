@@ -47,7 +47,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QTabWidget" name="module_tab_wg">
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="dr_prep_data_tab">
          <attribute name="title">
@@ -846,7 +846,103 @@
              </layout>
             </item>
             <item row="0" column="0">
-             <widget class="QTableWidget" name="dr_table"/>
+             <widget class="QTableWidget" name="dr_table">
+              <column>
+               <property name="text">
+                <string>Batch Id</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Compound Id</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Project</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Target</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Plate Id</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Assay type</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Detection type</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Cmax</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Y Max</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>M Min</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Hill</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>IC50</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>EC50</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>I Cmax</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Graph</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Test date</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Operator</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>ELN Id</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Confirmed</string>
+               </property>
+              </column>
+             </widget>
             </item>
            </layout>
           </item>

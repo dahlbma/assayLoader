@@ -264,7 +264,8 @@ def fit_curve(x, y):
                                                        num_iterations,
                                                        slope,
                                                        ic50/10,
-                                                       bottom, top)
+                                                       bottom,
+                                                       top)
     '''
     print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
     axs[0,0].cla()

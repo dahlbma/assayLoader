@@ -48,6 +48,7 @@ class ScatterplotWidget(QWidget):
         x_values = np.array(df['finalConc_nM'].values/1000000000, dtype=np.float64)
         y_values = np.array(df['inhibition'].values, dtype=np.float64)
         y_err_values = np.array(df['yStd'].values, dtype=np.float64)
+        sInfo = ''
         
         fitOk = True
         try:
@@ -82,7 +83,7 @@ class ScatterplotWidget(QWidget):
                 slope_std, ic50_std, bottom_std, top_std = perr
                 slope, ic50, bottom, top = params
                 print(f'SciPy slope {slope} ic50 {ic50} bottom {bottom} top {top}')
-                slope, ic50, bottom, top = fit_curve(x_values, y_values)
+                slope, ic50, bottom, top, sInfo = fit_curve(x_values, y_values)
                 print(f'Mats slope {slope} ic50 {ic50} bottom {bottom} top {top}')
             else:
                 slope, ic50, bottom, top, sInfo = fit_curve(x_values, y_values)
@@ -167,7 +168,7 @@ class DoseResponseTable(QTableWidget):
         self.parent = None
 
     def generate_scatterplots(self, file_path, yScale, parent):
-        print('populating data')
+        #print('populating data')
         self.parent = parent
         outputDir = os.path.dirname(file_path)
         self.workingDirectory = outputDir
@@ -209,7 +210,8 @@ class DoseResponseTable(QTableWidget):
         # "Batch nr" "Compound ID" "finalConc_nM" "yMean" "yStd"
         batch = batch_df['Batch nr'].iloc[0]
         compound = batch_df['Compound ID'].iloc[0]
-        print(f'Compound_id: {compound}')      
+        #print("######################################")
+        #print(f'Compound_id: {compound}')      
 
         scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale, self.workingDirectory)
         item = QTableWidgetItem(batch)
@@ -322,7 +324,7 @@ class DoseResponseTable(QTableWidget):
             image_path = f"{imgDir}/{i}.png"
             img = Image(image_path)
                         
-            ws.add_image(img)
+            #ws.add_image(img)
             ws.add_image(img, f"K{i + 2}")
 
         # Adjust row heights and column widths to fit images
