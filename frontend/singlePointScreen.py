@@ -300,7 +300,6 @@ class SinglePointScreen(QMainWindow):
                 item = QTableWidgetItem(data[row][col])
                 self.sp_table.setItem(row, col, item)
 
-        
         print(fileName)
 
                 
@@ -317,7 +316,8 @@ class SinglePointScreen(QMainWindow):
         self.populateColumn('comment', self.comment_eb.text())
         self.populateColumn('eln', self.eln_eb.text())
 
-        self.save_to_csv("gridData.csv")
+        sOutput = os.path.join(self.workingDirectory, "gridData.csv")
+        self.save_to_csv(sOutput)
 
         
     def populateScreenData(self):
