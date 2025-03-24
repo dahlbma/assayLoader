@@ -284,12 +284,31 @@ class SinglePointScreen(QMainWindow):
         if not fileName:
             return
 
+        num_columns = self.sp_table.columnCount()
+        
         # Read CSV file
         with open(fileName, 'r') as file:
             reader = csv.reader(file, delimiter='\t')
             header = next(reader)  # Skip the header row
             data = list(reader)
 
+        num_columns = self.sp_table.columnCount()
+        try:
+            iCsvColumnCount = len(data[0])
+            if iCsvColumnCount == 1:
+                with open(fileName, 'r') as file:
+                    reader = csv.reader(file, delimiter=',')
+                    header = next(reader)  # Skip the header row
+                    data = list(reader)
+                    iCsvColumnCount = len(data[0])
+        except:
+            print('CSV file has no data')
+            return
+        
+        if num_columns != iCsvColumnCount:
+            print(f'CSV file has wrong number of columns looking for {num_columns} columns but got {iCsvColumnCount}')
+            return
+        
         # Set table dimensions
         self.sp_table.setRowCount(len(data))
         self.sp_table.setColumnCount(len(data[0]))
