@@ -456,10 +456,10 @@ class SinglePointScreen(QMainWindow):
         fileName, _ = envision_dialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xlsx *.xls)")
         if fileName:
             subdirectory_path = os.path.dirname(fileName)
-        prepared_path = os.path.join(subdirectory_path, "preparedEnvisionFiles")
+        prepared_path = os.path.join(subdirectory_path, "assayLoaderEnvisionFiles")
         delete_all_files_in_directory(prepared_path)
         self.workingDirectory = prepared_path
-        if prepared_path == "preparedEnvisionFiles":
+        if prepared_path == "assayLoaderEnvisionFiles":
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
@@ -482,9 +482,9 @@ class SinglePointScreen(QMainWindow):
         directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
-        subdirectory_path = os.path.join(selected_directory, "preparedHarmonyFiles")
+        subdirectory_path = os.path.join(selected_directory, "assayLoaderHarmonyFiles")
         self.workingDirectory = subdirectory_path
-        if subdirectory_path == "preparedHarmonyFiles":
+        if subdirectory_path == "assayLoaderHarmonyFiles":
             return
 
         delete_all_files_in_directory(subdirectory_path)

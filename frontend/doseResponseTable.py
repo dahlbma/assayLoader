@@ -340,9 +340,13 @@ class DoseResponseTable(QTableWidget):
         wb.save(file_path)
         self.parent.saveExcel_btn.setEnabled(False)
 
-        if self.parent.finalPreparedDR['deselected'].any():
-            # There are rows where 'deselected' is True
-            # Save the new dataframe without the deselected datapoints
-            df_filtered = self.parent.finalPreparedDR[self.parent.finalPreparedDR['deselected'] == False]
-            df_filtered = df_filtered.drop(columns=['deselected'])
-            df_filtered.to_excel(self.parent.pathToFinalPreparedDR_deselects, index=False)
+        try:
+            if self.parent.finalPreparedDR['deselected'].any():
+                # There are rows where 'deselected' is True
+                # Save the new dataframe without the deselected datapoints
+                df_filtered = self.parent.finalPreparedDR[self.parent.finalPreparedDR['deselected'] == False]
+                df_filtered = df_filtered.drop(columns=['deselected'])
+                df_filtered.to_excel(self.parent.pathToFinalPreparedDR_deselects, index=False)
+        except:
+            # There where no deselected items
+            pass

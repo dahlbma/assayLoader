@@ -250,10 +250,10 @@ class DoseResponseScreen(QMainWindow):
         if fileName:
             subdirectory_path = os.path.dirname(fileName)
         print(f'subdirectory_path: {subdirectory_path}')
-        prepared_path = os.path.join(subdirectory_path, "preparedEnvisionFiles")
+        prepared_path = os.path.join(subdirectory_path, "assayLoaderEnvisionFiles")
         delete_all_files_in_directory(prepared_path)
         self.workingDirectory = prepared_path
-        if prepared_path == "preparedEnvisionFiles":
+        if prepared_path == "assayLoaderEnvisionFiles":
             return
 
         platemapFile, plateIdToFileMapping = findEnvisionFiles(self, prepared_path, fileName)
@@ -270,8 +270,8 @@ class DoseResponseScreen(QMainWindow):
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
 
-        subdirectory_path = os.path.join(selected_directory, "preparedHarmonyFiles")
-        if subdirectory_path == "preparedHarmonyFiles":
+        subdirectory_path = os.path.join(selected_directory, "assayLoaderHarmonyFiles")
+        if subdirectory_path == "assayLoaderHarmonyFiles":
             return
 
         delete_all_files_in_directory(subdirectory_path)
