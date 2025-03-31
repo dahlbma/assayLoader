@@ -1,9 +1,9 @@
 import re, sys, os, logging, glob, csv
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
-from PyQt5.QtCore import Qt, QDate, QUrl
+from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QDoubleValidator
+from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QDoubleValidator, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import openpyxl
 from pathlib import Path
@@ -30,6 +30,12 @@ class SinglePointScreen(QMainWindow):
         self.logger = logging.getLogger(self.mod_name)
         loadUi(resource_path("assets/singlePointTab.ui"), self)
 
+        self.rVolume = None
+        self.finalVolume_eb.textChanged.connect(self.wellVolumeChanged)
+        regex = QRegExp("[0-9]+.?[0-9]*")  # Only digits 1-9 and a single dot
+        validator = QRegExpValidator(regex, self.finalVolume_eb)
+        self.finalVolume_eb.setValidator(validator)
+        
         self.preparedZinput = 'preparedZinput.csv'
         self.QCoutput = 'screenQC.xlsx'
         self.workingDirectory = ''
@@ -38,9 +44,9 @@ class SinglePointScreen(QMainWindow):
         # Prep data screen
         self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
         self.envision_plateID_to_file_btn.clicked.connect(self.prepareEnvisionFiles)
-        #self.nrOfPlateCopies_sp           # spin box
-        #self.plates_te.                   # text edit
         self.printPlates_btn.clicked.connect(self.printPlates)
+        self.prepareHarmony_btn.setEnabled(False)
+        self.envision_plateID_to_file_btn.setEnabled(False)
         # Prep data screen end
         #####################
 
@@ -117,6 +123,18 @@ class SinglePointScreen(QMainWindow):
         self.maxNegCtrl_eb.setValidator(validator)
 
 
+    def wellVolumeChanged(self, sVolume):
+        try:
+            self.rVolume = float(sVolume)
+        except:
+            self.prepareHarmony_btn.setEnabled(False)
+            self.rVolume = None
+            return
+        
+        self.prepareHarmony_btn.setEnabled(True)
+        self.envision_plateID_to_file_btn.setEnabled(True)
+ 
+ 
     def saveSpToDb(self):
 
         def getDateColumn():
@@ -574,6 +592,7 @@ class SinglePointScreen(QMainWindow):
     def extractData(self, sFile, sPlate, saDataLines, iDataColPosition, iWellColPosition):
         columns = ['plate', 'well', 'compound_id', 'batch_id', 'raw_data', 'type', 'concentration']
         df = pd.DataFrame(columns=columns)
+
         sPosCtrl = self.posCtrl_eb.text()
         sNegCtrl = self.negCtrl_eb.text()
         iSkipped = 0
@@ -621,15 +640,24 @@ class SinglePointScreen(QMainWindow):
             except Exception as e:
                 self.printQcLog(f'The raw data value is not numeric in plate {sPlate} well {well}', 'error', beep=False)
                 continue
-            
+
+
+            currentConc = selected_row['Conc mM'][0]
+            currentVolume = selected_row['volume nL'][0]
+            targetVolume = self.rVolume
+
+            if currentVolume != targetVolume:
+                targetConc = (currentConc * currentVolume) / targetVolume
+            else:
+                targetConc = selected_row['Conc mM'][0]
             data = {'plate': sPlate,
                     'well': well,
                     'compound_id': selected_row['Compound ID'][0],
                     'batch_id': selected_row['Batch nr'][0],
                     'raw_data': raw_data,
                     'type': sType,
-                    'concentration': selected_row['Conc mM'][0],
-                    'volume: selected_row': ['volume nL'][0]}
+                    'concentration': targetConc,
+                    'volume': targetVolume}
             df.loc[len(df.index)] = data
         if iData == 0 or iPosCtrl == 0 or iNegCtrl == 0:
             sStatus = 'error'
