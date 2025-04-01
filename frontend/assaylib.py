@@ -153,6 +153,12 @@ def createPlatemap(self, platesDf, subdirectory_path):
             iNrOfPlates += 1
             printPrepLog(self, f'{plate_value}')
             df = pd.DataFrame(plate_data, columns=columns)
+
+            df_zero_volume = df[((df['volume nL'] == 0) & (df['Compound ID'].str.startswith('CBK')))]
+            for index, row in df_zero_volume.iterrows():
+                printPrepLog(self, f'''No volume, deleteing {row['Platt ID']} {row['Well']} {row['Compound ID']}''', 'error')
+
+            df = df[~((df['volume nL'] == 0) & (df['Compound ID'].str.startswith('CBK')))]
         else:
             printPrepLog(self, f'Error getting plate {plate_value} {plate_data}', 'error')
         platemapDf = pd.concat([platemapDf if not platemapDf.empty else None, df], ignore_index=True)

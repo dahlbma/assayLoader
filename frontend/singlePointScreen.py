@@ -229,26 +229,6 @@ class SinglePointScreen(QMainWindow):
         self.popup.obj.proc_counter(100)
         self.popup.close()
 
-
-    def createPlatemap(self, platesDf, subdirectory_path):
-        columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
-        platemapDf = pd.DataFrame(columns=columns)
-        
-        for index, row in platesDf.iterrows():
-            df = pd.DataFrame()
-            plate_value = row['plate']
-            plate_data, lSuccess = dbInterface.getPlate(self.token, plate_value)
-            if lSuccess:
-                self.printPrepLog(f'Got plate data for {plate_value}')
-                df = pd.DataFrame(plate_data, columns=columns)
-            else:
-                self.printPrepLog(f'Error getting plate {plate_value} {plate_data}', 'error')
-            platemapDf = pd.concat([platemapDf if not platemapDf.empty else None, df], ignore_index=True)
-
-        excel_filename = 'PLATEMAP.xlsx'
-        full_path = os.path.join(subdirectory_path, excel_filename)
-        platemapDf.to_excel(full_path, index=False)
-
         
     def findColumnNumber(self, sCol):
         iCol = -1
@@ -506,7 +486,10 @@ class SinglePointScreen(QMainWindow):
             return
 
         delete_all_files_in_directory(subdirectory_path)
-        findHarmonyFiles(self, subdirectory_path, selected_directory)
+        sPlatemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
+        self.instrument_cb.setCurrentText('Harmony')
+        self.selectFileToPlateMap(plateIdToFileMapping)
+        self.selectPlatemap(sPlatemapFile)
         
 
     def checkForm(self):
