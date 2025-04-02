@@ -147,7 +147,6 @@ class DoseResponseScreen(QMainWindow):
 
         widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
         if isinstance(widget, ScatterplotWidget):
-            #print(df)
             pass
         self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.dataPoints_layout.addItem(self.bottom_spacer)
@@ -279,7 +278,23 @@ class DoseResponseScreen(QMainWindow):
         platemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
 
-
+    def remove_single_row_compounds(self, df):
+        """
+        Removes rows from a DataFrame where 'Compound ID' appears only once. (No DR calulation for these)
+        
+            Args:
+            df (pd.DataFrame): The input DataFrame.
+            
+            Returns:
+            pd.DataFrame: The DataFrame with single-row compounds removed.
+            """
+        
+        compound_counts = df['Batch nr'].value_counts()
+        compounds_to_keep = compound_counts[compound_counts > 1].index.tolist()
+        
+        filtered_df = df[df['Batch nr'].isin(compounds_to_keep)]
+        return filtered_df
+        
     def generateDoseResponseInputFile(self, platemapFile, plateIdToFileMapping):
         platemap_xlsx = os.path.abspath(platemapFile)
         sBasePath = os.path.dirname(platemap_xlsx)
@@ -370,6 +385,9 @@ class DoseResponseScreen(QMainWindow):
 
         excel_file_path_deselected = os.path.join(self.workingDirectory, 'finalPreparedDR_deselected_datapoints.xlsx')
         self.pathToFinalPreparedDR_deselects = excel_file_path_deselected
+
+
+        resultDf = self.remove_single_row_compounds(resultDf)
         
         #fullPath = os.path.join(sBasePath, excel_file_path)
         resultDf.to_excel(excel_file_path, index=False)

@@ -19,7 +19,10 @@ warnings.filterwarnings('ignore')
 
 # Define the 4-PL model function
 def fourpl(x, slope, ic50, bottom, top):
-    return bottom + (top - bottom) / (1 + (x / ic50)**slope)
+    try:
+        return bottom + (top - bottom) / (1 + (x / ic50)**slope)
+    except:
+        return -1
 
 class ScatterplotWidget(QWidget):
     def __init__(self, data_dict, rowPosition, yScale, workingDir, parent=None):
@@ -168,7 +171,6 @@ class DoseResponseTable(QTableWidget):
         self.parent = None
 
     def generate_scatterplots(self, file_path, yScale, parent):
-        #print('populating data')
         self.parent = parent
         outputDir = os.path.dirname(file_path)
         self.workingDirectory = outputDir
@@ -177,7 +179,7 @@ class DoseResponseTable(QTableWidget):
         self.setRowCount(0)
         self.setColumnWidth(10, 600)
         df = pd.read_excel(file_path)
-        
+
         dialog = assaylib.CancelDialog(self)
         dialog.show()
 
@@ -187,7 +189,6 @@ class DoseResponseTable(QTableWidget):
             iCount += 1
             dialog.update_label(f"{iCount + 1} of {iTotPlotNum} curves")
             if dialog.cancelled:
-                print("Calculation cancelled!")
                 break
             
             rowPosition = self.rowCount()

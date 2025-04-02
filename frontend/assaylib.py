@@ -137,7 +137,7 @@ def findDataColumns(sFileName):
                 return saLine
     # This is an error
     return None
-        
+
 
 def createPlatemap(self, platesDf, subdirectory_path):
     columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
