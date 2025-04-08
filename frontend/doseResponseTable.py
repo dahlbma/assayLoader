@@ -170,6 +170,37 @@ class DoseResponseTable(QTableWidget):
         self.workingDirectory = ''
         self.parent = None
 
+    def qtablewidget_to_dataframe(self):
+        """
+        Converts a QTableWidget to a pandas DataFrame.
+        
+        Args:
+        table_widget (QTableWidget): The QTableWidget to convert.
+        
+        Returns:
+        pd.DataFrame: A pandas DataFrame containing the QTableWidget data.
+        """
+        
+        data = []
+        headers = []
+
+        # Get headers
+        for column in range(self.columnCount()):
+            headers.append(self.horizontalHeaderItem(column).text())
+                
+        # Get data
+        for row in range(self.rowCount()):
+            row_data = []
+            for column in range(self.columnCount()):
+                item = self.item(row, column)
+                if item is not None:
+                    row_data.append(item.text())
+                else:
+                    row_data.append(None)  # Handle empty cells
+            data.append(row_data)
+        return pd.DataFrame(data, columns=headers)
+
+        
     def generate_scatterplots(self, file_path, yScale, parent):
         self.parent = parent
         outputDir = os.path.dirname(file_path)

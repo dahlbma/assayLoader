@@ -105,7 +105,16 @@ class DoseResponseScreen(QMainWindow):
         
         self.saveExcel_btn.clicked.connect(self.doseResponseTable.saveToExcel)
         self.saveExcel_btn.setEnabled(True)
-        
+
+        self.module_tab_wg.currentChanged.connect(self.tab_switched)
+
+
+    def tab_switched(self, index):
+        tab_text = self.module_tab_wg.tabText(index)
+        if tab_text == "DR load data":
+            print("User switched to dr_load_data tab")
+            df = self.doseResponseTable.qtablewidget_to_dataframe()
+            print(df)
 
     def toggleInhibition(self):
         sender = self.sender()
@@ -278,6 +287,7 @@ class DoseResponseScreen(QMainWindow):
         platemapFile, plateIdToFileMapping = findHarmonyFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
 
+
     def remove_single_row_compounds(self, df):
         """
         Removes rows from a DataFrame where 'Compound ID' appears only once. (No DR calulation for these)
@@ -291,10 +301,10 @@ class DoseResponseScreen(QMainWindow):
         
         compound_counts = df['Batch nr'].value_counts()
         compounds_to_keep = compound_counts[compound_counts > 1].index.tolist()
-        
         filtered_df = df[df['Batch nr'].isin(compounds_to_keep)]
         return filtered_df
-        
+
+
     def generateDoseResponseInputFile(self, platemapFile, plateIdToFileMapping):
         platemap_xlsx = os.path.abspath(platemapFile)
         sBasePath = os.path.dirname(platemap_xlsx)
