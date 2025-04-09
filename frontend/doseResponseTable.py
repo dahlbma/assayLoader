@@ -258,9 +258,14 @@ class DoseResponseTable(QTableWidget):
         self.setItem(rowPosition, self.graph_col, item)
         self.setCellWidget(rowPosition, self.graph_col, scatterplot_widget)
         self.setCurrentCell(rowPosition, self.graph_col)
-        #print(f'Figsize: {scatterplot_widget.figure.get_size_inches()}')
         self.updateTable(rowPosition, scatterplot_widget)
         QApplication.processEvents()
+
+
+    def updateMaxConc(self, row, maxConc):
+        item = QTableWidgetItem(str(f"{maxConc:.1f}"))
+        self.setItem(row, self.maxConc_col, item)
+
 
     def updateTable(self, rowPosition, scatterplot_widget):
         item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))

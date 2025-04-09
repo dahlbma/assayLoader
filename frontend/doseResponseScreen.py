@@ -108,13 +108,55 @@ class DoseResponseScreen(QMainWindow):
 
         self.module_tab_wg.currentChanged.connect(self.tab_switched)
 
+        self.dr_tab_col_batch = 0
+        self.dr_tab_col_compound = 1
+        self.dr_tab_col_project = 2
+        self.dr_tab_col_target = 3
+        self.dr_tab_col_plate = 4
+        self.dr_tab_col_assay_type = 5
+        self.dr_tab_col_detection_type = 6
+        self.dr_tab_col_cmax = 7
+        self.dr_tab_col_top = 8
+        self.dr_tab_col_bottom = 9
+        self.dr_tab_col_slope = 10
+        self.dr_tab_col_ic50 = 11
+        self.dr_tab_col_ec50 = 12
+        self.dr_tab_col_icmax = 13
+        self.dr_tab_col_graph = 14
+        self.dr_tab_col_test_date = 15
+        self.dr_tab_col_operator = 16
+        self.dr_tab_col_eln = 17
+        self.dr_tab_col_confirmed = 18
+        
 
+    def populate_load_data(self, df):
+        self.dr_table.setRowCount(len(df))
+        for row_index, row_data in df.iterrows():
+            batch_id = str(row_data["Batch"])
+            compound_id = str(row_data["Compound"])
+            cmax = str(row_data["Max Conc nM"])
+            ic50 = str(row_data["IC50"])
+            slope = str(row_data["Slope"])
+            top = str(row_data["Top"])
+            bottom = str(row_data["Bottom"])
+            
+            self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
+            self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
+            self.dr_table.setItem(row_index, self.dr_tab_col_cmax, QTableWidgetItem(cmax))
+            self.dr_table.setItem(row_index, self.dr_tab_col_ic50, QTableWidgetItem(ic50))
+            self.dr_table.setItem(row_index, self.dr_tab_col_slope, QTableWidgetItem(slope))
+            self.dr_table.setItem(row_index, self.dr_tab_col_top, QTableWidgetItem(top))
+            self.dr_table.setItem(row_index, self.dr_tab_col_bottom, QTableWidgetItem(bottom))
+
+    
     def tab_switched(self, index):
         tab_text = self.module_tab_wg.tabText(index)
         if tab_text == "DR load data":
             print("User switched to dr_load_data tab")
             df = self.doseResponseTable.qtablewidget_to_dataframe()
-            print(df)
+            if len(df) == 0:
+                return
+            self.populate_load_data(df)
 
     def toggleInhibition(self):
         sender = self.sender()
@@ -187,17 +229,23 @@ class DoseResponseScreen(QMainWindow):
             return
 
         iIndex = 0
+        maxConc = 0
         for checkValue in includedPoints:
+            thisConc = df.iloc[iIndex]['finalConc_nM']
             if checkValue == False:
                 batch = df.iloc[iIndex]['Batch nr']
                 compound = df.iloc[iIndex]['Compound ID']
-                conc = df.iloc[iIndex]['finalConc_nM']
+                conc = thisConc
                 self.deselectRow(batch, compound, conc)
+            else:
+                if thisConc > maxConc:
+                    maxConc = thisConc
             iIndex += 1
-                
+
         selected_rows = df[includedPoints]
         widget.plot_scatter(selected_rows, self.yScale)
         self.doseResponseTable.updateTable(row, widget)
+        self.doseResponseTable.updateMaxConc(row, maxConc)
 
 
     def calcDR(self):
