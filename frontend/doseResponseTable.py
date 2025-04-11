@@ -71,7 +71,7 @@ class ScatterplotWidget(QWidget):
             
                 max_slope = 30
                 min_slope = -30
-            
+
                 max_ic50 = 0.01
                 min_ic50 = 1e-12
 
@@ -150,6 +150,7 @@ class ScatterplotWidget(QWidget):
         self.bottom = bottom
         self.minConc = self.data_dict['finalConc_nM'].iloc[0]
         self.maxConc = self.data_dict['finalConc_nM'].iloc[-1]
+        self.icmax = self.data_dict['inhibition'].iloc[-1]
 
         return slope, ic50, bottom, top, ic50_std, auc, sInfo
 
@@ -166,7 +167,8 @@ class DoseResponseTable(QTableWidget):
         self.minConc_col = 7
         self.maxConc_col = 8
         self.auc_col = 9
-        self.graph_col = 10
+        self.icmax_col = 10
+        self.graph_col = 11
         self.workingDirectory = ''
         self.parent = None
 
@@ -187,7 +189,7 @@ class DoseResponseTable(QTableWidget):
         # Get headers
         for column in range(self.columnCount()):
             headers.append(self.horizontalHeaderItem(column).text())
-                
+
         # Get data
         for row in range(self.rowCount()):
             row_data = []
@@ -208,7 +210,7 @@ class DoseResponseTable(QTableWidget):
         # Set the graph column to be 600 wide
         self.clearContents()
         self.setRowCount(0)
-        self.setColumnWidth(10, 600)
+        self.setColumnWidth(self.graph_col, 600)
         df = pd.read_excel(file_path)
 
         dialog = assaylib.CancelDialog(self)
@@ -265,6 +267,9 @@ class DoseResponseTable(QTableWidget):
     def updateMaxConc(self, row, maxConc):
         item = QTableWidgetItem(str(f"{maxConc:.1f}"))
         self.setItem(row, self.maxConc_col, item)
+        ### Mats
+        ### On next line we need to find the inhibition for the higest concentration when we have deselected concs.
+        # self.setItem(row, self.icmax_col, item)
 
 
     def updateTable(self, rowPosition, scatterplot_widget):
@@ -289,6 +294,9 @@ class DoseResponseTable(QTableWidget):
 
         item = QTableWidgetItem(str(f"{scatterplot_widget.maxConc:.1f}"))
         self.setItem(rowPosition, self.maxConc_col, item)
+
+        item = QTableWidgetItem(str(f"{scatterplot_widget.icmax:.2f}"))
+        self.setItem(rowPosition, self.icmax_col, item)
 
         item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
         self.setItem(rowPosition, self.auc_col, item)
@@ -325,18 +333,18 @@ class DoseResponseTable(QTableWidget):
         # Convert QTableWidget data to a pandas DataFrame
         table_data = []
         for row in range(self.rowCount()):
-            row_data = [self.item(row, col).text() if col < 11 else None for col in range(self.columnCount())]
+            row_data = [self.item(row, col).text() if col < 12 else None for col in range(self.columnCount())]
             table_data.append(row_data)
 
         columns = ['Batch', 'Compound', 'IC50', 'Quality', 'Slope',
-                   'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'Graph']
+                   'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'ICMax', 'Graph']
         df = pd.DataFrame(table_data, columns=columns)
 
         wb = Workbook()
         ws = wb.active
 
         headings = ["Batch", "Compound", "IC50", "Fit quality", "Slope",
-                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "Graph"]
+                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "ICMax", "Graph"]
 
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
@@ -362,7 +370,7 @@ class DoseResponseTable(QTableWidget):
             img = Image(image_path)
                         
             #ws.add_image(img)
-            ws.add_image(img, f"K{i + 2}")
+            ws.add_image(img, f"L{i + 2}")
 
         # Adjust row heights and column widths to fit images
         for r_idx in range(2, len(df) + 2):  # Include header row
@@ -371,7 +379,7 @@ class DoseResponseTable(QTableWidget):
         for c_idx in range(1, len(columns) + 1):
             ws.column_dimensions[chr(ord('A') + c_idx - 1)].width = 13  # Adjust the width as needed
 
-        ws.column_dimensions[chr(ord('K'))].width = 40
+        ws.column_dimensions[chr(ord('L'))].width = 40
         
         # Save the Excel workbook
         wb.save(file_path)

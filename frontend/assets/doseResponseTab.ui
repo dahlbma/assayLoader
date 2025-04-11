@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1658</width>
+    <width>1730</width>
     <height>827</height>
    </rect>
   </property>
@@ -308,6 +308,11 @@
               <column>
                <property name="text">
                 <string>AUC</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>ICMax</string>
                </property>
               </column>
               <column>

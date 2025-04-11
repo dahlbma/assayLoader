@@ -1,7 +1,8 @@
 import re, sys, os, logging, csv
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton, QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton
+from PyQt5.QtWidgets import QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIntValidator, QBrush, QColor, QRegExpValidator
 import openpyxl
@@ -52,7 +53,7 @@ def userInfo(sMessage):
     info_dialog.setIcon(QMessageBox.Information)
     info_dialog.setText(sMessage)
     info_dialog.setWindowTitle("Information")
-    
+
     # Add a button to the dialog
     info_dialog.addButton(QMessageBox.Ok)
     
@@ -135,6 +136,7 @@ class DoseResponseScreen(QMainWindow):
             batch_id = str(row_data["Batch"])
             compound_id = str(row_data["Compound"])
             cmax = str(row_data["Max Conc nM"])
+            icmax = str(row_data["ICMax"])
             ic50 = str(row_data["IC50"])
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
@@ -143,6 +145,7 @@ class DoseResponseScreen(QMainWindow):
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_cmax, QTableWidgetItem(cmax))
+            self.dr_table.setItem(row_index, self.dr_tab_col_icmax, QTableWidgetItem(icmax))
             self.dr_table.setItem(row_index, self.dr_tab_col_ic50, QTableWidgetItem(ic50))
             self.dr_table.setItem(row_index, self.dr_tab_col_slope, QTableWidgetItem(slope))
             self.dr_table.setItem(row_index, self.dr_tab_col_top, QTableWidgetItem(top))
@@ -222,7 +225,7 @@ class DoseResponseScreen(QMainWindow):
 
     def updatePlot(self, row, includedPoints):
         df = None
-        widget = self.doseResponseTable.cellWidget(row, 10)
+        widget = self.doseResponseTable.cellWidget(row, 11)
         if isinstance(widget, ScatterplotWidget):
             df = widget.data_dict
         else:
