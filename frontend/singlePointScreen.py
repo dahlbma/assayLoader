@@ -172,7 +172,7 @@ class SinglePointScreen(QMainWindow):
             self.populate_table(df, 'activation', error=True)
             self.populate_table(df, 'hit', error=True)
             self.populate_table(df, 'hit_threshold', error=True)
-            self.populate_table(df, 'experiment_date', error=True)
+            self.populate_table(df, 'test_date', error=True)
             self.populate_table(df, 'operator', error=True)
             self.populate_table(df, 'eln', error=True)
             self.populate_table(df, 'comment', error=True)
@@ -336,7 +336,7 @@ class SinglePointScreen(QMainWindow):
         sOutput = os.path.join(self.workingDirectory, "gridData.csv")
         self.save_to_csv(sOutput)
 
-        
+
     def populateScreenData(self):
         saProjects = dbInterface.getProjects(self.token)
         self.project_cb.addItems(saProjects)

@@ -1,6 +1,6 @@
 import re, sys, os, logging, csv
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp, QDate
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton
 from PyQt5.QtWidgets import QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt5 import QtGui
@@ -128,10 +128,138 @@ class DoseResponseScreen(QMainWindow):
         self.dr_tab_col_operator = 16
         self.dr_tab_col_eln = 17
         self.dr_tab_col_confirmed = 18
+
+        self.populateScreenData()
         
+        self.updateGrid_btn.clicked.connect(self.updateGrid)
+        self.loadAssayFile_btn.clicked.connect(self.loadAssayDataFromFile)
+        self.saveData_btn.clicked.connect(self.saveDrToDb)
+
+
+    def populateScreenData(self):
+        saProjects = dbInterface.getProjects(self.token)
+        self.project_cb.addItems(saProjects)
+
+        saOperators = dbInterface.getOperators(self.token)
+        self.operator_cb.addItems(saOperators)
+
+        saTargets = dbInterface.getTargets(self.token)
+        self.target_cb.addItems(saTargets)
+
+        saModelTypes = [
+            'Cell_Line',
+            'Protein',
+            'Primary_Cell',
+            'Organism',
+            'IPSC',
+            'Tissue',
+            'Virus',
+            'other'
+            ]
+        self.screenType_cb.addItems(saModelTypes)
+
+        saAssayTypes = [
+            "Phenotypic_2D",
+            "Phenotypic_Suspension",
+            "Phenotypic_3D",
+            "Targeted_Cell-based_2D",
+            "Targeted_Cell-based_Suspension",
+            "Targeted_Cell-based_3D",
+            "Protein_Binding",
+            "Protein_Enzymatic"
+        ]
+        #saAssayTypes = dbInterface.getAssayTypes(self.token)
+        self.assayType_cb.addItems(saAssayTypes)
+
+        saTargetTables = [
+            "DR Sandbox table",
+            "Dose response"
+        ]
+        self.targetTable_cb.addItems(saTargetTables)
+        
+        saViabilityMeasurement = [
+            'Yes',
+            'No'
+        ]
+
+        saDetectionType = [
+            'Imaging',
+            'Luminescence',
+            'Other',
+            'No'
+        ]
+        
+        self.detectionType_cb.addItems(saDetectionType)
+        self.viabilityMeasure_cb.addItems(saViabilityMeasurement)
+
+        
+        #saScreenType = dbInterface.getScreenTypes(self.token)
+        #self.screenType_cb.addItems(saScreenType)
+
+        self.testDate.setDate(QDate.currentDate())
+
+
+    def loadAssayDataFromFile(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+
+        loadAssayDataDialog = QFileDialog()
+        loadAssayDataDialog.setOptions(options)
+
+        fileName, _ = loadAssayDataDialog.getOpenFileName(self, "Select CSV File", "", "CSV Files (*.csv *.CSV)")
+
+        if not fileName:
+            return
+
+
+    def findColumnNumber(self, sCol):
+        iCol = -1
+        for col in range(self.dr_table.columnCount()):
+            header_item = self.dr_table.horizontalHeaderItem(col)
+            header_text = header_item.text()
+
+            if header_text == sCol:
+                iCol = col
+                break
+        return iCol
+
+
+    def saveDrToDb(self):
+        pass
+
+        
+    def populateColumn(self, sCol, sValue):
+        print(sCol, sValue)
+        iNrRows = self.dr_table.rowCount()
+        iCol = self.findColumnNumber(sCol)
+
+        print(iCol)
+        
+        iRow_index = 0
+        for iRow_index in range(iNrRows):
+            item = QTableWidgetItem(str(sValue))
+            self.dr_table.setItem(iRow_index, iCol, item)
+
+
+    def updateGrid(self):
+        print('updateGrid')
+        self.populateColumn('project', self.project_cb.currentText())
+        self.populateColumn('operator', self.operator_cb.currentText())
+        self.populateColumn('target', self.target_cb.currentText())
+        self.populateColumn('model_system', self.screenType_cb.currentText())
+        self.populateColumn('assay_type', self.assayType_cb.currentText())
+        self.populateColumn('detection_type', self.detectionType_cb.currentText())
+        self.populateColumn('viability_measurement', self.viabilityMeasure_cb.currentText())
+        testDate = self.testDate.date()
+        sDate = testDate.toString("yyyy-MM-dd") 
+        self.populateColumn('experiment_date', sDate)
+        self.populateColumn('comment', self.comment_eb.text())
+        self.populateColumn('eln', self.eln_eb.text())
+
 
     def populate_load_data(self, df):
         self.dr_table.setRowCount(len(df))
+        print(df)
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
             compound_id = str(row_data["Compound"])
