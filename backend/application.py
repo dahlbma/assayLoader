@@ -163,7 +163,8 @@ class GetTargets(tornado.web.RequestHandler):
 class GetAssayTypes(tornado.web.RequestHandler):
     def get(self):
         sSql = f'select distinct(assay_type) assay_type from assay.lcb_sp'
-        cur.execute(sSql)
+        sSql = f'select distinct(%s) assay_type from assay.lcb_sp'
+        cur.execute(sSql, assay_type)
         res = res2json()
         self.finish(res)
 
@@ -229,17 +230,24 @@ class GetBatchCompound(tornado.web.RequestHandler):
 
 class PingDB(tornado.web.RequestHandler):
     def get(self):
-        cur.ping()
-        
+        sSql = "SELECT * FROM glass.box_sequence"
+        ret = cur.ping(sSql)
+        if ret == 'error':
+            self.set_status(400)
+
     def head(self):
-        cur.ping()
+        sSql = "SELECT * FROM glass.box_sequence"
+        ret = cur.ping(sSql)
+        if ret == 'error':
+            self.set_status(400)
+
 
 
 def implSaveSpRowToDb(self, row, targetTable):
 
     def nullifyNumeric(sString):
         if sString == '':
-            return 'NULL'
+            return None
         else:
             return sString
         
@@ -248,6 +256,7 @@ def implSaveSpRowToDb(self, row, targetTable):
     sCompound = row['compound_id']
     sBatch = row['batch_id']
     sTarget = row['target']
+    sModelSystem = row['model_system']
     sProject = row['project']
     sPlate = row['plate']
     sWell = row['well']
@@ -271,14 +280,14 @@ def implSaveSpRowToDb(self, row, targetTable):
         tTable = targetTable
     else:
         tTable = f'{assayDB}.{targetTable}'
-    #logging.info(f'Table {tTable}')
-    #return 200,2
+
 
     sSql = f'''insert into {tTable}
     (compound_id,
     compound_batch,
     project,
     target,
+    model_system,
     PLATE_ID,
     WELL_ID,
     assay_type,
@@ -294,26 +303,7 @@ def implSaveSpRowToDb(self, row, targetTable):
     eln_id,
     COMMENTS,
     CREATED_DATE)
-    values (
-    '{sCompound}',
-    '{sBatch}',
-    '{sProject}',
-    '{sTarget}',
-    '{sPlate}',
-    '{sWell}',
-    '{sAssay_type}',
-    '{sDetection_type}',
-    '{sSiability_measurement}',
-    {sInhibition},
-    {sActivation},
-    '{sHit}',
-    {sHit_threshold},
-    {sConcentration},
-    '{sExperiment_date}',
-    '{sOperator}',
-    '{sEln}',
-    '{sComment}',
-    now())
+    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
     '''
 
     sError = ''
@@ -321,7 +311,7 @@ def implSaveSpRowToDb(self, row, targetTable):
     
     try:
         sSql = sSql.encode('utf-8', 'replace').decode('utf-8')
-        cur.execute(sSql)
+        cur.execute(sSql, (sCompound, sBatch, sProject, sTarget, sModelSystem, sPlate,  sWell, sAssay_type, sDetection_type, sSiability_measurement, sInhibition, sActivation, sHit, sHit_threshold, sConcentration, sExperiment_date, sOperator, sEln, sComment,))
     except Exception as e:
         sError = f"{str(e).encode('utf-8', 'replace').decode('utf-8')}"
         logging.error(sError)
@@ -445,13 +435,15 @@ class GetInstruments(tornado.web.RequestHandler):
 @jwtauth
 class GetInstrument(tornado.web.RequestHandler):
     def get(self, sInstrument):
+
         sSql = f'''select pre_data,
         post_data,
         well_col,
         plate_col,
         data_col from assayloader.instrument
-        where instrument_name = '{sInstrument}' '''
-        cur.execute(sSql)
+        where instrument_name = %s '''
+
+        cur.execute(sSql, (sInstrument, ))
         tRes = cur.fetchall()
         res = res_to_json(tRes, cur)
         
@@ -484,7 +476,6 @@ class GetPlate(tornado.web.RequestHandler):
     def get(self, sPlate):
         # Platt ID	Well	Compound ID	Batch nr	Form	Conc (mM)	volume
 
-
         sSql = f'''select
         config_id plate,
         well,
@@ -492,9 +483,10 @@ class GetPlate(tornado.web.RequestHandler):
         notebook_ref batch_id,
         conc,
         volume
-        from cool.config where config_id = '{sPlate}'
+        from cool.config where config_id = %s
         '''
-        cur.execute(sSql)
+        
+        cur.execute(sSql, (sPlate, ))
         res = res2json()
         
         if len(res) > 4:
