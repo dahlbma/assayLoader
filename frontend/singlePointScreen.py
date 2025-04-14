@@ -160,6 +160,7 @@ class SinglePointScreen(QMainWindow):
             self.populate_table(df, 'compound_id', insertRows=True, error=True)
             self.populate_table(df, 'batch_id', error=True)
             self.populate_table(df, 'target', error=True)
+            self.populate_table(df, 'model_system', error=True)
             self.populate_table(df, 'project', error=True)
             self.populate_table(df, 'plate', error=True)
             self.populate_table(df, 'well', error=True)
@@ -317,13 +318,12 @@ class SinglePointScreen(QMainWindow):
                 item = QTableWidgetItem(data[row][col])
                 self.sp_table.setItem(row, col, item)
 
-        print(fileName)
 
-                
     def updateGrid(self):
         self.populateColumn('project', self.project_cb.currentText())
         self.populateColumn('operator', self.operator_cb.currentText())
         self.populateColumn('target', self.target_cb.currentText())
+        self.populateColumn('model_system', self.screenType_cb.currentText())
         self.populateColumn('assay_type', self.assayType_cb.currentText())
         self.populateColumn('detection_type', self.detectionType_cb.currentText())
         self.populateColumn('viability_measurement', self.viabilityMeasure_cb.currentText())

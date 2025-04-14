@@ -1388,6 +1388,11 @@
                   </column>
                   <column>
                    <property name="text">
+                    <string>model_system</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
                     <string>project</string>
                    </property>
                   </column>
