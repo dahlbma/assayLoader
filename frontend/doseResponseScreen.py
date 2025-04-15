@@ -229,11 +229,11 @@ class DoseResponseScreen(QMainWindow):
 
         
     def populateColumn(self, sCol, sValue):
-        print(sCol, sValue)
         iNrRows = self.dr_table.rowCount()
         iCol = self.findColumnNumber(sCol)
 
-        print(iCol)
+        if iCol == -1:
+            print(sCol, sValue, iCol)
         
         iRow_index = 0
         for iRow_index in range(iNrRows):
@@ -259,7 +259,6 @@ class DoseResponseScreen(QMainWindow):
 
     def populate_load_data(self, df):
         self.dr_table.setRowCount(len(df))
-        print(df)
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
             compound_id = str(row_data["Compound"])
@@ -272,12 +271,14 @@ class DoseResponseScreen(QMainWindow):
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
-            self.dr_table.setItem(row_index, self.dr_tab_col_cmax, QTableWidgetItem(cmax))
-            self.dr_table.setItem(row_index, self.dr_tab_col_icmax, QTableWidgetItem(icmax))
-            self.dr_table.setItem(row_index, self.dr_tab_col_ic50, QTableWidgetItem(ic50))
-            self.dr_table.setItem(row_index, self.dr_tab_col_slope, QTableWidgetItem(slope))
-            self.dr_table.setItem(row_index, self.dr_tab_col_top, QTableWidgetItem(top))
-            self.dr_table.setItem(row_index, self.dr_tab_col_bottom, QTableWidgetItem(bottom))
+            
+            self.dr_table.setItem(row_index, self.findColumnNumber('Cmax'), QTableWidgetItem(cmax))
+            self.dr_table.setItem(row_index, self.findColumnNumber('I Cmax'), QTableWidgetItem(icmax))
+            self.dr_table.setItem(row_index, self.findColumnNumber('IC50'), QTableWidgetItem(ic50))
+            self.dr_table.setItem(row_index, self.findColumnNumber('Hill'), QTableWidgetItem(slope))
+
+            self.dr_table.setItem(row_index, self.findColumnNumber('Y Max'), QTableWidgetItem(top))
+            self.dr_table.setItem(row_index, self.findColumnNumber('M Min'), QTableWidgetItem(bottom))
 
     
     def tab_switched(self, index):

@@ -1054,7 +1054,17 @@
               </column>
               <column>
                <property name="text">
+                <string>model_system</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>detection_type</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>viability_measurement</string>
                </property>
               </column>
               <column>
@@ -1099,7 +1109,7 @@
               </column>
               <column>
                <property name="text">
-                <string>test_date</string>
+                <string>experiment_date</string>
                </property>
               </column>
               <column>
