@@ -23,8 +23,6 @@ from inhibitionScatter import ScatterPlotWindow
 os_name = platform.system()
 
 '''
-{{name='raw' style='dot' x_label='conc' x_unit='M' x_values={1.25E-04,4.17E-05,1.39E-05,4.63E-06,1.54E-06,5.14E-07,1.71E-07,5.72E-08,1.91E-08,6.35E-09,2.12E-09} y_label='Inhibition' y_unit='%' y_values={105.07,94.19,65.84,23.12,1.48,-9.46,-13.04,-11.79,-10.53,-12.85,-15.35} y_error={0.42,1.23,3.24,2.85,1.32,1.18,0.28,0.93,1.27,1.53,1.12} }{name='fitsigmoidal' style='line' x_label='conc' x_unit='M' x_values={1.25E-04,4.17E-05,1.39E-05,4.63E-06,1.54E-06,5.14E-07,1.71E-07,5.72E-08,1.91E-08,6.35E-09,2.12E-09} y_label='inhibition' y_unit='%' logic50=-5.0512 hillslope=1.252 bottom=-12.8 top=109.6}}
-
 {
    {
       name='raw' style='dot' x_label='conc' x_unit='M'
