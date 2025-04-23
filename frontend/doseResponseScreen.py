@@ -23,6 +23,20 @@ from inhibitionScatter import ScatterPlotWindow
 os_name = platform.system()
 
 '''
+1.25E-04, 105.07
+4.17E-05, 94.19
+1.39E-05, 65.84
+4.63E-06, 23.12
+1.54E-06, 1.48
+5.14E-07, -9.46
+1.71E-07, -13.04
+5.72E-08, -11.79
+1.91E-08, -10.53
+6.35E-09, -12.85
+2.12E-09, -15.35
+
+x_values={1.25E-04, 4.17E-05, 1.39E-05, 4.63E-06, 1.54E-06, 5.14E-07, 1.71E-07, 5.72E-08, 1.91E-08, 6.35E-09, 2.12E-09 }
+y_values={105.07, 94.19, 65.84, 23.12, 1.48, -9.46, -13.04, -11.79, -10.53, -12.85, -15.35 }
 {
    {
       name='raw' style='dot' x_label='conc' x_unit='M'
@@ -127,6 +141,8 @@ class DoseResponseScreen(QMainWindow):
         self.dr_tab_col_eln = 17
         self.dr_tab_col_confirmed = 18
 
+        self.ic50_ec50 = 'IC50'
+        
         self.populateScreenData()
         
         self.updateGrid_btn.clicked.connect(self.updateGrid)
@@ -262,7 +278,7 @@ class DoseResponseScreen(QMainWindow):
             compound_id = str(row_data["Compound"])
             cmax = str(row_data["Max Conc nM"])
             icmax = str(row_data["ICMax"])
-            ic50 = str(row_data["IC50"])
+            c50 = str(row_data[self.ic50_ec50])
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
             bottom = str(row_data["Bottom"])
@@ -272,15 +288,20 @@ class DoseResponseScreen(QMainWindow):
             
             self.dr_table.setItem(row_index, self.findColumnNumber('Cmax'), QTableWidgetItem(cmax))
             self.dr_table.setItem(row_index, self.findColumnNumber('I Cmax'), QTableWidgetItem(icmax))
-            self.dr_table.setItem(row_index, self.findColumnNumber('IC50'), QTableWidgetItem(ic50))
+            self.dr_table.setItem(row_index, self.findColumnNumber(self.ic50_ec50), QTableWidgetItem(c50))
             self.dr_table.setItem(row_index, self.findColumnNumber('Hill'), QTableWidgetItem(slope))
 
             self.dr_table.setItem(row_index, self.findColumnNumber('Y Max'), QTableWidgetItem(top))
             self.dr_table.setItem(row_index, self.findColumnNumber('M Min'), QTableWidgetItem(bottom))
 
-    
+
     def tab_switched(self, index):
         tab_text = self.module_tab_wg.tabText(index)
+
+        self.populateColumn('IC50', '')
+        self.populateColumn('EC50', '')
+
+        
         if tab_text == "DR load data":
             print("User switched to dr_load_data tab")
             df = self.doseResponseTable.qtablewidget_to_dataframe()
@@ -288,12 +309,17 @@ class DoseResponseScreen(QMainWindow):
                 return
             self.populate_load_data(df)
 
+
     def toggleInhibition(self):
         sender = self.sender()
         if sender == self.inhibition_rb and sender.isChecked():
             self.activation_rb.setChecked(False)
-        elif sender == self.inhibition_rb and sender.isChecked():
+            self.doseResponseTable.changeIC50_EC50_heading('IC50')
+            self.ic50_ec50 = 'IC50'
+        elif sender == self.activation_rb and sender.isChecked():
             self.inhibition_rb.setChecked(False)
+            self.doseResponseTable.changeIC50_EC50_heading('EC50')
+            self.ic50_ec50 = 'EC50'
 
 
     def rowChanged(self, currentRowIndex):

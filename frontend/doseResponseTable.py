@@ -240,6 +240,13 @@ class DoseResponseTable(QTableWidget):
         return batch_df
 
 
+    def changeIC50_EC50_heading(self, newHeading):
+        header_item = self.horizontalHeaderItem(self.ic50_col)
+        print(newHeading)
+        if header_item:
+            header_item.setText(newHeading)
+
+
     def plotCurve(self, batch_df, rowPosition, yScale):
         # "Batch nr" "Compound ID" "finalConc_nM" "yMean" "yStd"
         batch = batch_df['Batch nr'].iloc[0]
