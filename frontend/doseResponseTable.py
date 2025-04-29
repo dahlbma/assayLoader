@@ -2,6 +2,7 @@ from scipy.optimize import curve_fit
 from scipy.integrate import quad
 import os
 import json
+import math
 import sys
 import numpy as np
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication, QFileDialog
@@ -44,22 +45,45 @@ class ScatterplotWidget(QWidget):
         slope, ic50, bottom, top, ic50_std, auc, sInfo = self.plot_scatter(data_dict, self.yScale)
 
 
+    def generateGraphString(self):
+        template_string = f"""{{
+  {{
+    name='raw' style='dot' x_label='conc' x_unit='M'
+    x_values={{{', '.join(map(str, self.x_values))}}}
+    y_label='Inhibition'
+    y_unit='%'
+    y_values={{{', '.join(map(str, self.y_values))}}}
+    y_error={{{', '.join(map(str, self.y_err_values))}}}
+  }}{{
+    name='fitsigmoidal' style='line' x_label='conc' x_unit='M'
+    x_values={{{', '.join(map(str, self.x_values))}}}
+    y_label='inhibition'
+    y_unit='%'
+    logic50={math.log10(self.ic50)}
+    hillslope={self.slope}
+    bottom={self.bottom}
+    top={self.top}
+  }}
+}}"""
+        return template_string
+        
+        
     def plot_scatter(self, df, yScale):
         self.ax.clear()
         self.plotted_data = df
         # Extract the 'x' and 'y' arrays
-        x_values = np.array(df['finalConc_nM'].values/1000000000, dtype=np.float64)
-        y_values = np.array(df['inhibition'].values, dtype=np.float64)
-        y_err_values = np.array(df['yStd'].values, dtype=np.float64)
+        self.x_values = np.array(df['finalConc_nM'].values/1000000000, dtype=np.float64)
+        self.y_values = np.array(df['inhibition'].values, dtype=np.float64)
+        self.y_err_values = np.array(df['yStd'].values, dtype=np.float64)
         sInfo = ''
         
         fitOk = True
         try:
             if 1 == 2:
-                top = np.max(y_values)
-                bottom = np.min(y_values)
+                top = np.max(self.y_values)
+                bottom = np.min(self.y_values)
                 slope = -1
-                ic50 = np.mean(x_values)/10
+                ic50 = np.mean(self.x_values)/10
                 bottom = 0
             
                 # Fit the data to the 4-PL model
@@ -76,8 +100,8 @@ class ScatterplotWidget(QWidget):
                 min_ic50 = 1e-12
 
                 params, covariance = curve_fit(fourpl,
-                                               x_values,
-                                               y_values,
+                                               self.x_values,
+                                               self.y_values,
                                                maxfev = 100000,
                                                p0=[slope, ic50, bottom, top],
                                                bounds=([min_slope, min_ic50, min_bot, min_top], [max_slope, max_ic50, max_bot, max_top])
@@ -86,14 +110,14 @@ class ScatterplotWidget(QWidget):
                 slope_std, ic50_std, bottom_std, top_std = perr
                 slope, ic50, bottom, top = params
                 print(f'SciPy slope {slope} ic50 {ic50} bottom {bottom} top {top}')
-                slope, ic50, bottom, top, sInfo = fit_curve(x_values, y_values)
+                slope, ic50, bottom, top, sInfo = fit_curve(self.x_values, self.y_values)
                 print(f'Mats slope {slope} ic50 {ic50} bottom {bottom} top {top}')
             else:
-                slope, ic50, bottom, top, sInfo = fit_curve(x_values, y_values)
+                slope, ic50, bottom, top, sInfo = fit_curve(self.x_values, self.y_values)
                 # Extract the fitted parameters
                 slope_std = ic50_std = bottom_std = top_std = -1
         except Exception as e:
-            print(f'''Can't fit parameters {str(e)} {x_values[0]}''')
+            print(f'''Can't fit parameters {str(e)} {self.x_values[0]}''')
             fitOk = False
             slope = -1
             ic50 = -1
@@ -102,16 +126,16 @@ class ScatterplotWidget(QWidget):
             ic50_std = -1
 
         # Generate a curve using the fitted parameters
-        x_curve = np.logspace(np.log10(min(x_values)), np.log10(max(x_values)), 100)
+        x_curve = np.logspace(np.log10(min(self.x_values)), np.log10(max(self.x_values)), 100)
         if fitOk == True:
             y_curve_fit = fourpl(x_curve, slope, ic50, bottom, top)
 
         # Plot the original data and the fitted curve with a logarithmic x-axis
         #plt.scatter(x_values, y_values, label='Original Data')
 
-        self.ax.errorbar(x_values, y_values, yerr=y_err_values, fmt='o', label='Raw data')
+        self.ax.errorbar(self.x_values, self.y_values, yerr=self.y_err_values, fmt='o', label='Raw data')
 
-        self.ax.set_ylim(min(min(y_values), 0) - 10, max(max(y_values), 100) + 10)
+        self.ax.set_ylim(min(min(self.y_values), 0) - 10, max(max(self.y_values), 100) + 10)
         
         if fitOk == True:
             self.ax.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
@@ -139,7 +163,7 @@ class ScatterplotWidget(QWidget):
         self.canvas.draw()
         self.figure.set_size_inches(5.81, 4.06)
 
-        (auc, err) = quad(fourpl, min(x_values), max(x_values), args=(slope, ic50, bottom, top))
+        (auc, err) = quad(fourpl, min(self.x_values), max(self.x_values), args=(slope, ic50, bottom, top))
         
         # Save all the parameters for the curve fitting
         self.auc = auc
@@ -152,6 +176,8 @@ class ScatterplotWidget(QWidget):
         self.maxConc = self.data_dict['finalConc_nM'].iloc[-1]
         self.icmax = self.data_dict['inhibition'].iloc[-1]
 
+        self.sGraph = self.generateGraphString()
+        
         return slope, ic50, bottom, top, ic50_std, auc, sInfo
 
 

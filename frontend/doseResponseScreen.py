@@ -241,7 +241,7 @@ class DoseResponseScreen(QMainWindow):
     def saveDrToDb(self):
         pass
 
-        
+
     def populateColumn(self, sCol, sValue):
         iNrRows = self.dr_table.rowCount()
         iCol = self.findColumnNumber(sCol)
@@ -273,6 +273,7 @@ class DoseResponseScreen(QMainWindow):
 
     def populate_load_data(self, df):
         self.dr_table.setRowCount(len(df))
+        
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
             compound_id = str(row_data["Compound"])
@@ -282,6 +283,8 @@ class DoseResponseScreen(QMainWindow):
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
             bottom = str(row_data["Bottom"])
+
+            sGraph = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).sGraph
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
@@ -293,6 +296,7 @@ class DoseResponseScreen(QMainWindow):
 
             self.dr_table.setItem(row_index, self.findColumnNumber('Y Max'), QTableWidgetItem(top))
             self.dr_table.setItem(row_index, self.findColumnNumber('M Min'), QTableWidgetItem(bottom))
+            self.dr_table.setItem(row_index, self.findColumnNumber('Graph'), QTableWidgetItem(sGraph))
 
 
     def tab_switched(self, index):
@@ -300,7 +304,6 @@ class DoseResponseScreen(QMainWindow):
 
         self.populateColumn('IC50', '')
         self.populateColumn('EC50', '')
-
         
         if tab_text == "DR load data":
             print("User switched to dr_load_data tab")
