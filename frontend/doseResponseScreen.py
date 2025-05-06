@@ -1,6 +1,6 @@
 import re, sys, os, logging, csv
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import QRegExp, QDate
+from PyQt5.QtCore import QRegExp, QDate, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton
 from PyQt5.QtWidgets import QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt5 import QtGui
@@ -142,6 +142,7 @@ class DoseResponseScreen(QMainWindow):
         self.dr_tab_col_confirmed = 18
 
         self.ic50_ec50 = 'IC50'
+        self.not_ic50_ec50 = 'EC50'
         
         self.populateScreenData()
         
@@ -239,7 +240,137 @@ class DoseResponseScreen(QMainWindow):
 
 
     def saveDrToDb(self):
-        pass
+        # If there is no data do nothing.
+        if self.dr_table.rowCount() == 0:
+            return
+        
+        def getDateColumn():
+            column_count = self.dr_table.columnCount()
+            # Initialize an empty list to store column names
+            column_names = []
+
+            # Loop through each column index
+            for col in range(column_count):
+                # Get the horizontal header item for the column
+                header_item = self.dr_table.horizontalHeaderItem(col)
+    
+                # Check if the header item is not None
+                if header_item.text() == 'experiment_date':
+                    return col
+        iDateCol = getDateColumn()
+        item = self.dr_table.item(0, iDateCol)
+        
+        #if self.dr_table.rowCount() > 0 and item is not None and item.text().strip() == "":
+        if self.dr_table.rowCount() > 0:
+            self.updateGrid()
+
+        def repopulate_errors(df):
+            self.populate_table(df, 'compound_id', insertRows=True, error=True)
+            self.populate_table(df, 'batch_id', error=True)
+            self.populate_table(df, 'target', error=True)
+            self.populate_table(df, 'model_system', error=True)
+            self.populate_table(df, 'project', error=True)
+            self.populate_table(df, 'plate', error=True)
+            self.populate_table(df, 'well', error=True)
+            self.populate_table(df, 'assay_type', error=True)
+            self.populate_table(df, 'detection_type', error=True)
+            self.populate_table(df, 'viability_measurement', error=True)
+
+            self.populate_table(df, 'Cmax', error=True)
+            self.populate_table(df, 'Y max', error=True)
+            self.populate_table(df, 'M min', error=True)
+            self.populate_table(df, 'Hill', error=True)
+            self.populate_table(df, 'IC50', error=True)
+            self.populate_table(df, 'EC50', error=True)
+            self.populate_table(df, 'I Cmax', error=True)
+            self.populate_table(df, 'E Cmax', error=True)
+
+            self.populate_table(df, 'test_date', error=True)
+            self.populate_table(df, 'operator', error=True)
+            self.populate_table(df, 'eln', error=True)
+            self.populate_table(df, 'comment', error=True)
+
+        repopulate_data = []
+        def uploadRows(rows, targetTable):
+            if accumulated_rows == []:
+                return
+
+            sRes, lStatus = dbInterface.saveDrRowToDb(self.token, accumulated_rows, targetTable)
+            
+            if lStatus == False:
+                for ro in sRes:
+                    repopulate_data.append(ro)
+
+        accumulated_rows = []
+        iAccumulator_count = 0
+        iRowsBatch = 3
+        targetTable = self.targetTable_cb.currentText()
+        self.popup = PopUpProgress(f'Uploading data')
+        self.popup.show()
+        iNrOfRows = self.dr_table.rowCount()
+        iTick = 0
+        rProgressSteps = (iRowsBatch/iNrOfRows)*100
+
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        for row in range(self.dr_table.rowCount()):
+            row_dict = {}
+            for col in range(self.dr_table.columnCount()):
+                header_item = self.dr_table.horizontalHeaderItem(col)
+                item = self.dr_table.item(row, col)
+                if header_item and item:
+                    column_name = header_item.text()
+                    cell_value = item.text()
+                    row_dict[column_name] = cell_value
+            accumulated_rows.append(row_dict)
+            iAccumulator_count += 1
+
+            if iAccumulator_count == iRowsBatch:
+                uploadRows(accumulated_rows, targetTable)
+                accumulated_rows = []
+                iAccumulator_count = 0
+            
+                iTick += rProgressSteps
+                self.popup.obj.proc_counter(int(iTick))
+                QApplication.processEvents()
+
+        if iAccumulator_count > 0:
+            uploadRows(accumulated_rows, targetTable)
+
+        self.dr_table.setRowCount(0)
+        dfRepopulate = pd.DataFrame(repopulate_data)
+        repopulate_errors(dfRepopulate)
+        QApplication.restoreOverrideCursor()
+        self.popup.obj.proc_counter(100)
+        self.popup.close()
+
+
+    def populate_table(self, dataframe, column_name, insertRows=False, error=False):
+        
+        def insertRow(iNrOfRows, iNrOfCols):
+            iLocalCol = 0
+            for iRow in range(iNrOfRows):
+                self.dr_table.insertRow(iRow)
+                for iCol in range(iNrOfCols):
+                    item = QTableWidgetItem(str(''))
+                    self.dr_table.setItem(iRow, iCol, item)
+
+        if insertRows:
+            insertRow(dataframe.shape[0], self.dr_table.columnCount())
+
+        iCol = self.findColumnNumber(column_name)
+
+        if iCol == -1:
+            self.printQcLog(f"Couldn't find column {column_name}", 'error')
+            return
+        
+        # Populate the specified column of the table with data from the DataFrame
+        iRow_index = 0
+        for row_index, row_data in dataframe.iterrows():
+            item = QTableWidgetItem(str(row_data[column_name]))
+            self.dr_table.setItem(iRow_index, iCol, item)
+            if error == True:
+                item.setBackground(QBrush(QColor('red')))
+            iRow_index += 1
 
 
     def populateColumn(self, sCol, sValue):
@@ -253,6 +384,11 @@ class DoseResponseScreen(QMainWindow):
         for iRow_index in range(iNrRows):
             item = QTableWidgetItem(str(sValue))
             self.dr_table.setItem(iRow_index, iCol, item)
+
+
+    def printQcLog(self, s, type='', beep=False):
+        # What should we do here?
+        pass
 
 
     def updateGrid(self):
@@ -278,8 +414,15 @@ class DoseResponseScreen(QMainWindow):
             batch_id = str(row_data["Batch"])
             compound_id = str(row_data["Compound"])
             cmax = str(row_data["Max Conc nM"])
-            icmax = str(row_data["ICMax"])
+            if self.ic50_ec50 == 'IC50':
+                icmax = str(row_data["ICMax"])
+                ecmax = ''
+            else:
+                icmax = ''
+                ecmax = str(row_data["ICMax"])
+                
             c50 = str(row_data[self.ic50_ec50])
+            not_c50 = ''
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
             bottom = str(row_data["Bottom"])
@@ -291,7 +434,9 @@ class DoseResponseScreen(QMainWindow):
             
             self.dr_table.setItem(row_index, self.findColumnNumber('Cmax'), QTableWidgetItem(cmax))
             self.dr_table.setItem(row_index, self.findColumnNumber('I Cmax'), QTableWidgetItem(icmax))
+            self.dr_table.setItem(row_index, self.findColumnNumber('E Cmax'), QTableWidgetItem(ecmax))
             self.dr_table.setItem(row_index, self.findColumnNumber(self.ic50_ec50), QTableWidgetItem(c50))
+            self.dr_table.setItem(row_index, self.findColumnNumber(self.not_ic50_ec50), QTableWidgetItem(not_c50))
             self.dr_table.setItem(row_index, self.findColumnNumber('Hill'), QTableWidgetItem(slope))
 
             self.dr_table.setItem(row_index, self.findColumnNumber('Y Max'), QTableWidgetItem(top))
@@ -319,10 +464,12 @@ class DoseResponseScreen(QMainWindow):
             self.activation_rb.setChecked(False)
             self.doseResponseTable.changeIC50_EC50_heading('IC50')
             self.ic50_ec50 = 'IC50'
+            self.not_ic50_ec50 = 'EC50'
         elif sender == self.activation_rb and sender.isChecked():
             self.inhibition_rb.setChecked(False)
             self.doseResponseTable.changeIC50_EC50_heading('EC50')
             self.ic50_ec50 = 'EC50'
+            self.not_ic50_ec50 = 'IC50'
 
 
     def rowChanged(self, currentRowIndex):

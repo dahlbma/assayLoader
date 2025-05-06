@@ -163,6 +163,22 @@ def saveSpRowToDb(token, rows, targetTable):
         return r.content.decode(), True
 
 
+def saveDrRowToDb(token, rows, targetTable):
+    data = {'rows': rows, 'targetTable': targetTable}
+    r = requests.post(f'{baseUrl}saveDrRowToDb',
+                      headers={'token':token},
+                      json = data)
+    
+    if r.status_code != 200:
+        try:
+            data = ast.literal_eval(r.content.decode())
+        except:
+            return r.content.decode(), False
+        return data, False
+    else:
+        return r.content.decode(), True
+
+    
 def getPlate(token, plate):
     r = requests.get(f'{baseUrl}getPlate/{plate}',
                      headers={'token':token})
