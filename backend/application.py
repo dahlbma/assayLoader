@@ -242,7 +242,128 @@ class PingDB(tornado.web.RequestHandler):
             self.set_status(400)
 
 
+def implSaveDrRowToDb(self, row, targetTable):
 
+    def nullifyNumeric(sString):
+        if sString == '':
+            return None
+        else:
+            return sString
+        
+    assayDB = getDatabase(self)
+
+    try:
+        sCompound = row['compound_id']
+        sBatch = row['batch_id']
+        sTarget = row['target']
+        sModelSystem = row['model_system']
+        sProject = row['project']
+        sAssay_type = row['assay_type']
+        sDetection_type = row['detection_type']
+        sViability_measurement = row['viability_measurement']
+        sCmax = row['Cmax']
+        sYmax = nullifyNumeric(row['Y Max'])
+        sMmin = nullifyNumeric(row['M Min'])
+        sHill = row['Hill']
+        sIC50 = nullifyNumeric(row['IC50'])
+        sEC50 = nullifyNumeric(row['EC50'])
+        sICmax = nullifyNumeric(row['I Cmax'])
+        sECmax = nullifyNumeric(row['E Cmax'])
+        sGraph = row['Graph']
+        sExperiment_date = row['experiment_date']
+        sOperator = row['operator']
+        sEln = row['eln']
+        sComment = row['comment']
+    except:
+        logging.error(row)
+        sStatus = 400
+        return sStatus, 'Can not parse input'
+
+    if targetTable == "assay_test.lcb_dr":
+        tTable = targetTable
+    else:
+        logging.info("Wrong DR table")
+        #tTable = f'{assayDB}.{targetTable}'
+        pass
+
+    sSql = f'''insert into {tTable}
+    (compound_id,
+    compound_batch,
+    project,
+    target,
+    model_system,
+    assay_type,
+    detection_type,
+    viability_measurement,
+    CMAX,
+    Y_MAX,
+    M_MIN,
+    Hill,
+    IC50,
+    EC50,
+    I_CMAX,
+    E_CMAX,
+    GRAPH,
+    TDATE,
+    operator,
+    eln_id,
+    COMMENTS,
+    CREATED_DATE)
+    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+    '''
+
+    sError = ''
+    sStatus = 200
+    
+    try:
+        sSql = sSql.encode('utf-8', 'replace').decode('utf-8')
+        cur.execute(sSql, (sCompound, sBatch,
+                           sProject, sTarget,
+                           sModelSystem, sAssay_type,
+                           sDetection_type, sViability_measurement,
+                           sCmax, sYmax, sMmin, sHill, sIC50, sEC50, sICmax, sECmax, sGraph, 
+                           sExperiment_date, sOperator, sEln, sComment,))
+    except Exception as e:
+        sError = f"{str(e).encode('utf-8', 'replace').decode('utf-8')}"
+        logging.error(sError)
+        self.set_status(400)
+        sStatus = 400
+    return sStatus, sError
+
+
+@jwtauth
+class SaveDrRowToDb(tornado.web.RequestHandler):
+    
+    def post(self, *args, **kwargs):
+        data = json.loads(self.request.body)
+        saRows = data.get('rows')
+        targetTable = data.get("targetTable")
+        if targetTable == 'DR Sandbox table':
+            targetTable = 'assay_test.lcb_dr'
+        elif targetTable == 'Primary screen':
+            targetTable = 'assay_test.lcb_dr'
+        else:
+            self.set_status(400)
+            self.finish()
+            return
+
+        saError = []
+        iRowIndex = 0
+        for row in saRows:
+            status, sMessage = implSaveDrRowToDb(self, row, targetTable)
+            if status != 200:
+                saError.append(row)
+            iRowIndex += 1
+                
+        self.set_header("Content-Type", "application/json")
+        if len(saError) != 0:
+            self.set_status(400)
+        if len(saError) > 0:
+            logging.info(f'Error {saError}')
+            
+        self.finish(json.dumps(saError))
+
+        
 def implSaveSpRowToDb(self, row, targetTable):
 
     def nullifyNumeric(sString):
@@ -280,7 +401,6 @@ def implSaveSpRowToDb(self, row, targetTable):
         tTable = targetTable
     else:
         tTable = f'{assayDB}.{targetTable}'
-
 
     sSql = f'''insert into {tTable}
     (compound_id,
