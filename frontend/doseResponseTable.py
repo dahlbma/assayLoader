@@ -169,7 +169,7 @@ class ScatterplotWidget(QWidget):
         self.auc = auc
         self.ic50 = ic50
         self.fit_quality = sInfo
-        self.slope = slope
+        self.slope = -slope
         self.top = top
         self.bottom = bottom
         self.minConc = self.data_dict['finalConc_nM'].iloc[0]
@@ -313,7 +313,8 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(scatterplot_widget.fit_quality)
         self.setItem(rowPosition, self.ic50std_col, item) # 3
 
-        item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
+        #item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
+        item = QTableWidgetItem(str(f"{scatterplot_widget.slope:.2f}"))
         self.setItem(rowPosition, self.slope_col, item) #4
 
         item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))
