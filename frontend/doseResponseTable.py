@@ -169,7 +169,7 @@ class ScatterplotWidget(QWidget):
         self.auc = auc
         self.ic50 = ic50
         self.fit_quality = sInfo
-        self.slope = slope
+        self.slope = -slope
         self.top = top
         self.bottom = bottom
         self.minConc = self.data_dict['finalConc_nM'].iloc[0]
@@ -215,18 +215,42 @@ class DoseResponseTable(QTableWidget):
         # Get headers
         for column in range(self.columnCount()):
             headers.append(self.horizontalHeaderItem(column).text())
+        headers.append('comment')
 
         # Get data
         for row in range(self.rowCount()):
+
             row_data = []
+            sComment = ''
             for column in range(self.columnCount()):
                 item = self.item(row, column)
                 if item is not None:
                     row_data.append(item.text())
                 else:
                     row_data.append(None)  # Handle empty cells
+                
+            row_data.append(sComment)
             data.append(row_data)
-        return pd.DataFrame(data, columns=headers)
+            
+        df = pd.DataFrame(data, columns=headers)
+        df['Slope'] = df['Slope'].astype(float)
+        df['Bottom'] = df['Bottom'].astype(float)
+        df['Top'] = df['Top'].astype(float)
+        df['ICMax'] = df['Slope'].astype(float)
+        df.loc[df['Slope'] > 4, 'comment'] = df['comment'].astype(str) + ' High Hill Slope;'
+        df.loc[df['Slope'] < 0.5, 'comment'] = df['comment'].astype(str) + ' Low Hill Slope;'
+        df.loc[df['Top'] < 80, 'comment'] = df['comment'].astype(str) + ' Ymax < 80%;'
+
+        difference = df['Top'] - df['Bottom']
+        df.loc[difference < 60, 'comment'] = df['comment'].astype(str) + ' Low effect'
+
+        '''
+        mask = ~df['Compound'].str.startswith('CBK')
+        # Remove the rows that doesn't start with 'CBK'
+        df = df[~mask]
+        '''
+        
+        return df
 
         
     def generate_scatterplots(self, file_path, yScale, parent):
@@ -313,7 +337,7 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(scatterplot_widget.fit_quality)
         self.setItem(rowPosition, self.ic50std_col, item) # 3
 
-        item = QTableWidgetItem(str(f"{abs(scatterplot_widget.slope):.2f}"))
+        item = QTableWidgetItem(str(f"{scatterplot_widget.slope:.2f}"))
         self.setItem(rowPosition, self.slope_col, item) #4
 
         item = QTableWidgetItem(str(f"{scatterplot_widget.bottom:.2f}"))

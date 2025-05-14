@@ -403,12 +403,13 @@ class DoseResponseScreen(QMainWindow):
         testDate = self.testDate.date()
         sDate = testDate.toString("yyyy-MM-dd") 
         self.populateColumn('experiment_date', sDate)
-        self.populateColumn('comment', self.comment_eb.text())
+        #self.populateColumn('comment', self.comment_eb.text())
         self.populateColumn('eln', self.eln_eb.text())
 
 
     def populate_load_data(self, df):
         self.dr_table.setRowCount(len(df))
+        self.populateColumn('Confirmed', '')        
         
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
@@ -426,7 +427,8 @@ class DoseResponseScreen(QMainWindow):
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
             bottom = str(row_data["Bottom"])
-
+            sComment = str(row_data["comment"])
+            
             sGraph = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).sGraph
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
@@ -441,6 +443,7 @@ class DoseResponseScreen(QMainWindow):
 
             self.dr_table.setItem(row_index, self.findColumnNumber('Y Max'), QTableWidgetItem(top))
             self.dr_table.setItem(row_index, self.findColumnNumber('M Min'), QTableWidgetItem(bottom))
+            self.dr_table.setItem(row_index, self.findColumnNumber('comment'), QTableWidgetItem(sComment))
             self.dr_table.setItem(row_index, self.findColumnNumber('Graph'), QTableWidgetItem(sGraph))
 
 
