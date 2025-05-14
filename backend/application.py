@@ -274,7 +274,9 @@ def implSaveDrRowToDb(self, row, targetTable):
         sOperator = row['operator']
         sEln = row['eln']
         sComment = row['comment']
-    except:
+        sConfirmed = row['Confirmed']
+    except Exception as e:
+        logging.error(str(e))
         logging.error(row)
         sStatus = 400
         return sStatus, 'Can not parse input'
@@ -308,8 +310,9 @@ def implSaveDrRowToDb(self, row, targetTable):
     operator,
     eln_id,
     COMMENTS,
+    CONFIRMED,
     CREATED_DATE)
-    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
     '''
 
     sError = ''
@@ -322,7 +325,7 @@ def implSaveDrRowToDb(self, row, targetTable):
                            sModelSystem, sAssay_type,
                            sDetection_type, sViability_measurement,
                            sCmax, sYmax, sMmin, sHill, sIC50, sEC50, sICmax, sECmax, sGraph, 
-                           sExperiment_date, sOperator, sEln, sComment,))
+                           sExperiment_date, sOperator, sEln, sComment, sConfirmed))
     except Exception as e:
         sError = f"{str(e).encode('utf-8', 'replace').decode('utf-8')}"
         logging.error(sError)
