@@ -198,6 +198,20 @@ class DoseResponseTable(QTableWidget):
         self.workingDirectory = ''
         self.parent = None
 
+    def generateComment(self, df):
+        df['Slope'] = df['Slope'].astype(float)
+        df['Bottom'] = df['Bottom'].astype(float)
+        df['Top'] = df['Top'].astype(float)
+        df['ICMax'] = df['Slope'].astype(float)
+        df.loc[df['Slope'] > 4, 'comment'] = df['comment'].astype(str) + ' High Hill Slope;'
+        df.loc[df['Slope'] < 0.5, 'comment'] = df['comment'].astype(str) + ' Low Hill Slope;'
+        df.loc[df['Top'] < 80, 'comment'] = df['comment'].astype(str) + ' Ymax < 80%;'
+
+        difference = df['Top'] - df['Bottom']
+        df.loc[difference < 60, 'comment'] = df['comment'].astype(str) + ' Low effect'
+        return df
+
+        
     def qtablewidget_to_dataframe(self):
         """
         Converts a QTableWidget to a pandas DataFrame.
@@ -233,17 +247,7 @@ class DoseResponseTable(QTableWidget):
             data.append(row_data)
             
         df = pd.DataFrame(data, columns=headers)
-        df['Slope'] = df['Slope'].astype(float)
-        df['Bottom'] = df['Bottom'].astype(float)
-        df['Top'] = df['Top'].astype(float)
-        df['ICMax'] = df['Slope'].astype(float)
-        df.loc[df['Slope'] > 4, 'comment'] = df['comment'].astype(str) + ' High Hill Slope;'
-        df.loc[df['Slope'] < 0.5, 'comment'] = df['comment'].astype(str) + ' Low Hill Slope;'
-        df.loc[df['Top'] < 80, 'comment'] = df['comment'].astype(str) + ' Ymax < 80%;'
-
-        difference = df['Top'] - df['Bottom']
-        df.loc[difference < 60, 'comment'] = df['comment'].astype(str) + ' Low effect'
-
+        df = self.generateComment(df)
         '''
         mask = ~df['Compound'].str.startswith('CBK')
         # Remove the rows that doesn't start with 'CBK'
