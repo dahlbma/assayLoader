@@ -79,6 +79,12 @@ def check_bounds(val, param):
 
     return val
 
+def sigmoid_derivative(x, slope, ic50, bottom, top):
+    """Derivative of the 4PL sigmoid function."""
+    exponent = slope * np.log(x / ic50)
+    denominator = (1 + np.exp(exponent))**2
+    return (top - bottom) * slope * (1 / x) * (x / ic50)**slope / denominator
+
 # Step 1: Define the 4-PL model
 def four_parameter_logistic(x, slope, ic50, bottom, top):
     return bottom + (top - bottom) / (1 + (x / ic50) ** -slope)
@@ -211,7 +217,9 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
             axs[0,0].set_xscale('log')
             plt.pause(0.001)
         '''
-    return slope, ic50, bottom, top, f'RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n'
+    der_bottom = sigmoid_derivative(x[0], slope, ic50, bottom, top)
+    der_top = sigmoid_derivative(x[-1], slope, ic50, bottom, top)
+    return slope, ic50, bottom, top, f'RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n {"{:.1f}".format(der_bottom)}\n {"{:.1f}".format(der_top)}'
 
 def fit_curve(x, y):
     BOUNDS['top']['MIN'] = max(y) * 0.7
