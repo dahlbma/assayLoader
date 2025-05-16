@@ -39,9 +39,9 @@ class ScatterplotWidget(QWidget):
         self.setLayout(layout)
         # self.data_dict contains the original data for each plot, so we can reconstruct the original curve at all times
         self.data_dict = data_dict
-        # self.plotted_data contains the datapoints that are plottedt (in case some points are de-selected in the GUI)
+        # self.plotted_data contains the datapoints that are plotted (in case some points are de-selected in the GUI)
         self.plotted_data = data_dict
-
+        self.confirmed = 'N'
         slope, ic50, bottom, top, ic50_std, auc, sInfo = self.plot_scatter(data_dict, self.yScale)
 
 
@@ -67,10 +67,23 @@ class ScatterplotWidget(QWidget):
 }}"""
         return template_string
         
+
+    def isConfirmed(self):
+        df = self.data_dict
+        count_above_50 = df[df['inhibition'] > 50.0].shape[0]
+        count_below_20 = df[df['inhibition'] < 20.0].shape[0]
         
+        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50):
+            self.confirmed = 'Y'
+        else:
+            self.confirmed = 'N'
+        return self.confirmed
+
+    
     def plot_scatter(self, df, yScale):
         self.ax.clear()
         self.plotted_data = df
+
         # Extract the 'x' and 'y' arrays
         self.x_values = np.array(df['finalConc_nM'].values/1000000000, dtype=np.float64)
         self.y_values = np.array(df['inhibition'].values, dtype=np.float64)
@@ -177,6 +190,7 @@ class ScatterplotWidget(QWidget):
         self.icmax = self.data_dict['inhibition'].iloc[-1]
 
         self.sGraph = self.generateGraphString()
+        self.confirmed = self.isConfirmed()
         
         return slope, ic50, bottom, top, ic50_std, auc, sInfo
 
@@ -195,6 +209,7 @@ class DoseResponseTable(QTableWidget):
         self.auc_col = 9
         self.icmax_col = 10
         self.graph_col = 11
+        self.confirmed_col = 12
         self.workingDirectory = ''
         self.parent = None
 
@@ -206,7 +221,7 @@ class DoseResponseTable(QTableWidget):
         df.loc[df['Slope'] > 4, 'comment'] = df['comment'].astype(str) + ' High Hill Slope;'
         df.loc[df['Slope'] < 0.5, 'comment'] = df['comment'].astype(str) + ' Low Hill Slope;'
         df.loc[df['Top'] < 80, 'comment'] = df['comment'].astype(str) + ' Ymax < 80%;'
-
+        
         difference = df['Top'] - df['Bottom']
         df.loc[difference < 60, 'comment'] = df['comment'].astype(str) + ' Low effect'
         return df
@@ -248,12 +263,12 @@ class DoseResponseTable(QTableWidget):
             
         df = pd.DataFrame(data, columns=headers)
         df = self.generateComment(df)
+
         '''
         mask = ~df['Compound'].str.startswith('CBK')
         # Remove the rows that doesn't start with 'CBK'
         df = df[~mask]
         '''
-        
         return df
 
         
@@ -264,7 +279,7 @@ class DoseResponseTable(QTableWidget):
         # Set the graph column to be 600 wide
         self.clearContents()
         self.setRowCount(0)
-        self.setColumnWidth(self.graph_col, 600)
+        self.setColumnWidth(self.graph_col, 400)
         df = pd.read_excel(file_path)
 
         dialog = assaylib.CancelDialog(self)
@@ -283,7 +298,7 @@ class DoseResponseTable(QTableWidget):
                 if rowPosition > 20:
                     continue
             self.insertRow(rowPosition)
-            self.setRowHeight(rowPosition, 425)
+            self.setRowHeight(rowPosition, 300)
             
             print(f'Plot nr: {rowPosition}')
             # Call the scatter function for each batch
@@ -305,8 +320,6 @@ class DoseResponseTable(QTableWidget):
         # "Batch nr" "Compound ID" "finalConc_nM" "yMean" "yStd"
         batch = batch_df['Batch nr'].iloc[0]
         compound = batch_df['Compound ID'].iloc[0]
-        #print("######################################")
-        #print(f'Compound_id: {compound}')      
 
         scatterplot_widget = ScatterplotWidget(batch_df, rowPosition, yScale, self.workingDirectory)
         item = QTableWidgetItem(batch)
@@ -362,6 +375,9 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(str(f"{scatterplot_widget.auc:.5f}"))
         self.setItem(rowPosition, self.auc_col, item)
 
+        item = QTableWidgetItem(str(f"{scatterplot_widget.confirmed}"))
+        self.setItem(rowPosition, self.confirmed_col, item)
+
 
     def saveToExcel(self, sFileName = None):
         sDir = self.workingDirectory
@@ -398,7 +414,7 @@ class DoseResponseTable(QTableWidget):
             table_data.append(row_data)
 
         columns = ['Batch', 'Compound', 'IC50', 'Quality', 'Slope',
-                   'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'ICMax', 'Graph']
+                   'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'ICMax', 'Graph', 'Confirmed']
         df = pd.DataFrame(table_data, columns=columns)
 
         wb = Workbook()

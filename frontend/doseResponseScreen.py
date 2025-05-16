@@ -430,6 +430,7 @@ class DoseResponseScreen(QMainWindow):
             sComment = str(row_data["comment"])
             
             sGraph = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).sGraph
+            sConfirmed = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).confirmed
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
@@ -445,6 +446,7 @@ class DoseResponseScreen(QMainWindow):
             self.dr_table.setItem(row_index, self.findColumnNumber('M Min'), QTableWidgetItem(bottom))
             self.dr_table.setItem(row_index, self.findColumnNumber('comment'), QTableWidgetItem(sComment))
             self.dr_table.setItem(row_index, self.findColumnNumber('Graph'), QTableWidgetItem(sGraph))
+            self.dr_table.setItem(row_index, self.findColumnNumber('Confirmed'), QTableWidgetItem(sConfirmed))
 
 
     def tab_switched(self, index):

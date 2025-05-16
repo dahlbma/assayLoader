@@ -320,6 +320,11 @@
                 <string>Graph</string>
                </property>
               </column>
+              <column>
+               <property name="text">
+                <string>Confirmed</string>
+               </property>
+              </column>
              </widget>
             </item>
             <item>
