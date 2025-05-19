@@ -42,6 +42,7 @@ class ScatterplotWidget(QWidget):
         # self.plotted_data contains the datapoints that are plotted (in case some points are de-selected in the GUI)
         self.plotted_data = data_dict
         self.confirmed = 'N'
+        self.comment = ''
         slope, ic50, bottom, top, ic50_std, auc, sInfo = self.plot_scatter(data_dict, self.yScale)
 
 
@@ -66,20 +67,42 @@ class ScatterplotWidget(QWidget):
   }}
 }}"""
         return template_string
-        
 
+
+    def generateComment(self):
+        comment = ''
+        if self.slope > 4:
+            comment += ' High Hill Slope;'
+        if self.slope < 0.5:
+            comment += ' Low Hill Slope;'
+        if self.top < 80:
+            comment += ' Ymax < 80%;'
+            
+        difference = self.top - self.bottom
+        if difference < 50:
+            comment += ' Low effect;'
+
+        if self.derivative_ic50_div_bot < 2.5:
+            comment += ' No defined bottom;'
+
+        if self.derivative_ic50_div_top < 20:
+            comment += ' No defined top;'
+            
+        return comment
+
+    
     def isConfirmed(self):
         df = self.data_dict
         count_above_50 = df[df['inhibition'] > 50.0].shape[0]
         count_below_20 = df[df['inhibition'] < 20.0].shape[0]
         
-        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50):
+        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50) and self.derivative_ic50_div_bot > 2.5 and self.derivative_ic50_div_top > 20:
             self.confirmed = 'Y'
         else:
             self.confirmed = 'N'
         return self.confirmed
 
-    
+
     def plot_scatter(self, df, yScale):
         self.ax.clear()
         self.plotted_data = df
@@ -123,10 +146,10 @@ class ScatterplotWidget(QWidget):
                 slope_std, ic50_std, bottom_std, top_std = perr
                 slope, ic50, bottom, top = params
                 print(f'SciPy slope {slope} ic50 {ic50} bottom {bottom} top {top}')
-                slope, ic50, bottom, top, sInfo = fit_curve(self.x_values, self.y_values)
+                slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top = fit_curve(self.x_values, self.y_values)
                 print(f'Mats slope {slope} ic50 {ic50} bottom {bottom} top {top}')
             else:
-                slope, ic50, bottom, top, sInfo = fit_curve(self.x_values, self.y_values)
+                slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top = fit_curve(self.x_values, self.y_values)
                 # Extract the fitted parameters
                 slope_std = ic50_std = bottom_std = top_std = -1
         except Exception as e:
@@ -178,19 +201,22 @@ class ScatterplotWidget(QWidget):
 
         (auc, err) = quad(fourpl, min(self.x_values), max(self.x_values), args=(slope, ic50, bottom, top))
         
-        # Save all the parameters for the curve fitting
+        # Save all the parameters from the curve fitting
         self.auc = auc
         self.ic50 = ic50
         self.fit_quality = sInfo
         self.slope = -slope
         self.top = top
         self.bottom = bottom
+        self.derivative_ic50_div_bot = derivative_ic50_div_bot
+        self.derivative_ic50_div_top = derivative_ic50_div_top
         self.minConc = self.data_dict['finalConc_nM'].iloc[0]
         self.maxConc = self.data_dict['finalConc_nM'].iloc[-1]
         self.icmax = self.data_dict['inhibition'].iloc[-1]
 
         self.sGraph = self.generateGraphString()
         self.confirmed = self.isConfirmed()
+        self.comment = self.generateComment()
         
         return slope, ic50, bottom, top, ic50_std, auc, sInfo
 
@@ -210,9 +236,10 @@ class DoseResponseTable(QTableWidget):
         self.icmax_col = 10
         self.graph_col = 11
         self.confirmed_col = 12
+        self.comment_col = 13
         self.workingDirectory = ''
         self.parent = None
-
+    '''
     def generateComment(self, df):
         df['Slope'] = df['Slope'].astype(float)
         df['Bottom'] = df['Bottom'].astype(float)
@@ -225,7 +252,7 @@ class DoseResponseTable(QTableWidget):
         difference = df['Top'] - df['Bottom']
         df.loc[difference < 60, 'comment'] = df['comment'].astype(str) + ' Low effect'
         return df
-
+    '''
         
     def qtablewidget_to_dataframe(self):
         """
@@ -262,7 +289,7 @@ class DoseResponseTable(QTableWidget):
             data.append(row_data)
             
         df = pd.DataFrame(data, columns=headers)
-        df = self.generateComment(df)
+        #df = self.generateComment(df)
 
         '''
         mask = ~df['Compound'].str.startswith('CBK')
@@ -378,6 +405,9 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(str(f"{scatterplot_widget.confirmed}"))
         self.setItem(rowPosition, self.confirmed_col, item)
 
+        item = QTableWidgetItem(str(f"{scatterplot_widget.comment}"))
+        self.setItem(rowPosition, self.comment_col, item)
+
 
     def saveToExcel(self, sFileName = None):
         sDir = self.workingDirectory
@@ -406,27 +436,26 @@ class DoseResponseTable(QTableWidget):
             if not os.path.exists(imgDir):
                 # Create the directory and any missing parent directories
                 os.makedirs(imgDir)
-            
-        # Convert QTableWidget data to a pandas DataFrame
-        table_data = []
-        for row in range(self.rowCount()):
-            row_data = [self.item(row, col).text() if col < 12 else None for col in range(self.columnCount())]
-            table_data.append(row_data)
-
-        columns = ['Batch', 'Compound', 'IC50', 'Quality', 'Slope',
-                   'Bottom', 'Top', 'Min Conc nM', 'Max Conc nM', 'AUC', 'ICMax', 'Graph', 'Confirmed']
-        df = pd.DataFrame(table_data, columns=columns)
 
         wb = Workbook()
         ws = wb.active
 
         headings = ["Batch", "Compound", "IC50", "Fit quality", "Slope",
-                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "ICMax", "Graph"]
+                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "ICMax", "Graph", "Confirmed", "Comment"]
+                
+        # Convert QTableWidget data to a pandas DataFrame
+        table_data = []
+        for row in range(self.rowCount()):
+            row_data = [self.item(row, col).text() if col < len(headings) else None for col in range(self.columnCount())]
+            table_data.append(row_data)
+
+
+        df = pd.DataFrame(table_data, columns=headings)
 
         for col_num, heading in enumerate(headings, 1):
             cell = ws.cell(row=1, column=col_num, value=heading)
             cell.font = Font(bold=True)
-        
+
         # Write DataFrame to Excel
         for r_idx, row in enumerate(df.itertuples(index=False), start=2):  # Start from row 2 to leave space for header
             for c_idx, value in enumerate(row, start=1):
@@ -453,7 +482,7 @@ class DoseResponseTable(QTableWidget):
         for r_idx in range(2, len(df) + 2):  # Include header row
             ws.row_dimensions[r_idx].height = 160  # Adjust the height as needed
             
-        for c_idx in range(1, len(columns) + 1):
+        for c_idx in range(1, len(headings) + 1):
             ws.column_dimensions[chr(ord('A') + c_idx - 1)].width = 13  # Adjust the width as needed
 
         ws.column_dimensions[chr(ord('L'))].width = 40

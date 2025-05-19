@@ -4,7 +4,7 @@ from PyQt5.QtCore import QRegExp, QDate, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton
 from PyQt5.QtWidgets import QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QRegExpValidator
+from PyQt5.QtGui import QIntValidator, QBrush, QColor, QRegExpValidator, QCursor
 import openpyxl
 from pathlib import Path
 from instruments import parseEnvision
@@ -140,6 +140,7 @@ class DoseResponseScreen(QMainWindow):
         self.dr_tab_col_operator = 16
         self.dr_tab_col_eln = 17
         self.dr_tab_col_confirmed = 18
+        self.dr_tab_col_comment = 19
 
         self.ic50_ec50 = 'IC50'
         self.not_ic50_ec50 = 'EC50'
@@ -206,10 +207,6 @@ class DoseResponseScreen(QMainWindow):
         
         self.detectionType_cb.addItems(saDetectionType)
         self.viabilityMeasure_cb.addItems(saViabilityMeasurement)
-
-        
-        #saScreenType = dbInterface.getScreenTypes(self.token)
-        #self.screenType_cb.addItems(saScreenType)
 
         self.testDate.setDate(QDate.currentDate())
 
@@ -431,6 +428,7 @@ class DoseResponseScreen(QMainWindow):
             
             sGraph = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).sGraph
             sConfirmed = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).confirmed
+            sComment = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).comment
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
@@ -670,7 +668,7 @@ class DoseResponseScreen(QMainWindow):
         platemapDf = pd.read_excel(platemap_xlsx)
         
         rawDataFilesDf = pd.read_excel(plateIdToFileMapping)
-        
+
         # Final volume in nano liter (nL)
         final_volume = float(self.finalWellVolumeMicroliter_eb.text())*1000.0
         if len(platemapDf) > 0:
@@ -689,9 +687,13 @@ class DoseResponseScreen(QMainWindow):
         sDataColName = self.sDataColName
         if sDataColName == '':
             return
+
+        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        QApplication.processEvents()
         
         combinedDataDf = pd.DataFrame()
         for index, row in rawDataFilesDf.iterrows():
+            QApplication.processEvents()
             plate = row['plate']
             file_path = row['file']
         
@@ -706,6 +708,7 @@ class DoseResponseScreen(QMainWindow):
         platemapDf['rawData'] = ''
         
         for index, row in platemapDf.iterrows():
+            QApplication.processEvents()
             plate_id = row['Platt ID']
             well = row['Well']
         
@@ -733,6 +736,7 @@ class DoseResponseScreen(QMainWindow):
             meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]
         except:
             userInfo(f'''No controls named {sCtrl} in the dataset''')
+            QApplication.restoreOverrideCursor()
             return
         
         resultDf['inhibition'] = 100*(1-(resultDf['yMean']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl))
@@ -755,12 +759,12 @@ class DoseResponseScreen(QMainWindow):
         excel_file_path_deselected = os.path.join(self.workingDirectory, 'finalPreparedDR_deselected_datapoints.xlsx')
         self.pathToFinalPreparedDR_deselects = excel_file_path_deselected
 
-
         resultDf = self.remove_single_row_compounds(resultDf)
         
         #fullPath = os.path.join(sBasePath, excel_file_path)
         resultDf.to_excel(excel_file_path, index=False)
         resultDf['deselected'] = False
+        QApplication.restoreOverrideCursor()
 
         self.finalPreparedDR = resultDf
         assaylib.printPrepLog(self, f'File prepared for dose response computation saved:')
