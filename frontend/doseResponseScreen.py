@@ -536,7 +536,7 @@ class DoseResponseScreen(QMainWindow):
             df = widget.data_dict
         else:
             return
-
+        
         iIndex = 0
         maxConc = 0
         for checkValue in includedPoints:
@@ -555,7 +555,10 @@ class DoseResponseScreen(QMainWindow):
         widget.plot_scatter(selected_rows, self.yScale)
         self.doseResponseTable.updateTable(row, widget)
         self.doseResponseTable.updateMaxConc(row, maxConc)
-
+        
+        if self.parentWidget() and self.parentWidget().layout():
+            self.parentWidget().layout().invalidate()
+        
 
     def calcDR(self):
         self.saveExcel_btn.setEnabled(True)
@@ -708,7 +711,7 @@ class DoseResponseScreen(QMainWindow):
         platemapDf['rawData'] = ''
         
         for index, row in platemapDf.iterrows():
-            QApplication.processEvents()
+            assaylib.printPrepLog(self, '.')
             plate_id = row['Platt ID']
             well = row['Well']
         

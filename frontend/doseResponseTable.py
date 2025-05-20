@@ -18,6 +18,10 @@ import assaylib
 import warnings
 warnings.filterwarnings('ignore')
 
+DERIVATIVE_BOT_CUTOFF = 1.1
+GRAPH_WIDTH = 400
+GRAPH_HEIGHT = 300
+
 # Define the 4-PL model function
 def fourpl(x, slope, ic50, bottom, top):
     try:
@@ -44,6 +48,20 @@ class ScatterplotWidget(QWidget):
         self.confirmed = 'N'
         self.comment = ''
         slope, ic50, bottom, top, ic50_std, auc, sInfo = self.plot_scatter(data_dict, self.yScale)
+
+
+    def resizeEvent(self, event):
+        """
+        Override resizeEvent to ensure plot redraws when widget size changes.
+        This is crucial for Matplotlib integration.
+        """
+        super().resizeEvent(event)
+        # It's good practice to call draw() here when the widget size changes
+        # However, for FigureCanvas in a QTableWidget, the issue is often
+        # more about the initial sizing and layout updates, not continuous redraw.
+        # But this can help if the plot isn't scaling correctly on window resize etc.
+        self.figure.tight_layout(pad=0.1)
+        self.canvas.draw()
 
 
     def generateGraphString(self):
@@ -82,7 +100,7 @@ class ScatterplotWidget(QWidget):
         if difference < 50:
             comment += ' Low effect;'
 
-        if self.derivative_ic50_div_bot < 2.5:
+        if self.derivative_ic50_div_bot < DERIVATIVE_BOT_CUTOFF:
             comment += ' No defined bottom;'
 
         if self.derivative_ic50_div_top < 20:
@@ -96,7 +114,7 @@ class ScatterplotWidget(QWidget):
         count_above_50 = df[df['inhibition'] > 50.0].shape[0]
         count_below_20 = df[df['inhibition'] < 20.0].shape[0]
         
-        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50) and self.derivative_ic50_div_bot > 2.5 and self.derivative_ic50_div_top > 20:
+        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50) and self.derivative_ic50_div_bot > DERIVATIVE_BOT_CUTOFF and self.derivative_ic50_div_top > 20:
             self.confirmed = 'Y'
         else:
             self.confirmed = 'N'
@@ -193,11 +211,11 @@ class ScatterplotWidget(QWidget):
             # If it doesn't exist, create it
             os.makedirs(imgDir)
 
-        self.figure.set_size_inches(3, 2)
+        #self.figure.set_size_inches(3, 2)
         self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
+        #self.figure.set_size_inches(5.81, 4.06)
         self.ax.legend()
         self.canvas.draw()
-        self.figure.set_size_inches(5.81, 4.06)
 
         (auc, err) = quad(fourpl, min(self.x_values), max(self.x_values), args=(slope, ic50, bottom, top))
         
@@ -306,8 +324,9 @@ class DoseResponseTable(QTableWidget):
         # Set the graph column to be 600 wide
         self.clearContents()
         self.setRowCount(0)
-        self.setColumnWidth(self.graph_col, 400)
+        self.setColumnWidth(self.graph_col, GRAPH_WIDTH)
         df = pd.read_excel(file_path)
+        df = df[df['Compound ID'].str.startswith('CBK')] # Remove all controls
 
         dialog = assaylib.CancelDialog(self)
         dialog.show()
@@ -325,7 +344,7 @@ class DoseResponseTable(QTableWidget):
                 if rowPosition > 20:
                     continue
             self.insertRow(rowPosition)
-            self.setRowHeight(rowPosition, 300)
+            self.setRowHeight(rowPosition, GRAPH_HEIGHT)
             
             print(f'Plot nr: {rowPosition}')
             # Call the scatter function for each batch
@@ -362,8 +381,8 @@ class DoseResponseTable(QTableWidget):
         self.setCellWidget(rowPosition, self.graph_col, scatterplot_widget)
         self.setCurrentCell(rowPosition, self.graph_col)
         self.updateTable(rowPosition, scatterplot_widget)
-        QApplication.processEvents()
 
+        QApplication.processEvents()
 
     def updateMaxConc(self, row, maxConc):
         item = QTableWidgetItem(str(f"{maxConc:.1f}"))
@@ -374,6 +393,7 @@ class DoseResponseTable(QTableWidget):
 
 
     def updateTable(self, rowPosition, scatterplot_widget):
+        
         item = QTableWidgetItem(str("{:.2e}".format(scatterplot_widget.ic50)))
         self.setItem(rowPosition, self.ic50_col, item) # 2
 

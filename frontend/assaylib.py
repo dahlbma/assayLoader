@@ -117,7 +117,10 @@ def printPrepLog(self, s, type=''):
         s = f'''<font color='red'>{s}</font>'''
     elif type == 'bold': 
         s = f'''<b>{s}</b>'''
-    self.prepLog_te.append(s)
+    if s == '.':
+        self.prepLog_te.insertPlainText(s)
+    else:
+        self.prepLog_te.append(s)
     # Calculate the maximum vertical scrollbar value
     max_value = self.prepLog_te.verticalScrollBar().maximum()
 
