@@ -18,6 +18,7 @@ import assaylib
 import warnings
 warnings.filterwarnings('ignore')
 
+DERIVATIVE_TOP_CUTOFF = 17.0
 DERIVATIVE_BOT_CUTOFF = 1.1
 GRAPH_WIDTH = 400
 GRAPH_HEIGHT = 300
@@ -103,7 +104,7 @@ class ScatterplotWidget(QWidget):
         if self.derivative_ic50_div_bot < DERIVATIVE_BOT_CUTOFF:
             comment += ' No defined bottom;'
 
-        if self.derivative_ic50_div_top < 20:
+        if self.derivative_ic50_div_top < DERIVATIVE_TOP_CUTOFF:
             comment += ' No defined top;'
             
         return comment
@@ -114,7 +115,7 @@ class ScatterplotWidget(QWidget):
         count_above_50 = df[df['inhibition'] > 50.0].shape[0]
         count_below_20 = df[df['inhibition'] < 20.0].shape[0]
         
-        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50) and self.derivative_ic50_div_bot > DERIVATIVE_BOT_CUTOFF and self.derivative_ic50_div_top > 20:
+        if count_below_20 > 0 and count_above_50 > 1 and (self.top - self.bottom > 50) and self.derivative_ic50_div_bot > DERIVATIVE_BOT_CUTOFF and self.derivative_ic50_div_top > DERIVATIVE_TOP_CUTOFF:
             self.confirmed = 'Y'
         else:
             self.confirmed = 'N'
