@@ -709,9 +709,13 @@ class DoseResponseScreen(QMainWindow):
                 combinedDataDf = pd.concat([combinedDataDf, rawDataDf], ignore_index=True)
         
         platemapDf['rawData'] = ''
+        assaylib.printPrepLog(self, 'Reformatting input data\n')
         
+        iDataCounter = 0
         for index, row in platemapDf.iterrows():
-            assaylib.printPrepLog(self, '.')
+            iDataCounter += 1
+            if iDataCounter % 20 == 0:
+                assaylib.printPrepLog(self, '.')
             plate_id = row['Platt ID']
             well = row['Well']
         
