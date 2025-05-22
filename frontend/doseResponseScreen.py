@@ -710,7 +710,7 @@ class DoseResponseScreen(QMainWindow):
         
         platemapDf['rawData'] = ''
         assaylib.printPrepLog(self, 'Reformatting input data\n')
-        
+
         iDataCounter = 0
         for index, row in platemapDf.iterrows():
             iDataCounter += 1
@@ -718,7 +718,7 @@ class DoseResponseScreen(QMainWindow):
                 assaylib.printPrepLog(self, '.')
             plate_id = row['Platt ID']
             well = row['Well']
-        
+
             matching_row = combinedDataDf[(combinedDataDf['plate'] == plate_id) & (combinedDataDf['Well'] == well)]
             if not matching_row.empty:
                 # Update 'rawData' in platemapDf

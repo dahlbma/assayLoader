@@ -90,9 +90,9 @@ class ScatterplotWidget(QWidget):
 
     def generateComment(self):
         comment = ''
-        if self.slope > 4:
+        if abs(self.slope) > 4:
             comment += ' High Hill Slope;'
-        if self.slope < 0.5:
+        if abs(self.slope) < 0.5:
             comment += ' Low Hill Slope;'
         if self.top < 80:
             comment += ' Ymax < 80%;'
