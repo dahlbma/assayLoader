@@ -477,11 +477,11 @@ class DoseResponseScreen(QMainWindow):
 
     def rowChanged(self, currentRowIndex):
         # Remove the old checkboxes
-        for i in reversed(range(self.dataPoints_layout.count())):
-            item = self.dataPoints_layout.itemAt(i)
+        while self.dataPoints_layout.count():
+            item = self.dataPoints_layout.takeAt(0)
             
-            widg = item.widget()
-            if widg != None:
+            if item.widget():
+                widg = item.widget()
                 self.dataPoints_layout.removeWidget(widg)
             try:
                 widg.setParent(None)
