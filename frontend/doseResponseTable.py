@@ -5,8 +5,10 @@ import json
 import math
 import sys
 import numpy as np
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication, QFileDialog
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication, QFileDialog, QToolButton
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import pandas as pd
 from openpyxl import Workbook
@@ -36,7 +38,10 @@ class ScatterplotWidget(QWidget):
         self.rowPosition = rowPosition
 
         self.workingDirectory = workingDir
-        self.figure, self.ax = plt.subplots(figsize=(3, 2))
+
+        self.figure = Figure(figsize=(3, 2), dpi=100) # dpi is optional, but good for consistency
+        self.ax = self.figure.add_subplot(111)
+
         self.canvas = FigureCanvas(self.figure)
         self.yScale = yScale
         layout = QVBoxLayout()
@@ -212,10 +217,11 @@ class ScatterplotWidget(QWidget):
             # If it doesn't exist, create it
             os.makedirs(imgDir)
 
-        #self.figure.set_size_inches(3, 2)
+        self.figure.tight_layout(pad=0.1) # New line            
         self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
+
         #self.figure.set_size_inches(5.81, 4.06)
-        self.ax.legend()
+
         self.canvas.draw()
 
         (auc, err) = quad(fourpl, min(self.x_values), max(self.x_values), args=(slope, ic50, bottom, top))
@@ -258,21 +264,32 @@ class DoseResponseTable(QTableWidget):
         self.comment_col = 13
         self.workingDirectory = ''
         self.parent = None
-    '''
-    def generateComment(self, df):
-        df['Slope'] = df['Slope'].astype(float)
-        df['Bottom'] = df['Bottom'].astype(float)
-        df['Top'] = df['Top'].astype(float)
-        df['ICMax'] = df['Slope'].astype(float)
-        df.loc[df['Slope'] > 4, 'comment'] = df['comment'].astype(str) + ' High Hill Slope;'
-        df.loc[df['Slope'] < 0.5, 'comment'] = df['comment'].astype(str) + ' Low Hill Slope;'
-        df.loc[df['Top'] < 80, 'comment'] = df['comment'].astype(str) + ' Ymax < 80%;'
+
+    def reset_table_data(self):
+        """
+        Resets the table by clearing all existing data and widgets,
+        then optionally populates it with new_df.
+        Ensures proper memory cleanup for embedded widgets.
+        """
         
-        difference = df['Top'] - df['Bottom']
-        df.loc[difference < 60, 'comment'] = df['comment'].astype(str) + ' Low effect'
-        return df
-    '''
-        
+        # 1. Clear existing ScatterplotWidgets and ensure they are deleted
+        num_rows = self.rowCount()
+        for row in range(num_rows):
+            widget_item = self.cellWidget(row, self.graph_col)
+            if isinstance(widget_item, ScatterplotWidget):
+                # Remove the widget from the cell
+                self.removeCellWidget(row, self.graph_col)
+                # Schedule the widget for deletion. This is CRUCIAL for memory cleanup.
+                widget_item.deleteLater()
+                # print(f"  - Scheduled ScatterplotWidget in row {row} for deletion.")
+
+        # 2. Clear all table contents and reset row count
+        self.clearContents() # Clears text in cells
+        self.setRowCount(0)   # Resets the number of rows
+
+        print("Existing table data and widgets cleared.")
+
+    
     def qtablewidget_to_dataframe(self):
         """
         Converts a QTableWidget to a pandas DataFrame.
@@ -323,8 +340,12 @@ class DoseResponseTable(QTableWidget):
         outputDir = os.path.dirname(file_path)
         self.workingDirectory = outputDir
         # Set the graph column to be 600 wide
-        self.clearContents()
-        self.setRowCount(0)
+
+        self.reset_table_data()
+        #self.clearContents()
+        #self.setRowCount(0)
+
+        
         self.setColumnWidth(self.graph_col, GRAPH_WIDTH)
         df = pd.read_excel(file_path)
         df = df[df['Compound ID'].str.startswith('CBK')] # Remove all controls

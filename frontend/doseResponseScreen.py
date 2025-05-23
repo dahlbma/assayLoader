@@ -17,7 +17,7 @@ from prepareEnvisionFile import *
 from selectDataColumn import *
 from doseResponseTable import DoseResponseTable, ScatterplotWidget
 import platform
-from inhibitionScatter import ScatterPlotWindow
+#from inhibitionScatter import ScatterPlotWindow
 
 # Get the operating system name
 os_name = platform.system()
@@ -111,7 +111,7 @@ class DoseResponseScreen(QMainWindow):
         self.calculateDR_btn.clicked.connect(self.calcDR)
         self.goto_sp_btn.clicked.connect(self.gotoSP)
         self.dataPointCheckboxes = []
-
+        self._row_changed_slot = None # To keep track of callback for change row
         self.activation_rb.clicked.connect(self.toggleInhibition)
         self.inhibition_rb.clicked.connect(self.toggleInhibition)
         self.inhibition_rb.setChecked(True)
@@ -475,6 +475,29 @@ class DoseResponseScreen(QMainWindow):
             self.not_ic50_ec50 = 'IC50'
 
 
+    def connect_row_changed_slot(self, slot_function):
+        """Connects the currentRowChanged signal to a slot."""
+        if self._row_changed_slot: # Disconnect old one if exists (e.g. if re-connecting to new slot)
+            try:
+                self.doseResponseTable.selectionModel().currentRowChanged.disconnect(self._row_changed_slot)
+            except TypeError: # Handle case where it might already be disconnected
+                pass
+        self._row_changed_slot = slot_function
+        self.doseResponseTable.selectionModel().currentRowChanged.connect(slot_function)
+        print("Row changed slot connected.")
+
+    
+    def disconnect_row_changed_slot(self):
+        """Disconnects the currentRowChanged signal."""
+        if self._row_changed_slot:
+            try:
+                self.doseResponseTable.selectionModel().currentRowChanged.disconnect(self._row_changed_slot)
+                print("Row changed slot disconnected.")
+            except TypeError:
+                print("Row changed slot already disconnected (or never connected).")
+            self._row_changed_slot = None # Clear reference
+
+        
     def rowChanged(self, currentRowIndex):
         # Remove the old checkboxes
         while self.dataPoints_layout.count():
@@ -505,11 +528,11 @@ class DoseResponseScreen(QMainWindow):
             self.dataPointCheckboxes.append(new_checkbox)
             new_checkbox.stateChanged.connect(lambda state: self.checkbox_changed(new_checkbox, state, iCurrentRow))
 
-        widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
-        if isinstance(widget, ScatterplotWidget):
-            pass
-        self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        self.dataPoints_layout.addItem(self.bottom_spacer)
+        #widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
+        #if isinstance(widget, ScatterplotWidget):
+        #    pass
+        #self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        #self.dataPoints_layout.addItem(self.bottom_spacer)
 
 
     def checkbox_changed(self, checkbox, state, iCurrentRow):
@@ -569,8 +592,11 @@ class DoseResponseScreen(QMainWindow):
             self.yScale = 'Inhibition %'
             if self.activation_rb.isChecked():
                 self.yScale = 'Activation %'
+
+            self.disconnect_row_changed_slot()
             self.batch_df = self.doseResponseTable.generate_scatterplots(file, self.yScale, self)
-            self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
+            self.connect_row_changed_slot(self.rowChanged)
+            #self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
 
 
     def deselectRow(self, batch, compound, conc):
