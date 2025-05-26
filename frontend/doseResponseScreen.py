@@ -484,7 +484,6 @@ class DoseResponseScreen(QMainWindow):
                 pass
         self._row_changed_slot = slot_function
         self.doseResponseTable.selectionModel().currentRowChanged.connect(slot_function)
-        print("Row changed slot connected.")
 
     
     def disconnect_row_changed_slot(self):
@@ -492,9 +491,9 @@ class DoseResponseScreen(QMainWindow):
         if self._row_changed_slot:
             try:
                 self.doseResponseTable.selectionModel().currentRowChanged.disconnect(self._row_changed_slot)
-                print("Row changed slot disconnected.")
             except TypeError:
-                print("Row changed slot already disconnected (or never connected).")
+                #print("Row changed slot already disconnected (or never connected).")
+                pass
             self._row_changed_slot = None # Clear reference
 
         
