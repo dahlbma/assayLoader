@@ -1,13 +1,9 @@
-import re, sys, os, logging, glob, csv
+import re, os, logging, csv
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox
 from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
-from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QDoubleValidator, QRegExpValidator
+from PyQt5.QtGui import QBrush, QColor, QDoubleValidator, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-import openpyxl
-from pathlib import Path
-from instruments import parseEnvision
 import pandas as pd
 import subprocess
 from z_factor import *

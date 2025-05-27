@@ -1,15 +1,11 @@
 from scipy.optimize import curve_fit
 from scipy.integrate import quad
 import os
-import json
 import math
-import sys
 import numpy as np
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication, QFileDialog, QToolButton
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QApplication, QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 import pandas as pd
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image

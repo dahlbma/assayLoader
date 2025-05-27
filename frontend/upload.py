@@ -1,4 +1,4 @@
-import sys, os, platform, dbInterface, json, argparse
+import os, platform, dbInterface, json, argparse
 import getpass
 
 def upload(target, version, launcher):

@@ -1,10 +1,8 @@
-import re
 import os
 import pandas as pd
 import assaylib
 import dbInterface
 import openpyxl
-import csv
 
 def createPlatemap(self, platesDf, subdirectory_path):
     columns = ['Platt ID', 'Well', 'Compound ID', 'Batch nr', 'Conc mM', 'volume nL']
