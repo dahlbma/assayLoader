@@ -53,6 +53,12 @@ y_values={105.07, 94.19, 65.84, 23.12, 1.48, -9.46, -13.04, -11.79, -10.53, -12.
 }
 '''
 
+saSearchTables = {
+    "DR Sandbox": "assay_test.lcb_dr",
+    "DR": "assay.lcb_dr"
+}
+
+
 
 def userInfo(sMessage):
     info_dialog = QMessageBox()
@@ -146,11 +152,35 @@ class DoseResponseScreen(QMainWindow):
         self.updateGrid_btn.clicked.connect(self.updateGrid)
         self.loadAssayFile_btn.clicked.connect(self.loadAssayDataFromFile)
         self.saveData_btn.clicked.connect(self.saveDrToDb)
+        
+        self.search_btn.clicked.connect(self.searchDR)
+
+    def searchDR(self):
+        sProject = self.searchProject_cb.currentText()
+        sTable = self.searchTable_cb.currentText()
+
+
+        selectedTable_key = self.searchTable_cb.currentText()
+        selectedTable_value = saSearchTables.get(selectedTable_key)
+
+        #if sTable not in saSearchTables:
+        #    userInfo(f"Unknown table {sTable}")
+        #    return
+        print(selectedTable_value)
+
+        #df = dbInterface.getDrData(self.token, sProject, saSearchTables[sTable], sTarget, sOperator, sPlate, sWell)
+        #if df.empty:
+        #    userInfo("No data found")
+        #    return
+
+        #self.doseResponseTable.populate_table(df)
 
 
     def populateScreenData(self):
         saProjects = dbInterface.getProjects(self.token)
         self.project_cb.addItems(saProjects)
+        self.searchProject_cb.addItems(saProjects)
+        self.searchTable_cb.addItems(saSearchTables.keys())
 
         saOperators = dbInterface.getOperators(self.token)
         self.operator_cb.addItems(saOperators)

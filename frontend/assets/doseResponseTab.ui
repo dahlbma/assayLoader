@@ -1172,7 +1172,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox"/>
+                 <widget class="QComboBox" name="searchTable_cb"/>
                 </item>
                </layout>
               </item>
@@ -1186,12 +1186,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox_2"/>
+                 <widget class="QComboBox" name="searchProject_cb"/>
                 </item>
                </layout>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="search_btn">
                 <property name="text">
                  <string>Search</string>
                 </property>
