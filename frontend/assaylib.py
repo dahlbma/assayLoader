@@ -1,8 +1,8 @@
-import sys, requests, json, os, subprocess, platform, logging, dbInterface, re, shutil
+import sys, os, dbInterface, shutil
 import pandas as pd
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidgetItem, QWidget
-from PyQt5.QtWidgets import QProgressBar, QVBoxLayout, QDialog, QLabel, QDialogButtonBox, QPushButton, QVBoxLayout
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
+from PyQt5.QtWidgets import QProgressBar, QVBoxLayout, QDialog, QLabel, QDialogButtonBox, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
 def gotoSP(self):
