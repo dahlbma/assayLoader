@@ -53,6 +53,7 @@ y_values={105.07, 94.19, 65.84, 23.12, 1.48, -9.46, -13.04, -11.79, -10.53, -12.
 }
 '''
 
+
 def userInfo(sMessage):
     info_dialog = QMessageBox()
 

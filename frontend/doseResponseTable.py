@@ -45,8 +45,6 @@ class ScatterplotWidget(QWidget):
         self.setLayout(layout)
         # self.data_dict contains the original data for each plot, so we can reconstruct the original curve at all times
         self.data_dict = data_dict
-        # self.plotted_data contains the datapoints that are plotted (in case some points are de-selected in the GUI)
-        self.plotted_data = data_dict
         self.confirmed = 'N'
         self.comment = ''
         slope, ic50, bottom, top, ic50_std, auc, sInfo = self.plot_scatter(data_dict, self.yScale)
@@ -125,7 +123,6 @@ class ScatterplotWidget(QWidget):
 
     def plot_scatter(self, df, yScale):
         self.ax.clear()
-        self.plotted_data = df
 
         # Extract the 'x' and 'y' arrays
         self.x_values = np.array(df['finalConc_nM'].values/1000000000, dtype=np.float64)
@@ -392,8 +389,6 @@ class DoseResponseTable(QTableWidget):
         item = QTableWidgetItem(compound)
         self.setItem(rowPosition, 1, item)
 
-        self.org_figsize = scatterplot_widget.figure.get_size_inches()
-        
         item = QTableWidgetItem()
         self.setItem(rowPosition, self.graph_col, item)
         self.setCellWidget(rowPosition, self.graph_col, scatterplot_widget)

@@ -501,16 +501,6 @@ class SinglePointScreen(QMainWindow):
         pass
 
 
-    def getInputFilesFromTab(self):
-        saFiles = []
-
-        for row in range(self.inputFiles_tab.rowCount()):
-            item = self.inputFiles_tab.item(row, 0)  # Get item in the first column
-            if item is not None:
-                saFiles.append(item.text())
-        return saFiles
-
-
     def updateRawdataStatus(self, sFile, sStatusMessage, sStatusState):
 
         def color_row(row, sColor = "white"):
