@@ -1,7 +1,7 @@
-import sys, os, logging, traceback
+import sys, os, logging, traceback, json, platform
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5 import QtGui
 import shutil
 import subprocess

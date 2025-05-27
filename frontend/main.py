@@ -1,4 +1,4 @@
-import sys, os, importlib, platform, traceback, logging
+import sys, os, importlib, platform, traceback, logging, json
 from assaylib import *
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
