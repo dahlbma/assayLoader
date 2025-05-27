@@ -36,7 +36,7 @@ class ScatterPlotWindow(QMainWindow):
         # Draw a horizontal line at the hit limit
         self.ax.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
         mplcursors.cursor(hover=True).connect("add", self.show_tooltip)
-        
+
 
     def show_tooltip(self, sel):
         index = sel.index
