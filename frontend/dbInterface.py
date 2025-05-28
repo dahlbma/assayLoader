@@ -1,6 +1,7 @@
 import requests
 import json
 import ast
+import pandas as pd
 
 baseUrl = 'http://esox3.scilifelab.se:8084/'
 
@@ -64,12 +65,36 @@ def uploadLauncher(token, os_name, file):
     else:
         return r.content.decode(), True
 
+def getDrData(token, sProject, selectedTable_value):
+    r = requests.get(f'{baseUrl}getDrData/{sProject}/{selectedTable_value}',
+                     headers={'token':token})
+
+    if r.status_code != 200:
+        return r.content.decode(), False
+    else:
+        res = r.content.decode()
+        res = json.loads(res)
+        df = pd.DataFrame(res)
+        print(df)
+
+        return df, True
+    
+
 def getProjects(token):
     r = requests.get(f'{baseUrl}getProjects',
             headers={'token':token})
 
     cleanList = listify(r, False)
     return cleanList
+
+
+def getDrProjects(token, sTable):
+    r = requests.get(f'{baseUrl}getDrProjects/{sTable}',
+            headers={'token':token})
+
+    cleanList = listify(r, False)
+    return cleanList
+
 
 def getTargets(token):
     r = requests.get(f'{baseUrl}getTargets',
