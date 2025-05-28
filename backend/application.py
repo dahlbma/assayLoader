@@ -147,7 +147,16 @@ class GetProjects(tornado.web.RequestHandler):
         res = res2json()
         self.finish(res)
 
+@jwtauth
+class GetDrProjects(tornado.web.RequestHandler):
+    def get(self, sTable):
+        sSql = f'''select distinct(project) project from {sTable} order by project'''
 
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
+
+        
 @jwtauth
 class GetTargets(tornado.web.RequestHandler):
     def get(self):
@@ -186,6 +195,19 @@ class GetOperators(tornado.web.RequestHandler):
         res = res2json()
         self.finish(res)
 
+
+@jwtauth
+class GetDrData(tornado.web.RequestHandler):
+    def get(self, sProject, sTable):
+        sSql = f'''select compound_id, compound_batch, target, graph
+        from {sTable}
+        where project = %s '''
+        
+        cur.execute(sSql, (sProject, ))
+        res = res2json()
+        self.finish(res)
+
+    
 """
 @jwtauth
 class GetPlate(tornado.web.RequestHandler):
