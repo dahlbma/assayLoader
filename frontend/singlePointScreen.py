@@ -1,13 +1,9 @@
-import re, sys, os, logging, glob, csv
+import re, os, logging, csv
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDateEdit
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox
 from PyQt5.QtCore import Qt, QDate, QUrl, QRegExp
-from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QValidator, QDoubleValidator, QRegExpValidator
+from PyQt5.QtGui import QBrush, QColor, QDoubleValidator, QRegExpValidator
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-import openpyxl
-from pathlib import Path
-from instruments import parseEnvision
 import pandas as pd
 import subprocess
 from z_factor import *
@@ -503,16 +499,6 @@ class SinglePointScreen(QMainWindow):
         #self.checkForm()
         # Read a csv file from the inputFiles_tab text box and see of the datacolumn in this eb is present
         pass
-
-
-    def getInputFilesFromTab(self):
-        saFiles = []
-
-        for row in range(self.inputFiles_tab.rowCount()):
-            item = self.inputFiles_tab.item(row, 0)  # Get item in the first column
-            if item is not None:
-                saFiles.append(item.text())
-        return saFiles
 
 
     def updateRawdataStatus(self, sFile, sStatusMessage, sStatusState):

@@ -2,7 +2,6 @@ import re
 import os
 import pandas as pd
 import assaylib
-import dbInterface
 
 def number_to_alphabet(sRow):
     if 1 <= sRow <= 26:

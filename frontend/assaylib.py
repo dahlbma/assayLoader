@@ -1,8 +1,8 @@
-import sys, requests, json, os, subprocess, platform, logging, dbInterface, re, shutil
+import sys, os, dbInterface, shutil
 import pandas as pd
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMessageBox, QTableWidget, QTableWidgetItem, QWidget
-from PyQt5.QtWidgets import QProgressBar, QVBoxLayout, QDialog, QLabel, QDialogButtonBox, QPushButton, QVBoxLayout
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
+from PyQt5.QtWidgets import QProgressBar, QVBoxLayout, QDialog, QLabel, QDialogButtonBox, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
 def gotoSP(self):
@@ -117,7 +117,10 @@ def printPrepLog(self, s, type=''):
         s = f'''<font color='red'>{s}</font>'''
     elif type == 'bold': 
         s = f'''<b>{s}</b>'''
-    self.prepLog_te.append(s)
+    if s == '.':
+        self.prepLog_te.insertPlainText(s)
+    else:
+        self.prepLog_te.append(s)
     # Calculate the maximum vertical scrollbar value
     max_value = self.prepLog_te.verticalScrollBar().maximum()
 

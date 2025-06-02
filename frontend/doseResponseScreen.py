@@ -1,23 +1,18 @@
-import re, sys, os, logging, csv
+import os, logging
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QRegExp, QDate, Qt
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton
-from PyQt5.QtWidgets import QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
-from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QRegExpValidator
-import openpyxl
-from pathlib import Path
-from instruments import parseEnvision
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QDialog
+from PyQt5.QtWidgets import QCheckBox, QMessageBox
+from PyQt5.QtGui import QBrush, QColor, QRegExpValidator, QCursor
 import pandas as pd
-import subprocess
 from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
 from prepareEnvisionFile import *
 from selectDataColumn import *
-from doseResponseTable import DoseResponseTable, ScatterplotWidget
+from doseResponseTable import ScatterplotWidget
 import platform
-from inhibitionScatter import ScatterPlotWindow
+#from inhibitionScatter import ScatterPlotWindow
 
 # Get the operating system name
 os_name = platform.system()
@@ -57,6 +52,12 @@ y_values={105.07, 94.19, 65.84, 23.12, 1.48, -9.46, -13.04, -11.79, -10.53, -12.
    }
 }
 '''
+
+saSearchTables = {
+    "DR Sandbox": "assay_test.lcb_dr",
+    "DR": "assay.lcb_dr"
+}
+
 
 def userInfo(sMessage):
     info_dialog = QMessageBox()
@@ -111,7 +112,7 @@ class DoseResponseScreen(QMainWindow):
         self.calculateDR_btn.clicked.connect(self.calcDR)
         self.goto_sp_btn.clicked.connect(self.gotoSP)
         self.dataPointCheckboxes = []
-
+        self._row_changed_slot = None # To keep track of callback for change row
         self.activation_rb.clicked.connect(self.toggleInhibition)
         self.inhibition_rb.clicked.connect(self.toggleInhibition)
         self.inhibition_rb.setChecked(True)
@@ -140,6 +141,7 @@ class DoseResponseScreen(QMainWindow):
         self.dr_tab_col_operator = 16
         self.dr_tab_col_eln = 17
         self.dr_tab_col_confirmed = 18
+        self.dr_tab_col_comment = 19
 
         self.ic50_ec50 = 'IC50'
         self.not_ic50_ec50 = 'EC50'
@@ -149,11 +151,34 @@ class DoseResponseScreen(QMainWindow):
         self.updateGrid_btn.clicked.connect(self.updateGrid)
         self.loadAssayFile_btn.clicked.connect(self.loadAssayDataFromFile)
         self.saveData_btn.clicked.connect(self.saveDrToDb)
+        
+        self.search_btn.clicked.connect(self.searchDR)
+
+    def searchDR(self):
+        sProject = self.searchProject_cb.currentText()
+        sTable = self.searchTable_cb.currentText()
+
+        selectedTable_key = self.searchTable_cb.currentText()
+        selectedTable_value = saSearchTables.get(selectedTable_key)
+
+
+        print(selectedTable_value)
+
+        df, lStatus = dbInterface.getDrData(self.token, sProject, selectedTable_value)
+        if not lStatus or df.empty:
+            userInfo("No data found")
+            return
+
+        #self.doseResponseTable.populate_table(df)
 
 
     def populateScreenData(self):
         saProjects = dbInterface.getProjects(self.token)
+        saDrProjects = dbInterface.getDrProjects(self.token, 'assay.lcb_dr')
+
         self.project_cb.addItems(saProjects)
+        self.searchProject_cb.addItems(saDrProjects)
+        self.searchTable_cb.addItems(saSearchTables.keys())
 
         saOperators = dbInterface.getOperators(self.token)
         self.operator_cb.addItems(saOperators)
@@ -206,10 +231,6 @@ class DoseResponseScreen(QMainWindow):
         
         self.detectionType_cb.addItems(saDetectionType)
         self.viabilityMeasure_cb.addItems(saViabilityMeasurement)
-
-        
-        #saScreenType = dbInterface.getScreenTypes(self.token)
-        #self.screenType_cb.addItems(saScreenType)
 
         self.testDate.setDate(QDate.currentDate())
 
@@ -403,12 +424,13 @@ class DoseResponseScreen(QMainWindow):
         testDate = self.testDate.date()
         sDate = testDate.toString("yyyy-MM-dd") 
         self.populateColumn('experiment_date', sDate)
-        self.populateColumn('comment', self.comment_eb.text())
+        #self.populateColumn('comment', self.comment_eb.text())
         self.populateColumn('eln', self.eln_eb.text())
 
 
     def populate_load_data(self, df):
         self.dr_table.setRowCount(len(df))
+        self.populateColumn('Confirmed', '')        
         
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
@@ -426,8 +448,11 @@ class DoseResponseScreen(QMainWindow):
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
             bottom = str(row_data["Bottom"])
-
+            sComment = str(row_data["comment"])
+            
             sGraph = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).sGraph
+            sConfirmed = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).confirmed
+            sComment = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).comment
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
@@ -441,7 +466,9 @@ class DoseResponseScreen(QMainWindow):
 
             self.dr_table.setItem(row_index, self.findColumnNumber('Y Max'), QTableWidgetItem(top))
             self.dr_table.setItem(row_index, self.findColumnNumber('M Min'), QTableWidgetItem(bottom))
+            self.dr_table.setItem(row_index, self.findColumnNumber('comment'), QTableWidgetItem(sComment))
             self.dr_table.setItem(row_index, self.findColumnNumber('Graph'), QTableWidgetItem(sGraph))
+            self.dr_table.setItem(row_index, self.findColumnNumber('Confirmed'), QTableWidgetItem(sConfirmed))
 
 
     def tab_switched(self, index):
@@ -472,13 +499,35 @@ class DoseResponseScreen(QMainWindow):
             self.not_ic50_ec50 = 'IC50'
 
 
+    def connect_row_changed_slot(self, slot_function):
+        """Connects the currentRowChanged signal to a slot."""
+        if self._row_changed_slot: # Disconnect old one if exists (e.g. if re-connecting to new slot)
+            try:
+                self.doseResponseTable.selectionModel().currentRowChanged.disconnect(self._row_changed_slot)
+            except TypeError: # Handle case where it might already be disconnected
+                pass
+        self._row_changed_slot = slot_function
+        self.doseResponseTable.selectionModel().currentRowChanged.connect(slot_function)
+
+    
+    def disconnect_row_changed_slot(self):
+        """Disconnects the currentRowChanged signal."""
+        if self._row_changed_slot:
+            try:
+                self.doseResponseTable.selectionModel().currentRowChanged.disconnect(self._row_changed_slot)
+            except TypeError:
+                #print("Row changed slot already disconnected (or never connected).")
+                pass
+            self._row_changed_slot = None # Clear reference
+
+        
     def rowChanged(self, currentRowIndex):
         # Remove the old checkboxes
-        for i in reversed(range(self.dataPoints_layout.count())):
-            item = self.dataPoints_layout.itemAt(i)
+        while self.dataPoints_layout.count():
+            item = self.dataPoints_layout.takeAt(0)
             
-            widg = item.widget()
-            if widg != None:
+            if item.widget():
+                widg = item.widget()
                 self.dataPoints_layout.removeWidget(widg)
             try:
                 widg.setParent(None)
@@ -502,11 +551,11 @@ class DoseResponseScreen(QMainWindow):
             self.dataPointCheckboxes.append(new_checkbox)
             new_checkbox.stateChanged.connect(lambda state: self.checkbox_changed(new_checkbox, state, iCurrentRow))
 
-        widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
-        if isinstance(widget, ScatterplotWidget):
-            pass
-        self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        self.dataPoints_layout.addItem(self.bottom_spacer)
+        #widget = self.doseResponseTable.cellWidget(iCurrentRow, self.doseResponseTable.graph_col)
+        #if isinstance(widget, ScatterplotWidget):
+        #    pass
+        #self.bottom_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        #self.dataPoints_layout.addItem(self.bottom_spacer)
 
 
     def checkbox_changed(self, checkbox, state, iCurrentRow):
@@ -533,7 +582,7 @@ class DoseResponseScreen(QMainWindow):
             df = widget.data_dict
         else:
             return
-
+        
         iIndex = 0
         maxConc = 0
         for checkValue in includedPoints:
@@ -552,7 +601,10 @@ class DoseResponseScreen(QMainWindow):
         widget.plot_scatter(selected_rows, self.yScale)
         self.doseResponseTable.updateTable(row, widget)
         self.doseResponseTable.updateMaxConc(row, maxConc)
-
+        
+        if self.parentWidget() and self.parentWidget().layout():
+            self.parentWidget().layout().invalidate()
+        
 
     def calcDR(self):
         self.saveExcel_btn.setEnabled(True)
@@ -563,8 +615,11 @@ class DoseResponseScreen(QMainWindow):
             self.yScale = 'Inhibition %'
             if self.activation_rb.isChecked():
                 self.yScale = 'Activation %'
+
+            self.disconnect_row_changed_slot()
             self.batch_df = self.doseResponseTable.generate_scatterplots(file, self.yScale, self)
-            self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
+            self.connect_row_changed_slot(self.rowChanged)
+            #self.doseResponseTable.selectionModel().currentRowChanged.connect(self.rowChanged)
 
 
     def deselectRow(self, batch, compound, conc):
@@ -665,7 +720,7 @@ class DoseResponseScreen(QMainWindow):
         platemapDf = pd.read_excel(platemap_xlsx)
         
         rawDataFilesDf = pd.read_excel(plateIdToFileMapping)
-        
+
         # Final volume in nano liter (nL)
         final_volume = float(self.finalWellVolumeMicroliter_eb.text())*1000.0
         if len(platemapDf) > 0:
@@ -684,9 +739,13 @@ class DoseResponseScreen(QMainWindow):
         sDataColName = self.sDataColName
         if sDataColName == '':
             return
+
+        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        QApplication.processEvents()
         
         combinedDataDf = pd.DataFrame()
         for index, row in rawDataFilesDf.iterrows():
+            QApplication.processEvents()
             plate = row['plate']
             file_path = row['file']
         
@@ -699,11 +758,16 @@ class DoseResponseScreen(QMainWindow):
                 combinedDataDf = pd.concat([combinedDataDf, rawDataDf], ignore_index=True)
         
         platemapDf['rawData'] = ''
-        
+        assaylib.printPrepLog(self, 'Reformatting input data\n')
+
+        iDataCounter = 0
         for index, row in platemapDf.iterrows():
+            iDataCounter += 1
+            if iDataCounter % 20 == 0:
+                assaylib.printPrepLog(self, '.')
             plate_id = row['Platt ID']
             well = row['Well']
-        
+
             matching_row = combinedDataDf[(combinedDataDf['plate'] == plate_id) & (combinedDataDf['Well'] == well)]
             if not matching_row.empty:
                 # Update 'rawData' in platemapDf
@@ -728,6 +792,7 @@ class DoseResponseScreen(QMainWindow):
             meanNegCtrl = resultDf.loc[resultDf["Compound ID"] == "DMSO", "yMean"].values[0]
         except:
             userInfo(f'''No controls named {sCtrl} in the dataset''')
+            QApplication.restoreOverrideCursor()
             return
         
         resultDf['inhibition'] = 100*(1-(resultDf['yMean']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl))
@@ -750,12 +815,12 @@ class DoseResponseScreen(QMainWindow):
         excel_file_path_deselected = os.path.join(self.workingDirectory, 'finalPreparedDR_deselected_datapoints.xlsx')
         self.pathToFinalPreparedDR_deselects = excel_file_path_deselected
 
-
         resultDf = self.remove_single_row_compounds(resultDf)
         
         #fullPath = os.path.join(sBasePath, excel_file_path)
         resultDf.to_excel(excel_file_path, index=False)
         resultDf['deselected'] = False
+        QApplication.restoreOverrideCursor()
 
         self.finalPreparedDR = resultDf
         assaylib.printPrepLog(self, f'File prepared for dose response computation saved:')

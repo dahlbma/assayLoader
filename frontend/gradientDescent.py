@@ -1,11 +1,7 @@
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 from itertools import product
 import pandas as pd
-
-import ctypes
-import pathlib
 
 
 BOUNDS = {
@@ -78,6 +74,14 @@ def check_bounds(val, param):
     if val < min: return min
 
     return val
+
+
+def sigmoid_derivative(x, slope, ic50, bottom, top):
+    """Derivative of the 4PL sigmoid function."""
+    exponent = slope * np.log(x / ic50)
+    denominator = (1 + np.exp(exponent))**2
+    return (top - bottom) * slope * (1 / x) * (x / ic50)**slope / denominator
+
 
 # Step 1: Define the 4-PL model
 def four_parameter_logistic(x, slope, ic50, bottom, top):
@@ -201,17 +205,8 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
         
         #print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
         y_curve_fit = four_parameter_logistic(x_curve, slope, ic50, bottom, top)
-
-        '''
-        if iCount % 1 == 0:
-            axs[0,0].cla()
-            axs[0,0].plot(x_curve, y_curve_fit, color='g', label='Fitted')
-            axs[0,0].scatter(x, y, label='Measured Data')
-            axs[0,0].axvline(ic50, color='r', linestyle='--', label=f'IC50 = {ic50*1e6:.2f} uM')
-            axs[0,0].set_xscale('log')
-            plt.pause(0.001)
-        '''
-    return slope, ic50, bottom, top, f'RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n'
+        
+    return slope, ic50, bottom, top, rmse, iCount
 
 def fit_curve(x, y):
     BOUNDS['top']['MIN'] = max(y) * 0.7
@@ -258,25 +253,31 @@ def fit_curve(x, y):
     bottom = best_combination[2]
     top = best_combination[3]
 
-    slope, ic50, bottom, top, sInfo = gradient_descent(x,
-                                                       y,
-                                                       learning_rate,
-                                                       num_iterations,
-                                                       slope,
-                                                       ic50/10,
-                                                       bottom,
-                                                       top)
-    '''
-    print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
-    axs[0,0].cla()
-    axs[0,1].cla()
-    axs[0,2].cla()
-    axs[1,0].cla()
-    axs[1,1].cla()
-    axs[1,2].cla()
-    print(f'slope {slope} ic50 {ic50} bottom {bottom} top {top}')
-    '''
-    return -slope, ic50, bottom, top, sInfo
+    slope, ic50, bottom, top, rmse, iCount = gradient_descent(x,
+                                                y,
+                                                learning_rate,
+                                                num_iterations,
+                                                slope,
+                                                ic50/10,
+                                                bottom,
+                                                top)
+    
+    der_bottom = sigmoid_derivative(x[0], slope, ic50, bottom, top)
+    der_top = sigmoid_derivative(x[-1], slope, ic50, bottom, top)
+    der_ic50 = sigmoid_derivative(ic50, slope, ic50, bottom, top)
+
+    derivative_ic50_div_top = 0
+    derivative_ic50_div_bot = 0
+    try:
+        derivative_ic50_div_top = der_ic50 / der_top
+        derivative_ic50_div_bot = der_ic50 / der_bottom
+    except:
+        pass
+
+    #sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n {"{:.1f}".format(der_bottom)}\n{"{:.1f}".format(der_ic50)}\n{"{:.1f}".format(der_top)}\n{"{:.1f}".format(derivative_ic50_div_bot)}\n{"{:.1f}".format(derivative_ic50_div_top)}'''
+    sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\nDer bot: {"{:.1f}".format(derivative_ic50_div_bot)}\nDer top: {"{:.1f}".format(derivative_ic50_div_top)}'''
+    
+    return -slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top
     
 if __name__ == "__main__":
 

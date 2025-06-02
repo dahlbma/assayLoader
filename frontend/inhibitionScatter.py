@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -36,7 +36,7 @@ class ScatterPlotWindow(QMainWindow):
         # Draw a horizontal line at the hit limit
         self.ax.axhline(y=hitLimit, color='red', linestyle='--', label='Hit Limit')
         mplcursors.cursor(hover=True).connect("add", self.show_tooltip)
-        
+
 
     def show_tooltip(self, sel):
         index = sel.index

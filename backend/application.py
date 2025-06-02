@@ -147,7 +147,16 @@ class GetProjects(tornado.web.RequestHandler):
         res = res2json()
         self.finish(res)
 
+@jwtauth
+class GetDrProjects(tornado.web.RequestHandler):
+    def get(self, sTable):
+        sSql = f'''select distinct(project) project from {sTable} order by project'''
 
+        cur.execute(sSql)
+        res = res2json()
+        self.finish(res)
+
+        
 @jwtauth
 class GetTargets(tornado.web.RequestHandler):
     def get(self):
@@ -186,6 +195,19 @@ class GetOperators(tornado.web.RequestHandler):
         res = res2json()
         self.finish(res)
 
+
+@jwtauth
+class GetDrData(tornado.web.RequestHandler):
+    def get(self, sProject, sTable):
+        sSql = f'''select compound_id, compound_batch, target, graph
+        from {sTable}
+        where project = %s '''
+        
+        cur.execute(sSql, (sProject, ))
+        res = res2json()
+        self.finish(res)
+
+    
 """
 @jwtauth
 class GetPlate(tornado.web.RequestHandler):
@@ -274,7 +296,9 @@ def implSaveDrRowToDb(self, row, targetTable):
         sOperator = row['operator']
         sEln = row['eln']
         sComment = row['comment']
-    except:
+        sConfirmed = row['Confirmed']
+    except Exception as e:
+        logging.error(str(e))
         logging.error(row)
         sStatus = 400
         return sStatus, 'Can not parse input'
@@ -308,8 +332,9 @@ def implSaveDrRowToDb(self, row, targetTable):
     operator,
     eln_id,
     COMMENTS,
+    CONFIRMED,
     CREATED_DATE)
-    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
     '''
 
     sError = ''
@@ -322,7 +347,7 @@ def implSaveDrRowToDb(self, row, targetTable):
                            sModelSystem, sAssay_type,
                            sDetection_type, sViability_measurement,
                            sCmax, sYmax, sMmin, sHill, sIC50, sEC50, sICmax, sECmax, sGraph, 
-                           sExperiment_date, sOperator, sEln, sComment,))
+                           sExperiment_date, sOperator, sEln, sComment, sConfirmed))
     except Exception as e:
         sError = f"{str(e).encode('utf-8', 'replace').decode('utf-8')}"
         logging.error(sError)

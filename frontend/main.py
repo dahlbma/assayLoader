@@ -1,8 +1,7 @@
-import sys, os, importlib, platform, traceback, logging
+import sys, os, importlib, platform, traceback, logging, json
 from assaylib import *
-from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtGui
 from loginscreen import LoginScreen
 

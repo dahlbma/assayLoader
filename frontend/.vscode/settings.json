@@ -1,0 +1,4 @@
+{
+    "python.analysis.enableTroubleshootMissingImports": true,
+    "python.analysis.typeEvaluation.deprecateTypingAliases": true
+}

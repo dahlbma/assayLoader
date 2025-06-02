@@ -17,10 +17,10 @@
    <layout class="QGridLayout" name="gridLayout_7">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="0" column="0">
-       <widget class="QPushButton" name="goto_sp_btn">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="goto_dr_btn">
         <property name="text">
-         <string>Single Point</string>
+         <string>Dose Response</string>
         </property>
        </widget>
       </item>
@@ -37,10 +37,10 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="goto_dr_btn">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="goto_sp_btn">
         <property name="text">
-         <string>Dose Response</string>
+         <string>Single Point</string>
         </property>
        </widget>
       </item>
@@ -318,6 +318,16 @@
               <column>
                <property name="text">
                 <string>Graph</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Confirmed</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Comment</string>
                </property>
               </column>
              </widget>
@@ -1140,6 +1150,72 @@
              </widget>
             </item>
            </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="dr_search">
+         <attribute name="title">
+          <string>Search</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_15">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>Table</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="searchTable_cb"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <item>
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>Project</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="searchProject_cb"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="search_btn">
+                <property name="text">
+                 <string>Search</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tableWidget"/>
           </item>
          </layout>
         </widget>
