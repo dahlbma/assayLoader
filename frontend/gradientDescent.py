@@ -132,7 +132,7 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
     
     for perm in permutations:
         # Optimized parameters:
-        # Tested slope:0.015 ic50:0.5 bottom:0.5 top:2.5 -> avg RMSE: 1402.60
+        # Tested slope:0.015 ic50:0.5 bottom:0.5 top:2.5 -> avg RMSE: 1402.6
         new_slope = check_bounds(slope - learning_rate * 0.015 * perm['grad_slope'], 'slope')
         new_ic50 = check_bounds(ic50 - learning_rate * ic50_step * 0.5 * perm['grad_ic50'], 'ic50')
         new_bottom = check_bounds(bottom - learning_rate * 0.5 * perm['grad_bottom'], 'bot')
