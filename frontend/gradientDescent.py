@@ -138,7 +138,6 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
         new_bottom = check_bounds(bottom - learning_rate * 0.5 * perm['grad_bottom'], 'bot')
         new_top = check_bounds(top - learning_rate * 2.5 * perm['grad_top'], 'top')
 
-
         y_pred = four_parameter_logistic(x, new_slope, new_ic50, new_bottom, new_top)
         error = cost_function(y, y_pred)
         if error < old_error:
