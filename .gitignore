@@ -84,3 +84,4 @@ tools/screen_raw_data/preparedEnvisionFiles/*
 tools/doseResponse/preparedHaronyFiles/
 tools/doseResponse/preparedHaronyFiles/PLATEMAP.xlsx
 tools/doseResponse/preparedHaronyFiles/prepared_plate_to_file.xlsx
+frontend/transformed.csv
