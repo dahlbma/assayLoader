@@ -144,17 +144,6 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
             best_bottom = new_bottom
             best_top = new_top
             old_error = error
-    '''
-    if iCount % 10 == 0:
-        axs[0, 1].scatter([iCount], [grad_slope], color='b')
-        axs[0, 2].scatter([iCount], [grad_ic50], color='b')
-        axs[1, 0].scatter([iCount], [grad_bottom], color='b')
-        axs[1, 1].scatter([iCount], [grad_top], color='b')
-        axs[0, 1].set_title(f'grad_slope {grad_slope:.2f}')
-        axs[0, 2].set_title(f'grad_ic50 {grad_ic50:.2f}')
-        axs[1, 0].set_title(f'grad_bottom {grad_bottom:.2f}')
-        axs[1, 1].set_title(f'grad_top {grad_top:.2f}')
-    '''
     stop = False
     if org_error == old_error:
         stop = True
@@ -295,8 +284,8 @@ if __name__ == "__main__":
     BOUNDS = {
         'slope': {'MIN': -90.1, 'MAX': 100},
         'ic50': {'MIN': 5.00e-08, 'MAX': 0.01},
-        'top': {'MIN': 129, 'MAX': 300},
-        'bot': {'MIN': 0.0, 'MAX': 5}
+        'top': {'MIN': 80, 'MAX': 300},
+        'bot': {'MIN': -3.0, 'MAX': 10}
     }
 
     parameters = ['grad_slope', 'grad_ic50', 'grad_bottom', 'grad_top']
@@ -348,5 +337,24 @@ if __name__ == "__main__":
             print("Compound ID:", compound_id)
             print("Concentration:", conc)
             print("Y Value:", y_val)
-            fit_curve(conc, y_val)
-            quit()
+            (slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top) = fit_curve(conc, y_val)
+            print(f'slope: {-slope} ic50: {ic50} bottom: {bottom} top: {top}')
+            print(f'sInfo: {sInfo}')
+
+            fig, ax = plt.subplots(figsize=(7, 5))
+            ax.set_xscale('log')
+            ax.scatter(conc, y_val, label=compound_id)
+            ax.set_xlabel('Concentration (M)')
+            ax.set_ylabel('Inhibition (%)')
+            ax.set_title('Inhibition vs Concentration')
+            ax.set_ylim(-3, max(100, np.max(y_val)))  # Set y-axis from 0 to max(y_val) or 100, whichever is greater
+            x_curve = np.logspace(np.log10(min(conc)), np.log10(max(conc)), 100)
+            y_curve_fit = four_parameter_logistic(x_curve, -slope, ic50, bottom, top)
+            ax.plot(x_curve, y_curve_fit, label=f'Fit {compound_id}')
+            ax.legend()
+            plt.show()  # This will block until you close the window
+            plt.close(fig)  # Close the figure to free memory
+            print('##########################################################')            #quit()
+
+    #plt.ioff()  # Disable interactive mode
+    #plt.show()  # Show all plots at the end (optional)
