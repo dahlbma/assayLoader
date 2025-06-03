@@ -131,10 +131,13 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
         old_error *= 2
     
     for perm in permutations:
-        new_slope = check_bounds(slope - learning_rate * 0.03 * perm['grad_slope'], 'slope')
-        new_ic50 = check_bounds(ic50 - learning_rate * ic50_step * 2 * perm['grad_ic50'], 'ic50')
-        new_bottom = check_bounds(bottom - learning_rate * 3 * perm['grad_bottom'], 'bot')
-        new_top = check_bounds(top - learning_rate * 5 * perm['grad_top'], 'top')
+        # Optimized parameters:
+        # Tested slope:0.015 ic50:0.5 bottom:0.5 top:2.5 -> avg RMSE: 1402.61, total iterations: 6220
+        new_slope = check_bounds(slope - learning_rate * 0.015 * perm['grad_slope'], 'slope')
+        new_ic50 = check_bounds(ic50 - learning_rate * ic50_step * 0.5 * perm['grad_ic50'], 'ic50')
+        new_bottom = check_bounds(bottom - learning_rate * 0.5 * perm['grad_bottom'], 'bot')
+        new_top = check_bounds(top - learning_rate * 2.5 * perm['grad_top'], 'top')
+
 
         y_pred = four_parameter_logistic(x, new_slope, new_ic50, new_bottom, new_top)
         error = cost_function(y, y_pred)
