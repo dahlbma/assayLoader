@@ -30,7 +30,6 @@ for signs in sign_combinations:
         # Append the parameter values to the permutations list
     permutations.append(params)
 
-
 def calculate_distr(val, x):
     distr = []
     lower_bound = val - 0.2 * val
@@ -127,6 +126,7 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
     best_ic50 = ic50
     best_bottom = bottom
     best_top = top
+
     if iCount < 2:
         old_error *= 2
     
@@ -134,8 +134,8 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
         new_slope = check_bounds(slope - learning_rate * 0.03 * perm['grad_slope'], 'slope')
         new_ic50 = check_bounds(ic50 - learning_rate * ic50_step * 2 * perm['grad_ic50'], 'ic50')
         new_bottom = check_bounds(bottom - learning_rate * 3 * perm['grad_bottom'], 'bot')
-        
         new_top = check_bounds(top - learning_rate * 5 * perm['grad_top'], 'top')
+
         y_pred = four_parameter_logistic(x, new_slope, new_ic50, new_bottom, new_top)
         error = cost_function(y, y_pred)
         if error < old_error:
@@ -259,13 +259,15 @@ def fit_curve(x, y):
     derivative_ic50_div_bot = 0
     try:
         derivative_ic50_div_top = der_ic50 / der_top
+    except Exception:
+        derivative_ic50_div_top = 0
+    try:
         derivative_ic50_div_bot = der_ic50 / der_bottom
-    except:
-        pass
+    except Exception:
+        derivative_ic50_div_bot = 0
 
     #sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n {"{:.1f}".format(der_bottom)}\n{"{:.1f}".format(der_ic50)}\n{"{:.1f}".format(der_top)}\n{"{:.1f}".format(derivative_ic50_div_bot)}\n{"{:.1f}".format(derivative_ic50_div_top)}'''
     sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\nDer bot: {"{:.1f}".format(derivative_ic50_div_bot)}\nDer top: {"{:.1f}".format(derivative_ic50_div_top)}'''
-    
     return -slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top
     
 if __name__ == "__main__":
@@ -306,15 +308,6 @@ if __name__ == "__main__":
             # Append the parameter values to the permutations list
         permutations.append(params)
 
-    fig, axs = plt.subplots(2, 3, figsize=(15, 8))
-
-    axs[0, 0].set_xscale('log')
-    axs[0, 1].set_title('grad_slope')
-    axs[0, 2].set_title('grad_ic50')
-    axs[1, 0].set_title('grad_bottom')
-    axs[1, 1].set_title('grad_top')
-    axs[1, 2].set_title('RMSE')
-
     iPlotNr = 0
     with open('transformed.csv', 'r') as file:
         # Skip the header line
@@ -341,13 +334,46 @@ if __name__ == "__main__":
             print(f'slope: {-slope} ic50: {ic50} bottom: {bottom} top: {top}')
             print(f'sInfo: {sInfo}')
 
+
+
+
+            param_ranges = {
+                'slope': np.linspace(slope * 0.5, slope * 1.5, 50),
+                'ic50': np.linspace(ic50 * 0.5, ic50 * 1.5, 50),
+                'bottom': np.linspace(bottom - abs(bottom) * 0.5, bottom + abs(bottom) * 0.5, 50),
+                'top': np.linspace(top - abs(top) * 0.5, top + abs(top) * 0.5, 50)
+            }
+
+            fixed_params = {'slope': slope, 'ic50': ic50, 'bottom': bottom, 'top': top}
+            x = conc
+            y = y_val
+
+            for param in ['slope', 'ic50', 'bottom', 'top']:
+                costs = []
+                for val in param_ranges[param]:
+                    params = fixed_params.copy()
+                    params[param] = val
+                    y_pred = four_parameter_logistic(x, params['slope'], params['ic50'], params['bottom'], params['top'])
+                    cost = cost_function(y, y_pred)
+                    costs.append(cost)
+                plt.figure()
+                plt.plot(param_ranges[param], costs)
+                plt.xlabel(param)
+                plt.ylabel('RMSE')
+                plt.title(f'RMSE vs {param} for {compound_id}')
+                plt.show()
+
+
+
+
+
             fig, ax = plt.subplots(figsize=(7, 5))
             ax.set_xscale('log')
             ax.scatter(conc, y_val, label=compound_id)
             ax.set_xlabel('Concentration (M)')
             ax.set_ylabel('Inhibition (%)')
             ax.set_title('Inhibition vs Concentration')
-            ax.set_ylim(-3, max(100, np.max(y_val)))  # Set y-axis from 0 to max(y_val) or 100, whichever is greater
+            ax.set_ylim(min(-5, np.min(y_val)-5), max(100, np.max(y_val)+3))  # Set y-axis from 0 to max(y_val) or 100, whichever is greater
             x_curve = np.logspace(np.log10(min(conc)), np.log10(max(conc)), 100)
             y_curve_fit = four_parameter_logistic(x_curve, -slope, ic50, bottom, top)
             ax.plot(x_curve, y_curve_fit, label=f'Fit {compound_id}')
