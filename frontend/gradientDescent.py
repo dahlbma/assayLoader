@@ -98,9 +98,6 @@ def compute_gradient(iCount, x, y, slope, ic50, bottom, top, learning_rate):
     # Compute errors
     error = abs_error = cost_function(y, y_pred)
     print(f'error: {abs_error}')
-    if iCount % 10 == 0:
-        axs[1, 2].scatter([iCount], [abs_error], color='b')
-        axs[1, 2].set_title(f'RMSE {abs_error:.2f}')
 
     if abs_error < 10:
         learning_rate *= 0.95
@@ -138,7 +135,10 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
         new_bottom = check_bounds(bottom - learning_rate * 0.5 * perm['grad_bottom'], 'bot')
         new_top = check_bounds(top - learning_rate * 2.5 * perm['grad_top'], 'top')
 
-        y_pred = four_parameter_logistic(x, new_slope, new_ic50, new_bottom, new_top)
+        x_div_ic50 = x / new_ic50
+        # Inline 4-parameter logistic function
+        y_pred = new_bottom + (new_top - new_bottom) / (1 + x_div_ic50 ** -new_slope)
+        #y_pred = four_parameter_logistic(x, new_slope, new_ic50, new_bottom, new_top)
         error = cost_function(y, y_pred)
         if error < old_error:
             best_slope = new_slope
@@ -302,6 +302,10 @@ if __name__ == "__main__":
 
     # Loop through each sign combination
     for signs in sign_combinations:
+        # Skip the all-zeros permutation
+        if all(sign == 0 for sign in signs):
+            continue
+
         # Create a dictionary to hold the parameter values for this combination of signs
         params = {}
         # Loop through each parameter and assign the value with the corresponding sign
