@@ -154,6 +154,8 @@ class GetDrProjects(tornado.web.RequestHandler):
 
         cur.execute(sSql)
         res = res2json()
+        #response = cur.fetchall()
+        #res = res_to_json(response, cur)
         self.finish(res)
 
         
@@ -204,8 +206,13 @@ class GetDrData(tornado.web.RequestHandler):
         where project = %s '''
         
         cur.execute(sSql, (sProject, ))
-        res = res2json()
-        self.finish(res)
+
+        response = cur.fetchall()
+        res = res_to_json(response, cur)
+        self.finish(json.dumps(res))
+        
+        #res = res2json()
+        #self.finish(res)
 
     
 """
