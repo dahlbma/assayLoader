@@ -18,6 +18,21 @@ def gotoDR(self):
     return
 
 
+def userInfo(sMessage):
+    info_dialog = QMessageBox()
+
+    # Set the icon and text of the dialog
+    info_dialog.setIcon(QMessageBox.Information)
+    info_dialog.setText(sMessage)
+    info_dialog.setWindowTitle("Information")
+
+    # Add a button to the dialog
+    info_dialog.addButton(QMessageBox.Ok)
+    
+    # Show the dialog
+    info_dialog.exec_()
+
+
 def delete_all_files_in_directory(directory_path):
     # Check if the directory exists
     if os.path.exists(directory_path):

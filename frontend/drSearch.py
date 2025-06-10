@@ -3,17 +3,43 @@ from PyQt5.uic import loadUi
 from PyQt5.QtCore import QRegExp, QDate, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, QComboBox, QDialog, QPushButton
 from PyQt5.QtWidgets import QCheckBox, QSpacerItem, QSizePolicy, QMessageBox
-from PyQt5 import QtGui
-from PyQt5.QtGui import QIntValidator, QBrush, QColor, QRegExpValidator, QCursor
 import openpyxl
 from pathlib import Path
-from instruments import parseEnvision
 import pandas as pd
-import subprocess
-from z_factor import *
 from assaylib import *
 from prepareHarmonyFile import *
 from prepareEnvisionFile import *
 from selectDataColumn import *
-from doseResponseTable import DoseResponseTable, ScatterplotWidget
 
+saSearchTables = {
+    "DR Sandbox": "assay_test.lcb_dr",
+    "DR": "assay.lcb_dr"
+}
+
+
+class DrSearch:
+    def __init__(self, parent):
+        self.parent = parent  # Reference to DoseResponseScreen or needed context
+
+    def search(self):
+        # Access parent widgets/data as needed
+        sProject = self.parent.searchProject_cb.currentText()
+        sTable = self.parent.searchTable_cb.currentText()
+        selectedTable_key = self.parent.searchTable_cb.currentText()
+        selectedTable_value = saSearchTables.get(selectedTable_key)
+        print(selectedTable_value)
+        df, lStatus = dbInterface.getDrData(self.parent.token, sProject, selectedTable_value)
+        if not lStatus or df.empty:
+            userInfo("No data found")
+            return
+        print('searching for data in project:', sProject, 'table:', selectedTable_value)
+        # Populate the tableWidget with the DataFrame
+        table = self.parent.drSearchResultTab  # Make sure this is your QTableWidget
+        table.setRowCount(df.shape[0])
+        table.setColumnCount(df.shape[1])
+        table.setHorizontalHeaderLabels(df.columns.astype(str))
+
+        for row in range(df.shape[0]):
+            for col in range(df.shape[1]):
+                value = str(df.iat[row, col])
+                table.setItem(row, col, QTableWidgetItem(value))

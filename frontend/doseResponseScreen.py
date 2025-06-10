@@ -11,6 +11,7 @@ from prepareHarmonyFile import *
 from prepareEnvisionFile import *
 from selectDataColumn import *
 from doseResponseTable import ScatterplotWidget
+from drSearch import DrSearch
 import platform
 #from inhibitionScatter import ScatterPlotWindow
 
@@ -57,21 +58,6 @@ saSearchTables = {
     "DR Sandbox": "assay_test.lcb_dr",
     "DR": "assay.lcb_dr"
 }
-
-
-def userInfo(sMessage):
-    info_dialog = QMessageBox()
-
-    # Set the icon and text of the dialog
-    info_dialog.setIcon(QMessageBox.Information)
-    info_dialog.setText(sMessage)
-    info_dialog.setWindowTitle("Information")
-
-    # Add a button to the dialog
-    info_dialog.addButton(QMessageBox.Ok)
-    
-    # Show the dialog
-    info_dialog.exec_()
 
 
 class DoseResponseScreen(QMainWindow):
@@ -152,7 +138,9 @@ class DoseResponseScreen(QMainWindow):
         self.loadAssayFile_btn.clicked.connect(self.loadAssayDataFromFile)
         self.saveData_btn.clicked.connect(self.saveDrToDb)
         
-        self.search_btn.clicked.connect(self.searchDR)
+        self.dr_search = DrSearch(self)
+        self.search_btn.clicked.connect(self.dr_search.search)
+
 
     def searchDR(self):
         sProject = self.searchProject_cb.currentText()
@@ -160,7 +148,6 @@ class DoseResponseScreen(QMainWindow):
 
         selectedTable_key = self.searchTable_cb.currentText()
         selectedTable_value = saSearchTables.get(selectedTable_key)
-
 
         print(selectedTable_value)
 
