@@ -54,12 +54,6 @@ y_values={105.07, 94.19, 65.84, 23.12, 1.48, -9.46, -13.04, -11.79, -10.53, -12.
 }
 '''
 
-saSearchTables = {
-    "DR Sandbox": "assay_test.lcb_dr",
-    "DR": "assay.lcb_dr"
-}
-
-
 class DoseResponseScreen(QMainWindow):
     from assaylib import gotoSP
     def __init__(self, token, test):
@@ -142,30 +136,12 @@ class DoseResponseScreen(QMainWindow):
         self.search_btn.clicked.connect(self.dr_search.search)
 
 
-    def searchDR(self):
-        sProject = self.searchProject_cb.currentText()
-        sTable = self.searchTable_cb.currentText()
-
-        selectedTable_key = self.searchTable_cb.currentText()
-        selectedTable_value = saSearchTables.get(selectedTable_key)
-
-        print(selectedTable_value)
-
-        df, lStatus = dbInterface.getDrData(self.token, sProject, selectedTable_value)
-        if not lStatus or df.empty:
-            userInfo("No data found")
-            return
-
-        #self.doseResponseTable.populate_table(df)
-
-
     def populateScreenData(self):
         saProjects = dbInterface.getProjects(self.token)
         saDrProjects = dbInterface.getDrProjects(self.token, 'assay.lcb_dr')
 
         self.project_cb.addItems(saProjects)
         self.searchProject_cb.addItems(saDrProjects)
-        self.searchTable_cb.addItems(saSearchTables.keys())
 
         saOperators = dbInterface.getOperators(self.token)
         self.operator_cb.addItems(saOperators)

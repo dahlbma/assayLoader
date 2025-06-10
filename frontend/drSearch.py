@@ -11,22 +11,22 @@ from prepareHarmonyFile import *
 from prepareEnvisionFile import *
 from selectDataColumn import *
 
-saSearchTables = {
-    "DR Sandbox": "assay_test.lcb_dr",
-    "DR": "assay.lcb_dr"
-}
-
 
 class DrSearch:
     def __init__(self, parent):
         self.parent = parent  # Reference to DoseResponseScreen or needed context
+        self.saSearchTables = {
+            "DR Sandbox": "assay_test.lcb_dr",
+            "DR": "assay.lcb_dr"
+        }
+        parent.searchTable_cb.addItems(self.saSearchTables.keys())
 
     def search(self):
         # Access parent widgets/data as needed
         sProject = self.parent.searchProject_cb.currentText()
         sTable = self.parent.searchTable_cb.currentText()
         selectedTable_key = self.parent.searchTable_cb.currentText()
-        selectedTable_value = saSearchTables.get(selectedTable_key)
+        selectedTable_value = self.saSearchTables.get(selectedTable_key)
         print(selectedTable_value)
         df, lStatus = dbInterface.getDrData(self.parent.token, sProject, selectedTable_value)
         if not lStatus or df.empty:
