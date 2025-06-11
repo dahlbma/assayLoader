@@ -561,7 +561,9 @@ class DoseResponseScreen(QMainWindow):
             iIndex += 1
 
         selected_rows = df[includedPoints]
-        widget.plot_scatter(selected_rows, self.yScale)
+        widget.fit_curve_to_data(selected_rows, self.yScale)
+        widget.plot_curve()
+        print(f'Updating plot for row {row} with max concentration {maxConc}')
         self.doseResponseTable.updateTable(row, widget)
         self.doseResponseTable.updateMaxConc(row, maxConc)
         

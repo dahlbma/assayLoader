@@ -268,7 +268,6 @@ def fit_curve(x, y):
     except Exception:
         derivative_ic50_div_bot = 0
 
-    #sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\n {"{:.1f}".format(der_bottom)}\n{"{:.1f}".format(der_ic50)}\n{"{:.1f}".format(der_top)}\n{"{:.1f}".format(derivative_ic50_div_bot)}\n{"{:.1f}".format(derivative_ic50_div_top)}'''
     sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\nDer bot: {"{:.1f}".format(derivative_ic50_div_bot)}\nDer top: {"{:.1f}".format(derivative_ic50_div_top)}'''
     return -slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top
     
