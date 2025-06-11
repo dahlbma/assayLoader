@@ -206,13 +206,9 @@ class GetDrData(tornado.web.RequestHandler):
         where project = %s '''
         
         cur.execute(sSql, (sProject, ))
-
         response = cur.fetchall()
         res = res_to_json(response, cur)
         self.finish(json.dumps(res))
-        
-        #res = res2json()
-        #self.finish(res)
 
     
 """
