@@ -47,6 +47,22 @@ class ScatterplotWidget(QWidget):
         self.auc = None
         self.sInfo = None
 
+    def set_data(self, hillslope, ic50, bottom, top, x_values, y_values, y_error):
+        """
+        Set the data for the scatter plot and fit curve.
+        This method is called to update the plot with new data.
+        """
+
+        self.slope = hillslope
+        self.ic50 = ic50
+        self.bottom = bottom
+        self.top = top
+        self.fitOk = True
+        self.x_values = x_values
+        self.y_values = y_values
+        self.y_err_values = y_error
+        
+
     def resizeEvent(self, event):
         """
         Override resizeEvent to ensure plot redraws when widget size changes.
@@ -85,6 +101,8 @@ class ScatterplotWidget(QWidget):
 
 
     def generateComment(self):
+        if not hasattr(self, "derivative_ic50_div_bot"):
+            return ''
         comment = ''
         if abs(self.slope) > 4:
             comment += ' High Hill Slope;'
@@ -92,21 +110,19 @@ class ScatterplotWidget(QWidget):
             comment += ' Low Hill Slope;'
         if self.top < 80:
             comment += ' Ymax < 80%;'
-            
         difference = self.top - self.bottom
         if difference < 50:
             comment += ' Low effect;'
-
         if self.derivative_ic50_div_bot < DERIVATIVE_BOT_CUTOFF:
             comment += ' No defined bottom;'
-
         if self.derivative_ic50_div_top < DERIVATIVE_TOP_CUTOFF:
             comment += ' No defined top;'
-            
         return comment
     
 
     def isConfirmed(self):
+        if not hasattr(self, "derivative_ic50_div_bot"):
+            return ''
         df = self.data_dict
         count_above_50 = df[df['inhibition'] > 50.0].shape[0]
         count_below_20 = df[df['inhibition'] < 20.0].shape[0]
@@ -227,6 +243,7 @@ class ScatterplotWidget(QWidget):
         
         # Save all the parameters from the curve fitting
         self.auc = auc
+
         self.minConc = self.data_dict['finalConc_nM'].iloc[0]
         self.maxConc = self.data_dict['finalConc_nM'].iloc[-1]
         self.icmax = self.data_dict['inhibition'].iloc[-1]

@@ -10,12 +10,12 @@ from openpyxl.drawing.image import Image
 from openpyxl.styles import Font
 from scatterplotWidget import ScatterplotWidget
 import assaylib
-
+import frontend.configParams as cfg
 import warnings
 warnings.filterwarnings('ignore')
 
-GRAPH_WIDTH = 400
-GRAPH_HEIGHT = 300
+GRAPH_WIDTH = cfg.GRAPH_WIDTH
+GRAPH_HEIGHT = cfg.GRAPH_HEIGHT
 
 class DoseResponseTable(QTableWidget):
     def __init__(self, inputWidget):

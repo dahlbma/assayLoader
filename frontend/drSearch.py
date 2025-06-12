@@ -14,6 +14,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 from scatterplotWidget import ScatterplotWidget
+import frontend.configParams as cfg
 
 
 def parse_graph_column(graph_str):
@@ -31,8 +32,8 @@ def parse_graph_column(graph_str):
     hillslope = float(fit_match.group(2))
     bottom = float(fit_match.group(3))
     top = float(fit_match.group(4))
-
-    return x_values, y_values, y_error, logic50, hillslope, bottom, top
+    ic50 = 10 ** logic50
+    return x_values, y_values, y_error, ic50, -hillslope, bottom, top
 
 def four_parameter_logistic(x, slope, ic50, bottom, top):
     return bottom + (top - bottom) / (1 + (x / ic50) ** -slope)
@@ -93,17 +94,16 @@ class DrSearch:
 
         for row in range(df.shape[0]):
             # Prepare a data_dict similar to what ScatterplotWidget expects
-            # You may need to adapt this if your DataFrame columns differ
             graph_str = df.iloc[row]['graph']
             parsed = parse_graph_column(graph_str)
             if parsed is None:
                 continue  # or handle error
-            x_values, y_values, y_error, logic50, hillslope, bottom, top = parsed
+            x_values, y_values, y_error, ic50, hillslope, bottom, top = parsed
             data_dict = {
                 'finalConc_nM': np.array(x_values) * 1e9,  # convert M to nM if needed
                 'inhibition': np.array(y_values),
                 'yStd': np.array(y_error)
-            }            # You may need to parse these arrays from the 'graph' column if they are stored as strings
+            }
 
             df_tmp = pd.DataFrame(data_dict)
             # Add the extra columns
@@ -114,11 +114,20 @@ class DrSearch:
 
             # Create the plot widget
             scatterplot_widget = ScatterplotWidget(df_tmp, row, 'Inhibition (%)', self.parent.workingDirectory)
-            # Insert the widget into the last column
-            table.setCellWidget(row, df.shape[1], scatterplot_widget)
+            scatterplot_widget.set_data(hillslope, ic50, bottom, top, x_values, y_values, y_error)
+            scatterplot_widget.plot_curve()
+
+            # Find the index of the 'graph' column
+            graph_col_index = df.columns.get_loc('graph')
+            # Set the column width and row height to match the plot size from config.py
+            table.setColumnWidth(graph_col_index, cfg.GRAPH_WIDTH)
+            table.setRowHeight(row, cfg.GRAPH_HEIGHT)
+            # Insert the widget into the 'graph' column
+            table.setCellWidget(row, graph_col_index, scatterplot_widget)
             QApplication.processEvents()
-            print(f"Row {row} processed with ScatterplotWidget")
             # Optionally, fill in the rest of the columns with data
             for col in range(df.shape[1]):
+                if col == graph_col_index:
+                    continue
                 item = QTableWidgetItem(str(df.iat[row, col]))
                 table.setItem(row, col, item)
