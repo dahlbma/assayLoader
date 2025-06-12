@@ -10,7 +10,7 @@ from openpyxl.drawing.image import Image
 from openpyxl.styles import Font
 from scatterplotWidget import ScatterplotWidget
 import assaylib
-import frontend.configParams as cfg
+import configParams as cfg
 import warnings
 warnings.filterwarnings('ignore')
 

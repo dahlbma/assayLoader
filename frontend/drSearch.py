@@ -14,7 +14,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 from scatterplotWidget import ScatterplotWidget
-import frontend.configParams as cfg
+import configParams as cfg
 
 
 def parse_graph_column(graph_str):
