@@ -75,7 +75,6 @@ def getDrData(token, sProject, selectedTable_value):
         res = r.content.decode()
         res = json.loads(res)
         df = pd.DataFrame(res)
-        print(df)
 
         return df, True
     

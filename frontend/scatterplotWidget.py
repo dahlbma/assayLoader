@@ -202,7 +202,7 @@ class ScatterplotWidget(QWidget):
             self.top = -1
             self.ic50_std = -1
 
-    def plot_curve(self):
+    def plot_curve(self, createExcel = True):
         # Generate a curve using the fitted parameters
         x_curve = np.logspace(np.log10(min(self.x_values)), np.log10(max(self.x_values)), 100)
         if self.fitOk == True:
@@ -232,8 +232,9 @@ class ScatterplotWidget(QWidget):
             # If it doesn't exist, create it
             os.makedirs(imgDir)
 
-        self.figure.tight_layout(pad=0.1) # New line            
-        self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
+        if createExcel:
+            self.figure.tight_layout(pad=0.1) # New line            
+            self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
 
         #self.figure.set_size_inches(5.81, 4.06)
 

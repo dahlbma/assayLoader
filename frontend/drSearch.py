@@ -19,27 +19,62 @@ import configParams as cfg
 
 def parse_graph_column(graph_str):
     # Extract x_values, y_values, y_error from the 'raw' section
-    raw_match = re.search(r"\{name='raw'.*?x_values=\{([^\}]*)\}.*?y_values=\{([^\}]*)\}.*?y_error=\{([^\}]*)\}", graph_str, re.DOTALL)
-    fit_match = re.search(r"\{name='fitsigmoidal'.*?logic50=([-\d\.]+) hillslope=([-\d\.]+) bottom=([-\d\.]+) top=([-\d\.]+)", graph_str, re.DOTALL)
-    if not raw_match or not fit_match:
+    try:
+        raw_match = re.search(r"\{name='raw'.*?x_values=\{([^\}]*)\}.*?y_values=\{([^\}]*)\}.*?y_error=\{([^\}]*)\}", graph_str, re.DOTALL)
+        fit_match = re.search(r"\{name='fitsigmoidal'.*?logic50=([-\d\.]+) hillslope=([-\d\.]+) bottom=([-\d\.]+) top=([-\d\.]+)", graph_str, re.DOTALL)
+        if not raw_match or not fit_match:
+            return None
+
+        x_values = [float(x) for x in raw_match.group(1).split(',')]
+        y_values = [float(y) for y in raw_match.group(2).split(',')]
+        y_error_raw = raw_match.group(3).split(',')
+        try:
+            y_error = [float(e) for e in y_error_raw]
+        except Exception:
+            # If any conversion fails, set y_error to all zeros of same length
+            y_error = [0.0 for _ in y_error_raw]
+
+        logic50 = float(fit_match.group(1))
+        hillslope = float(fit_match.group(2))
+        bottom = float(fit_match.group(3))
+        top = float(fit_match.group(4))
+        ic50 = 10 ** logic50
+        return x_values, y_values, y_error, ic50, -hillslope, bottom, top
+    except Exception as e:
+        printDbg(f"Error parsing graph column: {e}")
+        printDbg(graph_str)
         return None
 
-    x_values = [float(x) for x in raw_match.group(1).split(',')]
-    y_values = [float(y) for y in raw_match.group(2).split(',')]
-    y_error = [float(e) for e in raw_match.group(3).split(',')]
-
-    logic50 = float(fit_match.group(1))
-    hillslope = float(fit_match.group(2))
-    bottom = float(fit_match.group(3))
-    top = float(fit_match.group(4))
-    ic50 = 10 ** logic50
-    return x_values, y_values, y_error, ic50, -hillslope, bottom, top
 
 def four_parameter_logistic(x, slope, ic50, bottom, top):
     return bottom + (top - bottom) / (1 + (x / ic50) ** -slope)
 
 
 class DrSearch:
+    def clear_table(self):
+        """Remove all rows and clean up embedded widgets in the drSearchResultTab table."""
+        table = self.parent.drSearchResultTab
+        # Remove and delete all cell widgets to avoid memory leaks
+        row_count = table.rowCount()
+        col_count = table.columnCount()
+        # Remove widgets row by row from bottom to top to avoid shifting issues
+        for row in reversed(range(row_count)):
+            for col in range(col_count):
+                widget = table.cellWidget(row, col)
+                if widget is not None:
+                    table.removeCellWidget(row, col)
+                    widget.deleteLater()
+        # Remove all items (QTableWidgetItem) as well
+        for row in reversed(range(row_count)):
+            for col in range(col_count):
+                item = table.item(row, col)
+                if item is not None:
+                    table.takeItem(row, col)
+        table.clearContents()
+        table.setRowCount(0)
+        table.viewport().update()  # Force a repaint of the table
+        QApplication.processEvents()
+
     def __init__(self, parent):
         self.parent = parent  # Reference to DoseResponseScreen or needed context
         self.saSearchTables = {
@@ -77,17 +112,21 @@ class DrSearch:
         # Access parent widgets/data as needed
         sProject = self.parent.searchProject_cb.currentText()
         sTable = self.parent.searchTable_cb.currentText()
-        selectedTable_key = self.parent.searchTable_cb.currentText()
+        selectedTable_key = sTable
         selectedTable_value = self.saSearchTables.get(selectedTable_key)
-        print(selectedTable_value)
+        printDbg(selectedTable_value)
         df, lStatus = dbInterface.getDrData(self.parent.token, sProject, selectedTable_value)
         if not lStatus or df.empty:
             userInfo("No data found")
             return
-        print('searching for data in project:', sProject, 'table:', selectedTable_value)
-        # Populate the tableWidget with the DataFrame
 
+        # Clear the table before populating
+        self.clear_table()
+
+        # Populate the tableWidget with the DataFrame
         table = self.parent.drSearchResultTab  # Make sure this is your QTableWidget
+        table.setRowCount(0)
+        QApplication.processEvents()
         table.setRowCount(df.shape[0])
         table.setColumnCount(df.shape[1])
         table.setHorizontalHeaderLabels(df.columns.astype(str))
@@ -115,7 +154,8 @@ class DrSearch:
             # Create the plot widget
             scatterplot_widget = ScatterplotWidget(df_tmp, row, 'Inhibition (%)', self.parent.workingDirectory)
             scatterplot_widget.set_data(hillslope, ic50, bottom, top, x_values, y_values, y_error)
-            scatterplot_widget.plot_curve()
+            createExcel = False
+            scatterplot_widget.plot_curve(createExcel)
 
             # Find the index of the 'graph' column
             graph_col_index = df.columns.get_loc('graph')

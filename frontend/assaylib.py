@@ -1,3 +1,5 @@
+import inspect
+import configParams
 import sys, os, dbInterface, shutil
 import pandas as pd
 from PyQt5 import QtCore
@@ -16,6 +18,15 @@ def gotoDR(self):
     self.window().setCurrentIndex(2)
     #self.window().widget(2).drPlateIdFile_btn.setFocus()
     return
+
+
+# Utility: printDbg prints a debug message with file and line number
+def printDbg(msg):
+    if getattr(configParams, 'DBG', True):
+        frame = inspect.currentframe().f_back
+        filename = os.path.basename(frame.f_code.co_filename)
+        lineno = frame.f_lineno
+        print(f"[DBG] {filename}:{lineno}: {msg}")
 
 
 def userInfo(sMessage):
