@@ -77,10 +77,7 @@ class DrSearch:
 
     def __init__(self, parent):
         self.parent = parent  # Reference to DoseResponseScreen or needed context
-        self.saSearchTables = {
-            "DR Sandbox": "assay_test.lcb_dr",
-            "DR": "assay.lcb_dr"
-        }
+        self.saSearchTables = cfg.searchTables
         parent.searchTable_cb.addItems(self.saSearchTables.keys())
 
     def show_plot_in_widget(self, x_values, y_values, y_error, hillslope, ic50, bottom, top):
