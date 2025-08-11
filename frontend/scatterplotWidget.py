@@ -208,12 +208,13 @@ class ScatterplotWidget(QWidget):
         if self.fitOk == True:
             y_curve_fit = fourpl(x_curve, self.slope, self.ic50, self.bottom, self.top)
 
-        self.ax.errorbar(self.x_values, self.y_values, yerr=self.y_err_values, fmt='o', label='Raw data')
+        self.ax.errorbar(self.x_values, self.y_values, yerr=self.y_err_values, fmt='o', color='blue', label='Raw data')
 
         self.ax.set_ylim(min(min(self.y_values), 0) - 10, max(max(self.y_values), 100) + 10)
 
         if self.fitOk == True:
-            self.ax.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
+            self.ax.plot(x_curve, y_curve_fit, color='orange', label='Fitted 4-PL Curve')
+
         if self.ic50 == -1:
             pass
         elif self.ic50 > 0.001:
