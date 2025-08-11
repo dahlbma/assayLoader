@@ -12,6 +12,7 @@ from prepareEnvisionFile import *
 from selectDataColumn import *
 from doseResponseTable import ScatterplotWidget
 import platform
+from drSearch import DrSearch
 #from inhibitionScatter import ScatterPlotWindow
 
 # Get the operating system name
@@ -158,10 +159,12 @@ class DoseResponseScreen(QMainWindow):
         sProject = self.searchProject_cb.currentText()
         sTable = self.searchTable_cb.currentText()
 
+        # Instantiate DrSearch for search functionality
+        self.dr_search = DrSearch(self)
         selectedTable_key = self.searchTable_cb.currentText()
         selectedTable_value = saSearchTables.get(selectedTable_key)
 
-
+        self.dr_search.search()
         print(selectedTable_value)
 
         df, lStatus = dbInterface.getDrData(self.token, sProject, selectedTable_value)

@@ -204,14 +204,14 @@ class ScatterplotWidget(QWidget):
 
     def plot_curve(self, createExcel = True):
         # Generate a curve using the fitted parameters
-        x_curve = np.logspace(np.log10(min(self.x_values)), np.log10(max(self.x_values)), 100)
+        x_curve = np.logspace(np.log10(min(self.x_values)), np.log10(max(self.x_values)), 40)  # Reduced from 100 to 40 points
         if self.fitOk == True:
             y_curve_fit = fourpl(x_curve, self.slope, self.ic50, self.bottom, self.top)
 
         self.ax.errorbar(self.x_values, self.y_values, yerr=self.y_err_values, fmt='o', label='Raw data')
 
         self.ax.set_ylim(min(min(self.y_values), 0) - 10, max(max(self.y_values), 100) + 10)
-        
+
         if self.fitOk == True:
             self.ax.plot(x_curve, y_curve_fit, label='Fitted 4-PL Curve')
         if self.ic50 == -1:
@@ -224,24 +224,18 @@ class ScatterplotWidget(QWidget):
         self.ax.set_xlabel('Concentration')
         self.ax.set_ylabel(self.yScale)
 
-        # Create sub dir for images of the DR-curves (for Excel)
-        imgDir = self.workingDirectory + '/img'
-        
-        # Check if the directory exists
-        if not os.path.exists(imgDir):
-            # If it doesn't exist, create it
-            os.makedirs(imgDir)
-
+        # Only create image directory and save figure if exporting for Excel
         if createExcel:
-            self.figure.tight_layout(pad=0.1) # New line            
+            imgDir = self.workingDirectory + '/img'
+            if not os.path.exists(imgDir):
+                os.makedirs(imgDir)
+            self.figure.tight_layout(pad=0.1)
             self.figure.savefig(f'{imgDir}/{self.rowPosition}.png', bbox_inches='tight', dpi=96)
-
-        #self.figure.set_size_inches(5.81, 4.06)
 
         self.canvas.draw()
 
         (auc, err) = quad(fourpl, min(self.x_values), max(self.x_values), args=(self.slope, self.ic50, self.bottom, self.top))
-        
+
         # Save all the parameters from the curve fitting
         self.auc = auc
 
@@ -252,5 +246,5 @@ class ScatterplotWidget(QWidget):
         self.sGraph = self.generateGraphString()
         self.confirmed = self.isConfirmed()
         self.comment = self.generateComment()
-        
+
         return self.slope, self.ic50, self.bottom, self.top, self.ic50_std, self.auc, self.sInfo

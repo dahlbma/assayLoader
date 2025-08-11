@@ -128,43 +128,42 @@ class DrSearch:
         table.setColumnCount(df.shape[1])
         table.setHorizontalHeaderLabels(df.columns.astype(str))
 
+        table.setSortingEnabled(True)
+
+        # First, populate all rows and columns except the plot
+        graph_col_index = df.columns.get_loc('graph')
         for row in range(df.shape[0]):
-            # Prepare a data_dict similar to what ScatterplotWidget expects
+            for col in range(df.shape[1]):
+                if col == graph_col_index:
+                    continue
+                item = QTableWidgetItem(str(df.iat[row, col]))
+                table.setItem(row, col, item)
+
+        # Then, generate and insert the plots for each row
+        for row in range(df.shape[0]):
             graph_str = df.iloc[row]['graph']
             parsed = parse_graph_column(graph_str)
             if parsed is None:
                 continue  # or handle error
             x_values, y_values, y_error, ic50, hillslope, bottom, top = parsed
             data_dict = {
-                'finalConc_nM': np.array(x_values) * 1e9,  # convert M to nM if needed
+                'finalConc_nM': np.array(x_values) * 1e9,
                 'inhibition': np.array(y_values),
                 'yStd': np.array(y_error)
             }
-
             df_tmp = pd.DataFrame(data_dict)
-            # Add the extra columns
             df_tmp['Batch nr'] = "1"
             df_tmp['Compound ID'] = "2"
-            # Reorder columns as desired
             df_tmp = df_tmp[['Batch nr', 'Compound ID', 'finalConc_nM', 'yStd', 'inhibition']]
 
-            # Create the plot widget
-            scatterplot_widget = ScatterplotWidget(df_tmp, row, 'Inhibition (%)', self.parent.workingDirectory)
+            working_dir = self.parent.workingDirectory if hasattr(self.parent, 'workingDirectory') and self.parent.workingDirectory else os.path.join(os.getcwd(), 'img')
+            if not os.path.exists(working_dir):
+                os.makedirs(working_dir, exist_ok=True)
+            scatterplot_widget = ScatterplotWidget(df_tmp, row, 'Inhibition (%)', working_dir)
             scatterplot_widget.set_data(hillslope, ic50, bottom, top, x_values, y_values, y_error)
             createExcel = False
             scatterplot_widget.plot_curve(createExcel)
-
-            # Find the index of the 'graph' column
-            graph_col_index = df.columns.get_loc('graph')
-            # Set the column width and row height to match the plot size from config.py
             table.setColumnWidth(graph_col_index, cfg.GRAPH_WIDTH)
             table.setRowHeight(row, cfg.GRAPH_HEIGHT)
-            # Insert the widget into the 'graph' column
             table.setCellWidget(row, graph_col_index, scatterplot_widget)
             QApplication.processEvents()
-            # Optionally, fill in the rest of the columns with data
-            for col in range(df.shape[1]):
-                if col == graph_col_index:
-                    continue
-                item = QTableWidgetItem(str(df.iat[row, col]))
-                table.setItem(row, col, item)
