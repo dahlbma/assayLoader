@@ -134,7 +134,6 @@ class ScatterplotWidget(QWidget):
         return self.confirmed
 
 
-    #def plot_scatter(self, df, yScale):
     def fit_curve_to_data(self, data_dict = None, yScale = None):
         if data_dict is None:
             data_dict = self.data_dict
@@ -193,6 +192,7 @@ class ScatterplotWidget(QWidget):
                  self.derivative_ic50_div_top) = fit_curve(self.x_values, self.y_values)
                 # Extract the fitted parameters
                 self.slope_std = self.ic50_std = self.bottom_std = self.top_std = -1
+                self.plot_curve(createExcel = False)
         except Exception as e:
             print(f'''Can't fit parameters {str(e)} {self.x_values[0]}''')
             self.fitOk = False
