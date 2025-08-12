@@ -92,7 +92,7 @@ class ScatterplotWidget(QWidget):
     y_label='inhibition'
     y_unit='%'
     logic50={math.log10(self.ic50)}
-    hillslope={self.slope}
+    hillslope={self.slope * -1}
     bottom={self.bottom}
     top={self.top}
   }}
