@@ -79,7 +79,7 @@ def jwtauth(handler_class):
                 name = s['username']
             except Exception as e:
                 handler._transforms = []
-                logging.error(str(err))
+                logging.error(str(e))
                 handler.set_status(401)
                 handler.write(e.message)
                 handler.finish()

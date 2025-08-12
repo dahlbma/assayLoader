@@ -174,8 +174,9 @@ class GetTargets(tornado.web.RequestHandler):
 class GetAssayTypes(tornado.web.RequestHandler):
     def get(self):
         sSql = f'select distinct(assay_type) assay_type from assay.lcb_sp'
-        sSql = f'select distinct(%s) assay_type from assay.lcb_sp'
-        cur.execute(sSql, assay_type)
+        #sSql = f'select distinct(%s) assay_type from assay.lcb_sp'
+        #cur.execute(sSql, assay_type)
+        cur.execute(sSql)
         res = res2json()
         self.finish(res)
 
