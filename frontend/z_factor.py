@@ -97,7 +97,7 @@ def calculatePlateData(self, df, plate, ws, iMinPosCtrl, iMaxNegCtrl):
     try:
         Z = 1 - (pos3SD + neg3SD)/abs(meanPosCtrl - meanNegCtrl)
     except:
-        printQcLog(f'Failed calculating plate: {plate}')
+        self.printQcLog(f'Failed calculating plate: {plate}')
         return False
     condition = (df['type'] == 'Neg') | (df['type'] == 'Pos')
     df['inhibition'] = np.where(condition, None, 100*(1-(df['raw_data']-meanPosCtrl)/(meanNegCtrl-meanPosCtrl)))
@@ -527,7 +527,7 @@ def generate_gradient(end_color, start_color, num_steps):
     return gradient
 
 
-def populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, data_col, lDebug=False):
+def populate_plate_data(self, excelSettings, heatMapsWs, plate, plateDf, start_cell, data_col, lDebug=False):
     whiteFont = Font(name='Calibri', color="FFFFFF")
     # Convert the top-left cell to row and column indices
     current_row , current_col = heatMapsWs[start_cell].row + 3, heatMapsWs[start_cell].column + 1
@@ -662,7 +662,7 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
         start_cell = start_col + str(iRow)
         create_outer_thick_border(heatMapsWs, start_cell, num_columns, num_rows)
         create_plate_frame(heatMapsWs, 'Plate', plate, start_cell, num_columns, num_rows)
-        populate_plate_data(excelSettings, heatMapsWs, plate, plateDf, start_cell, 'raw_data')
+        populate_plate_data(self, excelSettings, heatMapsWs, plate, plateDf, start_cell, 'raw_data')
         iPlate += 1
 
     # Group by 'well' and sum the 'hit' column to count occurrences of '1'
@@ -675,7 +675,7 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
     start_cell = 'N240'
     create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
     create_plate_frame(screenDataWs, 'Hit Distr', "", start_cell, num_columns, num_rows)
-    populate_plate_data(excelSettings, screenDataWs, 1, df_hit_distr, start_cell, 'count')
+    populate_plate_data(self, excelSettings, screenDataWs, 1, df_hit_distr, start_cell, 'count')
     ##
     ######################################################
 
@@ -704,7 +704,7 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
     start_cell = 'N266'
     create_outer_thick_border(screenDataWs, start_cell, num_columns, num_rows)
     create_plate_frame(screenDataWs, 'Well Avg', "", start_cell, num_columns, num_rows)
-    populate_plate_data(excelSettings, screenDataWs, 1, df_avg_well, start_cell, 'avgDataValue', lDebug=True)
+    populate_plate_data(self, excelSettings, screenDataWs, 1, df_avg_well, start_cell, 'avgDataValue', lDebug=True)
 
     self.printQcLog(f"Creating Excel file")
 
