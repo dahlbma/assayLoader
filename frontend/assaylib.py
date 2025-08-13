@@ -140,19 +140,24 @@ def resize_window(self, height=800, width=1200):
     
 def printPrepLog(self, s, type=''):
     if type == 'error':
-        s = f'''<font color='red'>{s}</font>'''
-    elif type == 'bold': 
-        s = f'''<b>{s}</b>'''
-    if s == '.':
+        s = f"<font color='red'>{s}</font>"
+    elif type == 'bold':
+        s = f"<b>{s}</b>"
+    if type == 'progress':
+        # Overwrite the last line in the QTextEdit
+        cursor = self.prepLog_te.textCursor()
+        self.prepLog_te.moveCursor(cursor.End)
+        self.prepLog_te.moveCursor(cursor.StartOfLine, cursor.KeepAnchor)
+        self.prepLog_te.textCursor().removeSelectedText()
+        self.prepLog_te.textCursor().deletePreviousChar()  # Remove newline if present
+        self.prepLog_te.insertPlainText(s)
+    elif s == '.':
         self.prepLog_te.insertPlainText(s)
     else:
         self.prepLog_te.append(s)
     # Calculate the maximum vertical scrollbar value
     max_value = self.prepLog_te.verticalScrollBar().maximum()
-
-    # Set the scrollbar value to the maximum to reach the bottom
     self.prepLog_te.verticalScrollBar().setValue(max_value)
-    
     QApplication.processEvents()
 
 

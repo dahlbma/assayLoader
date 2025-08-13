@@ -411,6 +411,7 @@ class DoseResponseScreen(QMainWindow):
 
 
     def printQcLog(self, s, type='', beep=False):
+        print('In printQcLog: ' + s)
         # What should we do here?
         pass
 
@@ -764,10 +765,14 @@ class DoseResponseScreen(QMainWindow):
         assaylib.printPrepLog(self, 'Reformatting input data\n')
 
         iDataCounter = 0
+        totalRows = len(platemapDf)
         for index, row in platemapDf.iterrows():
             iDataCounter += 1
             if iDataCounter % 20 == 0:
-                assaylib.printPrepLog(self, '.')
+                percent_done = int((iDataCounter / totalRows) * 100)
+                # Print progress percentage in place by using carriage return and flush
+                assaylib.printPrepLog(self, f'\r{percent_done}% done', type='progress')
+                QApplication.processEvents()
             plate_id = row['Platt ID']
             well = row['Well']
 
@@ -775,7 +780,9 @@ class DoseResponseScreen(QMainWindow):
             if not matching_row.empty:
                 # Update 'rawData' in platemapDf
                 platemapDf.at[index, 'rawData'] = matching_row[sDataColName].values[0]
-        
+
+        assaylib.printPrepLog(self, f'\r100% done', type='progress')
+
         # Remove columns 'Conc mM' and 'volume nL'
         columns_to_remove = ['Conc mM', 'volume nL']
         platemapDf = platemapDf.drop(columns=columns_to_remove)
