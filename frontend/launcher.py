@@ -83,12 +83,12 @@ class LauncherScreen(QDialog):
         elif match == 1:
             #update needed
             # send notification
-            send_msg('Updated Version', f"New version information:")
+            send_msg('Updated Version', f"New version information: {info}")
             try: 
                 bin_r = dbInterface.getAssayLoaderBinary(os_name)
                 
                 with open(exec_path, 'wb') as al_file:
-                    shutil.copyfileobj(bin_r.raw, al_file)
+                    shutil.copyfileobj(bin_r.raw, al_file, length=1024*1024)  # 1MB buffer for faster writing
                     logging.info("Updated AssayLoader")
                 
                 os.chmod(exec_path, 0o775)
