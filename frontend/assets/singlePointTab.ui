@@ -685,6 +685,20 @@
                       </property>
                      </widget>
                     </item>
+                    <item>
+                     <widget class="QRadioButton" name="sp_inhibition_rb">
+                      <property name="text">
+                       <string>Inhibition</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QRadioButton" name="sp_activation_rb">
+                      <property name="text">
+                       <string>Activation</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </item>
                  </layout>
@@ -1540,7 +1554,7 @@
      <x>0</x>
      <y>0</y>
      <width>1691</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

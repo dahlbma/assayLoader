@@ -101,6 +101,9 @@ class SinglePointScreen(QMainWindow):
         self.qcInputFile_lab.setText('')
 
         self.populateScreenData()
+        # Set sp_inhibition_rb checked by default
+        if hasattr(self, 'sp_inhibition_rb'):
+            self.sp_inhibition_rb.setChecked(True)
         self.updateGrid_btn.clicked.connect(self.updateGrid)
         self.loadAssayFile_btn.clicked.connect(self.loadAssayDataFromFile)
         self.saveData_btn.clicked.connect(self.saveSpToDb)
@@ -857,7 +860,7 @@ class SinglePointScreen(QMainWindow):
             return
         
         self.show_scatter_plot(dfQcData, newHitThreshold)
-        
+
         dfQcData['inhibition'] = pd.to_numeric(dfQcData['inhibition'], errors='coerce').round(2)
         newHitThreshold = "{:.2f}".format(newHitThreshold)
         self.hitThreshold_eb.setText(str(newHitThreshold))
@@ -875,12 +878,19 @@ class SinglePointScreen(QMainWindow):
         self.sp_table.setRowCount(0)
         self.populate_table(dfQcData, 'compound_id', insertRows=True)
         self.populate_table(dfQcData, 'batch_id')
-        self.populate_table(dfQcData, 'inhibition')
+
+
+        if self.sp_inhibition_rb.isChecked():
+            self.populate_table(dfQcData, 'inhibition')
+        else:
+            dfQcData = dfQcData.rename(columns={'inhibition': 'activation'})
+            self.populate_table(dfQcData, 'activation')
+
         self.populate_table(dfQcData, 'hit')
         self.populate_table(dfQcData, 'plate')
         self.populate_table(dfQcData, 'well')
         self.populate_table(dfQcData, 'concentration')
-        
+
         self.populateColumn('hit_threshold', newHitThreshold)
 
         QApplication.restoreOverrideCursor()
