@@ -13,6 +13,8 @@ from selectDataColumn import *
 from doseResponseTable import ScatterplotWidget
 import platform
 from drSearch import DrSearch
+from assaylib import saModelTypes, saAssayTypes, saViabilityMeasurement, saDetectionType
+
 #from inhibitionScatter import ScatterPlotWindow
 
 # Get the operating system name
@@ -189,51 +191,16 @@ class DoseResponseScreen(QMainWindow):
         saTargets = dbInterface.getTargets(self.token)
         self.target_cb.addItems(saTargets)
 
-        saModelTypes = [
-            'Cell_Line',
-            'Protein',
-            'Primary_Cell',
-            'Organism',
-            'IPSC',
-            'Tissue',
-            'Virus',
-            'other'
-            ]
         self.screenType_cb.addItems(saModelTypes)
-
-        saAssayTypes = [
-            "Phenotypic_2D",
-            "Phenotypic_Suspension",
-            "Phenotypic_3D",
-            "Targeted_Cell-based_2D",
-            "Targeted_Cell-based_Suspension",
-            "Targeted_Cell-based_3D",
-            "Protein_Binding",
-            "Protein_Enzymatic"
-        ]
-        #saAssayTypes = dbInterface.getAssayTypes(self.token)
         self.assayType_cb.addItems(saAssayTypes)
+        self.detectionType_cb.addItems(saDetectionType)
+        self.viabilityMeasure_cb.addItems(saViabilityMeasurement)
 
         saTargetTables = [
             "DR Sandbox table",
             "Dose response"
         ]
         self.targetTable_cb.addItems(saTargetTables)
-        
-        saViabilityMeasurement = [
-            'Yes',
-            'No'
-        ]
-
-        saDetectionType = [
-            'Imaging',
-            'Luminescence',
-            'Other',
-            'No'
-        ]
-        
-        self.detectionType_cb.addItems(saDetectionType)
-        self.viabilityMeasure_cb.addItems(saViabilityMeasurement)
 
         self.testDate.setDate(QDate.currentDate())
 

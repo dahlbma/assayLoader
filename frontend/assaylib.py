@@ -7,6 +7,43 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
 from PyQt5.QtWidgets import QProgressBar, QVBoxLayout, QDialog, QLabel, QDialogButtonBox, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 
+saModelTypes = [
+    'Cell_Line',
+    'Protein',
+    'Primary_Cell',
+    'Organism',
+    'IPSC',
+    'Tissue',
+    'Virus',
+    'other'
+]
+
+saAssayTypes = [
+    "Phenotypic_2D",
+    "Phenotypic_Suspension",
+    "Phenotypic_3D",
+    "Targeted_Cell-based_2D",
+    "Targeted_Cell-based_Suspension",
+    "Targeted_Cell-based_3D",
+    "Protein_Binding",
+    "Protein_Enzymatic"
+]
+
+saViabilityMeasurement = [
+    'Yes',
+    'No'
+]
+
+saDetectionType = [
+    'Absorbance',
+    'Fluorescence',
+    'Imaging',
+    'Luminescence',
+    'Other',
+    'No'
+]
+
+
 def gotoSP(self):
     resize_window(self)
     self.window().setCurrentIndex(1)
@@ -61,6 +98,7 @@ def delete_all_files_in_directory(directory_path):
                 print(f'Failed to delete {file_path}. Reason: {e}')
     else:
         print(f'The directory {directory_path} does not exist')
+
 
 
 class Worker(QObject):
