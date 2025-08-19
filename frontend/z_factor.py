@@ -277,7 +277,7 @@ def plotMeanStd(values, stds, sHeader):
     return image_buffer
 
 
-def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl, iMaxNegCtrl):
+def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl, iMaxNegCtrl, sActivationOrInhibition):
     columns = ['Plate', 'meanRaw', 'stdRaw', 'meanNegCtrl', 'stdNegCtrl', 'meanPosCtrl', 'stdPosCtrl', 'Z-factor']
     df_summary = pd.DataFrame(columns=columns)
     df_inhibition = pd.DataFrame(columns=['inhibition'])
@@ -352,6 +352,8 @@ def calcData(self, excelSettings, df, ws, heatMapWs, iHitThreshold, iMinPosCtrl,
     ws['L3'] = ' Max inhib: {:.2f}'.format(maxInhib)
     ws['L4'] = ' Mean inhib: {:.2f}'.format(meanInhibition)
     ws['L5'] = ' STD inhib: {:.2f}'.format(stdInhibition)
+    # Set the measurement type in header, Activation or Inhibition
+    ws['H1'] = sActivationOrInhibition
 
     ##############################
     # Next two lines are used to avoid a bug with image in "io.BytesIO". Without these lines the wrong images appear if you runQc
@@ -579,7 +581,7 @@ def populate_plate_data(self, excelSettings, heatMapsWs, plate, plateDf, start_c
         if percentile < 10 or percentile > 90:
             cell.font = whiteFont
 
-def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtrl):
+def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtrl, sActivationOrInhibition):
     pd.set_option('mode.chained_assignment', None)
     df = pd.read_csv(input_file, delimiter='\t')
     self.printQcLog(f"Reading input, using {input_file}")
@@ -631,7 +633,8 @@ def calcQc(self, input_file, output_file, iHitThreshold, iMinPosCtrl, iMaxNegCtr
                                                                                  heatMapsWs,
                                                                                  iHitThreshold,
                                                                                  iMinPosCtrl,
-                                                                                 iMaxNegCtrl)
+                                                                                 iMaxNegCtrl,
+                                                                                 sActivationOrInhibition)
     self.printQcLog(f"All data read")
 
     for column in screenDataWs.columns:

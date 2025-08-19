@@ -847,13 +847,18 @@ class SinglePointScreen(QMainWindow):
         except:
             iHitThreshold = float(-1000.0)
         QApplication.setOverrideCursor(Qt.WaitCursor)
+        if hasattr(self, 'sp_activation_rb') and self.sp_activation_rb.isChecked():
+            sMeasureType = 'activation'
+        else:
+            sMeasureType = 'inhibition'
         try:
             newHitThreshold, dfQcData = calcQc(self,
                                                os.path.join(self.workingDirectory, self.preparedZinput),
                                                self.QCoutput,
                                                iHitThreshold,
                                                iMinPosCtrl,
-                                               iMaxNegCtrl)
+                                               iMaxNegCtrl,
+                                               sMeasureType)
         except Exception as e:
             self.printQcLog(f"Error calculating QC {str(e)}", 'error')
             QApplication.restoreOverrideCursor()
