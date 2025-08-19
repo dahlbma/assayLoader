@@ -307,12 +307,13 @@ def implSaveDrRowToDb(self, row, targetTable):
         sStatus = 400
         return sStatus, 'Can not parse input'
 
-    if targetTable == "assay_test.lcb_dr":
+    if targetTable in ("assay_test.lcb_dr", "assay.lcb_dr"):
         tTable = targetTable
     else:
         logging.info("Wrong DR table")
         #tTable = f'{assayDB}.{targetTable}'
-        pass
+        sStatus = 400
+        return sStatus, 'Target table unknown'
 
     sSql = f'''insert into {tTable}
     (compound_id,
@@ -367,10 +368,11 @@ class SaveDrRowToDb(tornado.web.RequestHandler):
         data = json.loads(self.request.body)
         saRows = data.get('rows')
         targetTable = data.get("targetTable")
+        
         if targetTable == 'DR Sandbox table':
             targetTable = 'assay_test.lcb_dr'
-        elif targetTable == 'Primary screen':
-            targetTable = 'assay_test.lcb_dr'
+        elif targetTable == 'Dose response':
+            targetTable = 'assay.lcb_dr'
         else:
             self.set_status(400)
             self.finish()
