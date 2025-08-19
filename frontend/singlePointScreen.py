@@ -558,7 +558,7 @@ class SinglePointScreen(QMainWindow):
             elif selected_row['Compound ID'][0] == sNegCtrl:
                 sType = 'Neg'
                 iNegCtrl += 1
-            elif selected_row['Compound ID'][0].startswith('CBK'):
+            elif selected_row['Compound ID'][0].startswith('CBK') or selected_row['Compound ID'][0].startswith('CTRL'):
                 sType = 'Data'
                 iData += 1
             else:
