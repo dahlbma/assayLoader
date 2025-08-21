@@ -212,10 +212,27 @@ class DoseResponseScreen(QMainWindow):
         loadAssayDataDialog = QFileDialog()
         loadAssayDataDialog.setOptions(options)
 
-        fileName, _ = loadAssayDataDialog.getOpenFileName(self, "Select CSV File", "", "CSV Files (*.csv *.CSV)")
+        fileName, _ = loadAssayDataDialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xls *.xlsx)")
 
         if not fileName:
             return
+
+        df = pd.read_excel(fileName)
+        self.dr_table.setRowCount(len(df))
+        self.dr_table.setColumnCount(len(df.columns))
+        # Set headers
+        for col, col_name in enumerate(df.columns):
+            self.dr_table.setHorizontalHeaderItem(col, QTableWidgetItem(str(col_name)))
+        # Set cell values
+
+        for row in range(len(df)):
+            for col in range(len(df.columns)):
+                value = df.iloc[row, col]
+                if pd.isna(value):  # Handles both np.nan and None
+                    value = ""
+                else:
+                    value = str(value)
+                self.dr_table.setItem(row, col, QTableWidgetItem(value))
 
 
     def findColumnNumber(self, sCol):
@@ -399,10 +416,29 @@ class DoseResponseScreen(QMainWindow):
         self.populateColumn('eln', self.eln_eb.text())
 
 
+    def save_load_table_to_excel(self, file_path):
+        # Get headers
+        headers = [self.dr_table.horizontalHeaderItem(col).text() for col in range(self.dr_table.columnCount())]
+        # Get table data
+        data = []
+        for row in range(self.dr_table.rowCount()):
+            row_data = []
+            for col in range(self.dr_table.columnCount()):
+                item = self.dr_table.item(row, col)
+                row_data.append(item.text() if item else "")
+            data.append(row_data)
+        # Create DataFrame and save
+        df = pd.DataFrame(data, columns=headers)
+        df.to_excel(file_path, index=False)
+
     def populate_load_data(self, df):
         self.dr_table.setRowCount(len(df))
-        self.populateColumn('Confirmed', '')        
-        
+        self.populateColumn('Confirmed', '')
+        print(*df.columns, sep=' ')
+        headings = ["Batch", "Compound", "IC50", "Fit quality", "Slope",
+                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "ICMax", "Graph", "Confirmed", "Comment"]
+        #df.columns = headings
+
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
             compound_id = str(row_data["Compound"])
@@ -440,6 +476,12 @@ class DoseResponseScreen(QMainWindow):
             self.dr_table.setItem(row_index, self.findColumnNumber('comment'), QTableWidgetItem(sComment))
             self.dr_table.setItem(row_index, self.findColumnNumber('Graph'), QTableWidgetItem(sGraph))
             self.dr_table.setItem(row_index, self.findColumnNumber('Confirmed'), QTableWidgetItem(sConfirmed))
+
+
+        sDir = self.workingDirectory
+        sFile = 'DR_Load_Data.xlsx'
+        file_path = os.path.join(sDir, sFile)
+        self.save_load_table_to_excel(file_path)
 
 
     def tab_switched(self, index):
