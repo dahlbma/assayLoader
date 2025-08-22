@@ -432,12 +432,9 @@ class DoseResponseScreen(QMainWindow):
         df.to_excel(file_path, index=False)
 
     def populate_load_data(self, df):
+        self.dr_table.setRowCount(0)
         self.dr_table.setRowCount(len(df))
         self.populateColumn('Confirmed', '')
-        print(*df.columns, sep=' ')
-        headings = ["Batch", "Compound", "IC50", "Fit quality", "Slope",
-                    "Bottom", "Top", "MinConc nM", "MaxConc nM", "AUC", "ICMax", "Graph", "Confirmed", "Comment"]
-        #df.columns = headings
 
         for row_index, row_data in df.iterrows():
             batch_id = str(row_data["Batch"])
@@ -455,11 +452,10 @@ class DoseResponseScreen(QMainWindow):
             slope = str(row_data["Slope"])
             top = str(row_data["Top"])
             bottom = str(row_data["Bottom"])
-            sComment = str(row_data["comment"])
+            sConfirmed = str(row_data["Confirmed"])
+            sComment = str(row_data["Comment"])
             
             sGraph = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).sGraph
-            sConfirmed = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).confirmed
-            sComment = self.doseResponseTable.cellWidget(row_index, self.doseResponseTable.graph_col).comment
             
             self.dr_table.setItem(row_index, self.dr_tab_col_batch, QTableWidgetItem(batch_id))
             self.dr_table.setItem(row_index, self.dr_tab_col_compound, QTableWidgetItem(compound_id))
@@ -476,7 +472,6 @@ class DoseResponseScreen(QMainWindow):
             self.dr_table.setItem(row_index, self.findColumnNumber('comment'), QTableWidgetItem(sComment))
             self.dr_table.setItem(row_index, self.findColumnNumber('Graph'), QTableWidgetItem(sGraph))
             self.dr_table.setItem(row_index, self.findColumnNumber('Confirmed'), QTableWidgetItem(sConfirmed))
-
 
         sDir = self.workingDirectory
         sFile = 'DR_Load_Data.xlsx'

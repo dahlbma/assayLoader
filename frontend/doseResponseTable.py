@@ -36,6 +36,14 @@ class DoseResponseTable(QTableWidget):
         self.workingDirectory = ''
         self.parent = None
 
+        # Enable saveExcel_btn when any cell is edited
+        self.cellChanged.connect(self._enable_save_excel_btn)
+
+
+    def _enable_save_excel_btn(self, row, column):
+        if self.parent.saveExcel_btn:
+            self.parent.saveExcel_btn.setEnabled(True)
+
     def reset_table_data(self):
         """
         Resets the table by clearing all existing data and widgets,
@@ -307,3 +315,7 @@ class DoseResponseTable(QTableWidget):
         except:
             # There where no deselected items
             pass
+
+        mydf = self.qtablewidget_to_dataframe()
+        if len(mydf) > 0:
+            self.parent.populate_load_data(mydf)
