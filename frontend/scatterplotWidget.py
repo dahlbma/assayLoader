@@ -46,6 +46,7 @@ class ScatterplotWidget(QWidget):
         self.ic50_std = None
         self.auc = None
         self.sInfo = None
+        self.iParameterCount = 0
 
     def set_data(self, hillslope, ic50, bottom, top, x_values, y_values, y_error):
         """
@@ -183,13 +184,15 @@ class ScatterplotWidget(QWidget):
                 (self.slope, self.ic50,
                  self.bottom, self.top,
                  self.sInfo, self.derivative_ic50_div_bot,
-                 self.derivative_ic50_div_top) = fit_curve(self.x_values, self.y_values)
+                 self.derivative_ic50_div_top,
+                 iParameterCount) = fit_curve(self.x_values, self.y_values)
                 print(f'Mats slope {self.slope} ic50 {self.ic50} bottom {self.bottom} top {self.top}')
             else:
                 (self.slope, self.ic50,
                  self.bottom, self.top,
                  self.sInfo, self.derivative_ic50_div_bot,
-                 self.derivative_ic50_div_top) = fit_curve(self.x_values, self.y_values)
+                 self.derivative_ic50_div_top,
+                 self.iParameterCount) = fit_curve(self.x_values, self.y_values)
                 # Extract the fitted parameters
                 self.slope_std = self.ic50_std = self.bottom_std = self.top_std = -1
                 self.plot_curve(createExcel = False)

@@ -146,6 +146,12 @@ class DoseResponseTable(QTableWidget):
             # Call the scatter function for each batch
             self.plotCurve(batch_df, rowPosition, yScale)
 
+        total_param_changes = 0
+        for row in range(self.rowCount()):
+            widget = self.cellWidget(row, self.graph_col)
+            if widget and hasattr(widget, 'iParameterCount'):
+                total_param_changes += widget.iParameterCount
+        print("Total parameter changes:", total_param_changes)
         dialog.close()
         self.saveToExcel('DR_Excel.xlsx')
         return batch_df

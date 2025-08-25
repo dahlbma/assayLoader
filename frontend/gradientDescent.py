@@ -124,13 +124,20 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
     best_bottom = bottom
     best_top = top
 
+    original_params = {
+        'slope': slope,
+        'ic50': ic50,
+        'bottom': bottom,
+        'top': top
+    }
+
     if iCount < 2:
         old_error *= 2
     
     for perm in permutations:
         # Optimized parameters:
         # Tested slope:0.015 ic50:0.5 bottom:0.5 top:2.5 -> avg RMSE: 1402.6
-        new_slope = check_bounds(slope - learning_rate * 0.015 * perm['grad_slope'], 'slope')
+        new_slope = check_bounds(slope - learning_rate * 0.25 * perm['grad_slope'], 'slope')
         new_ic50 = check_bounds(ic50 - learning_rate * ic50_step * 0.5 * perm['grad_ic50'], 'ic50')
         new_bottom = check_bounds(bottom - learning_rate * 0.5 * perm['grad_bottom'], 'bot')
         new_top = check_bounds(top - learning_rate * 2.5 * perm['grad_top'], 'top')
@@ -154,7 +161,24 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
     else:
         learning_rate = learning_rate * 0.995
     #ic50_step = ic50_step * 0.99
-    return best_slope, best_ic50, best_bottom, best_top, learning_rate, stop, abs_error
+
+    updated_params = {
+        'slope': best_slope,
+        'ic50': best_ic50,
+        'bottom': best_bottom,
+        'top': best_top
+    }
+
+    changed_params = set()
+    # This loop is to keep track of which parameters have changed, we only use this while optimizing the
+    # parameters for new_slope, new_ic50, new_bottom and new_top
+    #for key in original_params:
+    #    if original_params[key] != updated_params[key]:
+    #        direction = "increased" if updated_params[key] > original_params[key] else "decreased"
+    #        #print(f"{key} {direction} in call {iCount}")
+    #        changed_params.add(key + " " + direction)
+    #print(changed_params)
+    return best_slope, best_ic50, best_bottom, best_top, learning_rate, stop, abs_error, changed_params
 
 # Step 5: Implement gradient descent
 def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, top):
@@ -162,28 +186,31 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
     old_rmse = np.inf
     x_curve = np.logspace(np.log10(min(x)), np.log10(max(x)), 100)
     iCount = 0
-
+    iParameterChangeCount = 0
     for _ in range(num_iterations):
         iCount += 1
         # Compute predictions
         y_pred = four_parameter_logistic(x, slope, ic50, bottom, top)
         
         # Compute gradients (analytically or numerically)
-        new_slope, new_ic50, new_bottom, new_top, learning_rate, lStop, rmse = update_parameters(iCount,
-                                                                                                 x,
-                                                                                                 y,
-                                                                                                 slope,
-                                                                                                 ic50,
-                                                                                                 bottom,
-                                                                                                 top,
-                                                                                                 learning_rate,
-                                                                                                 ic50_step)
+        new_slope, new_ic50, new_bottom, new_top, learning_rate, lStop, rmse, update_params = update_parameters(iCount,
+                                                                                                                x,
+                                                                                                                y,
+                                                                                                                slope,
+                                                                                                                ic50,
+                                                                                                                bottom,
+                                                                                                                top,
+                                                                                                                learning_rate,
+                                                                                                                ic50_step)
+        iParameterChangeCount += len(update_params)
         if abs(old_rmse - rmse) < 1:
             learning_rate *= 0.98
         if lStop:
             learning_rate = learning_rate / 1.1
-        if learning_rate < 0.001:
+        if learning_rate < 0.01:
             break
+        #if learning_rate < 0.001:
+        #    break
         
         # Update parameters using gradient descent
         slope = new_slope
@@ -196,8 +223,7 @@ def gradient_descent(x, y, learning_rate, num_iterations, slope, ic50, bottom, t
         
         #print(f'slope:{slope} ic50:{ic50} bottom:{bottom} top:{top}')
         y_curve_fit = four_parameter_logistic(x_curve, slope, ic50, bottom, top)
-        
-    return slope, ic50, bottom, top, rmse, iCount
+    return slope, ic50, bottom, top, rmse, iCount, iParameterChangeCount
 
 def fit_curve(x, y):
     BOUNDS['top']['MIN'] = max(y) * 0.7
@@ -244,14 +270,14 @@ def fit_curve(x, y):
     bottom = best_combination[2]
     top = best_combination[3]
 
-    slope, ic50, bottom, top, rmse, iCount = gradient_descent(x,
-                                                y,
-                                                learning_rate,
-                                                num_iterations,
-                                                slope,
-                                                ic50/10,
-                                                bottom,
-                                                top)
+    slope, ic50, bottom, top, rmse, iCount, iParameterChangeCount = gradient_descent(x,
+                                                                                    y,
+                                                                                    learning_rate,
+                                                                                    num_iterations,
+                                                                                    slope,
+                                                                                    ic50/10,
+                                                                                    bottom,
+                                                                                    top)
     
     der_bottom = sigmoid_derivative(x[0], slope, ic50, bottom, top)
     der_top = sigmoid_derivative(x[-1], slope, ic50, bottom, top)
@@ -269,8 +295,8 @@ def fit_curve(x, y):
         derivative_ic50_div_bot = 0
 
     sInfo = f'''RMSE: {"{:.1f}".format(rmse)}\nIteration: {iCount}\nDer bot: {"{:.1f}".format(derivative_ic50_div_bot)}\nDer top: {"{:.1f}".format(derivative_ic50_div_top)}'''
-    return -slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top
-    
+    return -slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top, iParameterChangeCount
+
 if __name__ == "__main__":
 
     # Read the tab-separated file
@@ -318,74 +344,80 @@ if __name__ == "__main__":
         # Skip the header line
         next(file)
 
-        # Iterate over each line
-        for line in file:
-            iPlotNr += 1
-            print(f'Plot nr: {iPlotNr}')
-            # Split the line based on the tab character
-            parts = line.strip().split('\t')
-            # Extract compound ID
-            compound_id = parts[0]
-            # Convert concentrations to a numpy array of floats
-            conc = np.array([float(value) for value in parts[1].strip("()").split(", ")])
-            # Convert y values to a numpy array of floats
-            y_val = np.array([float(value) for value in parts[-1].strip("()").split(", ")])
-        
-            # Print or do whatever you want with the variables
-            print("Compound ID:", compound_id)
-            print("Concentration:", conc)
-            print("Y Value:", y_val)
-            (slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top) = fit_curve(conc, y_val)
-            print(f'slope: {-slope} ic50: {ic50} bottom: {bottom} top: {top}')
-            print(f'sInfo: {sInfo}')
 
+        iPlotNr = 0
+        iParameterChangeCount = 0
+        with open('transformed.csv', 'r') as file:
+            # Skip the header line
+            next(file)
+            iParameterChangeCount_tot = 0
+            # Iterate over each line
+            for line in file:
+                iPlotNr += 1
+                print(f'Plot nr: {iPlotNr}')
+                # Split the line based on the tab character
+                parts = line.strip().split('\t')
+                # Extract compound ID
+                compound_id = parts[0]
+                # Convert concentrations to a numpy array of floats
+                conc = np.array([float(value) for value in parts[1].strip("()").split(", ")])
+                # Convert y values to a numpy array of floats
+                y_val = np.array([float(value) for value in parts[-1].strip("()").split(", ")])
+    
+                # Print or do whatever you want with the variables
+                print("Compound ID:", compound_id)
+                print("Concentration:", conc)
+                print("Y Value:", y_val)
+                (slope, ic50, bottom, top, sInfo, derivative_ic50_div_bot, derivative_ic50_div_top, iParameterChangeCount) = fit_curve(conc, y_val)
+                iParameterChangeCount_tot += iParameterChangeCount
+                print(f'slope: {-slope} ic50: {ic50} bottom: {bottom} top: {top}')
+                print(f'sInfo: {sInfo}')
 
+                # Track parameter changes for this graph
+                # You need to update fit_curve and gradient_descent to return changed_params if you want per-graph stats
+                # For now, you can collect from update_parameters in gradient_descent
 
+                # ...existing code for param_ranges and plotting...
 
-            param_ranges = {
-                'slope': np.linspace(slope * 0.5, slope * 1.5, 50),
-                'ic50': np.linspace(ic50 * 0.5, ic50 * 1.5, 50),
-                'bottom': np.linspace(bottom - abs(bottom) * 0.5, bottom + abs(bottom) * 0.5, 50),
-                'top': np.linspace(top - abs(top) * 0.5, top + abs(top) * 0.5, 50)
-            }
+                param_ranges = {
+                    'slope': np.linspace(slope * 0.5, slope * 1.5, 50),
+                    'ic50': np.linspace(ic50 * 0.5, ic50 * 1.5, 50),
+                    'bottom': np.linspace(bottom - abs(bottom) * 0.5, bottom + abs(bottom) * 0.5, 50),
+                    'top': np.linspace(top - abs(top) * 0.5, top + abs(top) * 0.5, 50)
+                }
 
-            fixed_params = {'slope': slope, 'ic50': ic50, 'bottom': bottom, 'top': top}
-            x = conc
-            y = y_val
+                fixed_params = {'slope': slope, 'ic50': ic50, 'bottom': bottom, 'top': top}
+                x = conc
+                y = y_val
 
-            for param in ['slope', 'ic50', 'bottom', 'top']:
-                costs = []
-                for val in param_ranges[param]:
-                    params = fixed_params.copy()
-                    params[param] = val
-                    y_pred = four_parameter_logistic(x, params['slope'], params['ic50'], params['bottom'], params['top'])
-                    cost = cost_function(y, y_pred)
-                    costs.append(cost)
-                plt.figure()
-                plt.plot(param_ranges[param], costs)
-                plt.xlabel(param)
-                plt.ylabel('RMSE')
-                plt.title(f'RMSE vs {param} for {compound_id}')
-                plt.show()
+                for param in ['slope', 'ic50', 'bottom', 'top']:
+                    costs = []
+                    for val in param_ranges[param]:
+                        params = fixed_params.copy()
+                        params[param] = val
+                        y_pred = four_parameter_logistic(x, params['slope'], params['ic50'], params['bottom'], params['top'])
+                        cost = cost_function(y, y_pred)
+                        costs.append(cost)
+                    plt.figure()
+                    plt.plot(param_ranges[param], costs)
+                    plt.xlabel(param)
+                    plt.ylabel('RMSE')
+                    plt.title(f'RMSE vs {param} for {compound_id}')
+                    plt.show()
 
+                fig, ax = plt.subplots(figsize=(7, 5))
+                ax.set_xscale('log')
+                ax.scatter(conc, y_val, label=compound_id)
+                ax.set_xlabel('Concentration (M)')
+                ax.set_ylabel('Inhibition (%)')
+                ax.set_title('Inhibition vs Concentration')
+                ax.set_ylim(min(-5, np.min(y_val)-5), max(100, np.max(y_val)+3))  # Set y-axis from 0 to max(y_val) or 100, whichever is greater
+                x_curve = np.logspace(np.log10(min(conc)), np.log10(max(conc)), 100)
+                y_curve_fit = four_parameter_logistic(x_curve, -slope, ic50, bottom, top)
+                ax.plot(x_curve, y_curve_fit, label=f'Fit {compound_id}')
+                ax.legend()
+                plt.show()  # This will block until you close the window
+                plt.close(fig)  # Close the figure to free memory
+                print('##########################################################')            #quit()
 
-
-
-
-            fig, ax = plt.subplots(figsize=(7, 5))
-            ax.set_xscale('log')
-            ax.scatter(conc, y_val, label=compound_id)
-            ax.set_xlabel('Concentration (M)')
-            ax.set_ylabel('Inhibition (%)')
-            ax.set_title('Inhibition vs Concentration')
-            ax.set_ylim(min(-5, np.min(y_val)-5), max(100, np.max(y_val)+3))  # Set y-axis from 0 to max(y_val) or 100, whichever is greater
-            x_curve = np.logspace(np.log10(min(conc)), np.log10(max(conc)), 100)
-            y_curve_fit = four_parameter_logistic(x_curve, -slope, ic50, bottom, top)
-            ax.plot(x_curve, y_curve_fit, label=f'Fit {compound_id}')
-            ax.legend()
-            plt.show()  # This will block until you close the window
-            plt.close(fig)  # Close the figure to free memory
-            print('##########################################################')            #quit()
-
-    #plt.ioff()  # Disable interactive mode
-    #plt.show()  # Show all plots at the end (optional)
+            print(f'Total number of changed parameters for all graphs: {iParameterChangeCount}')
