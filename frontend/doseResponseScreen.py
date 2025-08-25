@@ -212,12 +212,30 @@ class DoseResponseScreen(QMainWindow):
         loadAssayDataDialog = QFileDialog()
         loadAssayDataDialog.setOptions(options)
 
-        fileName, _ = loadAssayDataDialog.getOpenFileName(self, "Select Excel File", "", "Excel Files (*.xls *.xlsx)")
+        fileName, _ = loadAssayDataDialog.getOpenFileName(self,
+                                                          "Select Excel File",
+                                                          self.workingDirectory,
+                                                          "DR_Load_Data.xlsx")
+        #"Excel Files (*.xls *.xlsx)")
 
         if not fileName:
             return
 
+        required_columns = [
+            'batch_id', 'compound_id', 'project', 'target', 'assay_type', 'model_system',
+            'detection_type', 'viability_measurement', 'Cmax', 'Y Max', 'M Min', 'Hill',
+            'IC50', 'EC50', 'I Cmax', 'E Cmax', 'Graph', 'experiment_date', 'operator',
+            'eln', 'comment', 'Confirmed'
+        ]
+
         df = pd.read_excel(fileName)
+
+        missing = [col for col in required_columns if col not in df.columns]
+
+        if missing:
+            QMessageBox.information(self, "Missing Columns", f"Missing columns:\n{', '.join(missing)}")
+            return
+
         self.dr_table.setRowCount(len(df))
         self.dr_table.setColumnCount(len(df.columns))
         # Set headers
