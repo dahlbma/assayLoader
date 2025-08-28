@@ -207,7 +207,7 @@ class ScatterplotWidget(QWidget):
 
     def plot_curve(self, createExcel = True):
         # Generate a curve using the fitted parameters
-        x_curve = np.logspace(np.log10(min(self.x_values)), np.log10(max(self.x_values)), 40)  # Reduced from 100 to 40 points
+        x_curve = np.logspace(np.log10(min(self.x_values)), np.log10(max(self.x_values)), 50)  # Reduced from 100 to 50 points
         if self.fitOk == True:
             y_curve_fit = fourpl(x_curve, self.slope, self.ic50, self.bottom, self.top)
 
