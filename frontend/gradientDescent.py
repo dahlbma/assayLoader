@@ -160,7 +160,6 @@ def update_parameters(iCount, x, y, slope, ic50, bottom, top, learning_rate, ic5
         learning_rate *= 0.94
     else:
         learning_rate = learning_rate * 0.995
-    #ic50_step = ic50_step * 0.99
 
     updated_params = {
         'slope': best_slope,
