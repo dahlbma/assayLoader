@@ -8,6 +8,7 @@ import pandas as pd
 import subprocess
 from z_factor import *
 from assaylib import *
+from prepareClariostarFile import *
 from prepareHarmonyFile import *
 from prepareEnvisionFile import *
 import platform
@@ -41,9 +42,11 @@ class SinglePointScreen(QMainWindow):
         #####################
         # Prep data screen
         self.prepareHarmony_btn.clicked.connect(self.prepareHarmonyFiles)
+        self.prepareClariostar_btn.clicked.connect(self.prepareClariostarFiles)
         self.envision_plateID_to_file_btn.clicked.connect(self.prepareEnvisionFiles)
         self.printPlates_btn.clicked.connect(self.printPlates)
         self.prepareHarmony_btn.setEnabled(False)
+        self.prepareClariostar_btn.setEnabled(False)
         self.envision_plateID_to_file_btn.setEnabled(False)
         # Prep data screen end
         #####################
@@ -133,6 +136,7 @@ class SinglePointScreen(QMainWindow):
             return
         
         self.prepareHarmony_btn.setEnabled(True)
+        self.prepareClariostar_btn.setEnabled(True)
         self.envision_plateID_to_file_btn.setEnabled(True)
  
  
@@ -428,6 +432,27 @@ class SinglePointScreen(QMainWindow):
         self.selectFileToPlateMap(fullFileName)
         self.instrument_cb.setCurrentText('Envision')
         QApplication.restoreOverrideCursor()
+
+
+    def prepareClariostarFiles(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog  # Use the native file dialog
+        directory_dialog = QFileDialog()
+        directory_dialog.setOptions(options)
+        # Set the file mode to DirectoryOnly to allow selecting directories only
+        directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
+        # Show the directory dialog
+        selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
+        subdirectory_path = os.path.join(selected_directory, "assayLoaderClariostarFiles")
+        self.workingDirectory = subdirectory_path
+        if subdirectory_path == "assayLoaderClariostarFiles":
+            return
+
+        delete_all_files_in_directory(subdirectory_path)
+        sPlatemapFile, plateIdToFileMapping = findClariostarFiles(self, subdirectory_path, selected_directory)
+        self.instrument_cb.setCurrentText('Clariostar')
+        self.selectFileToPlateMap(plateIdToFileMapping)
+        self.selectPlatemap(sPlatemapFile)
 
 
     def prepareHarmonyFiles(self):

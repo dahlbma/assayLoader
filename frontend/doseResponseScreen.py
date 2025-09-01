@@ -7,6 +7,7 @@ from PyQt5.QtGui import QBrush, QColor, QRegExpValidator, QCursor
 import pandas as pd
 from z_factor import *
 from assaylib import *
+from prepareClariostarFile import *
 from prepareHarmonyFile import *
 from prepareEnvisionFile import *
 from selectDataColumn import *
@@ -99,10 +100,12 @@ class DoseResponseScreen(QMainWindow):
         self.pathToFinalPreparedDR_deselects = None
         
         self.posCtrl_eb.setText('CTRL')
-        
+
+        self.selectClariostarDirectory_btn.setEnabled(False)
+        self.selectClariostarDirectory_btn.clicked.connect(self.selectClariostarDirectory)
+
         self.selectHarmonyDirectory_btn.setEnabled(False)
         self.selectHarmonyDirectory_btn.clicked.connect(self.selectHarmonyDirectory)
-        self.workingDirectory = ''
 
         self.selectEnvisionPlateToFile_btn.setEnabled(False)
         self.selectEnvisionPlateToFile_btn.clicked.connect(self.selectEnvisionPlateToFile)
@@ -672,6 +675,7 @@ class DoseResponseScreen(QMainWindow):
             self.rVolume = None
             return
         self.selectHarmonyDirectory_btn.setEnabled(True)
+        self.selectClariostarDirectory_btn.setEnabled(True)
         self.selectEnvisionPlateToFile_btn.setEnabled(True)
         
     '''
@@ -700,6 +704,26 @@ class DoseResponseScreen(QMainWindow):
             return
 
         platemapFile, plateIdToFileMapping = findEnvisionFiles(self, prepared_path, fileName)
+        self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
+
+
+    def selectClariostarDirectory(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog  # Use the native file dialog
+        directory_dialog = QFileDialog()
+        directory_dialog.setOptions(options)
+        # Set the file mode to DirectoryOnly to allow selecting directories only
+        directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
+        # Show the directory dialog
+        selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
+
+        subdirectory_path = os.path.join(selected_directory, "assayLoaderClariostarFiles")
+        if subdirectory_path == "assayLoaderClariostarFiles":
+            return
+
+        delete_all_files_in_directory(subdirectory_path)
+        self.workingDirectory = subdirectory_path
+        platemapFile, plateIdToFileMapping = findClariostarFiles(self, subdirectory_path, selected_directory)
         self.generateDoseResponseInputFile(platemapFile, plateIdToFileMapping)
 
 

@@ -56,6 +56,18 @@
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
+
+            <item>
+             <widget class="QPushButton" name="selectClariostarDirectory_btn">
+              <property name="text">
+               <string>Clariostar top directory</string>
+              </property>
+             </widget>
+            </item>
+
+
+
+
             <item>
              <widget class="QPushButton" name="selectHarmonyDirectory_btn">
               <property name="text">
