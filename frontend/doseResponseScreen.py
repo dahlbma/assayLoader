@@ -737,8 +737,8 @@ class DoseResponseScreen(QMainWindow):
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
 
-        subdirectory_path = os.path.join(selected_directory, "assayLoaderHarmonyFiles")
-        if subdirectory_path == "assayLoaderHarmonyFiles":
+        subdirectory_path = os.path.join(selected_directory, "assayLoaderHarmonyDRFiles")
+        if subdirectory_path == "assayLoaderHarmonyDRFiles":
             return
 
         delete_all_files_in_directory(subdirectory_path)

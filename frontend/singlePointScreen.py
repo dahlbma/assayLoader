@@ -464,9 +464,9 @@ class SinglePointScreen(QMainWindow):
         directory_dialog.setFileMode(QFileDialog.DirectoryOnly)
         # Show the directory dialog
         selected_directory = directory_dialog.getExistingDirectory(self, 'Open Directory', '')
-        subdirectory_path = os.path.join(selected_directory, "assayLoaderHarmonyFiles")
+        subdirectory_path = os.path.join(selected_directory, "assayLoaderHarmonySPFiles")
         self.workingDirectory = subdirectory_path
-        if subdirectory_path == "assayLoaderHarmonyFiles":
+        if subdirectory_path == "assayLoaderHarmonySPFiles":
             return
 
         delete_all_files_in_directory(subdirectory_path)
