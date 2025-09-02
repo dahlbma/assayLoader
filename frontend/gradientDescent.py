@@ -51,7 +51,6 @@ def getLinReg(x, y):
 
     # Create fitted line
     fitted_line_x = np.linspace(min(x), max(x), 100)
-    fitted_line_y = slope * fitted_line_x + intercept
 
     # Find the x value where (max(y) - min(y))/2 occurs
     midpoint_y = ((max(y) - min(y)) / 2) + intercept

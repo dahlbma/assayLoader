@@ -122,19 +122,32 @@ def calculatePlateData(self, df, plate, ws, iMinPosCtrl, iMaxNegCtrl):
 
 def plotZfactor(df):
     # Create a bar plot for the 'Z-factor' column
-    plt.bar(range(len(df['Plate'])), df['Z-factor'])
-    
-    # Set labels and title
-    plt.xlabel('Plate')
-    plt.ylabel('Z-factor')
-    plt.title('Bar Plot of Z-factor')
+    fig, ax = plt.subplots()
+    ax.bar(range(len(df['Plate'])), df['Z-factor'])
+    # Compute dynamic lower bound so plots start at 0 when data >= 0
+    z_values = df['Z-factor'].dropna().values
+    if len(z_values) > 0:
+        min_val = float(z_values.min())
+        max_val = float(z_values.max())
+        span = max_val - min_val
+        margin = span * 0.05 if span > 0 else max(1.0, abs(min_val) * 0.05)
+        ymin = min(0.0, min_val - margin)
+    else:
+        ymin = 0.0
+    ax.set_ylim(bottom=ymin)
 
-    plt.xticks(fontsize=6)
-    plt.xticks(range(1, len(df) +1, 3), fontsize=6)
-    
+    # Set labels and title
+    ax.set_xlabel('Plate')
+    ax.set_ylabel('Z-factor')
+    ax.set_title('Bar Plot of Z-factor')
+
+    ax.tick_params(axis='x', labelsize=6)
+    ax.set_xticks(range(1, len(df) + 1, 3))
+    ax.tick_params(axis='x', labelrotation=0)
+
     image_buffer = io.BytesIO()
-    plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
-    plt.close()
+    fig.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
+    plt.close(fig)
     return image_buffer
 
 
@@ -164,13 +177,29 @@ def plotNegPosCtrl(df_summary):
     ticks = list(range(num_rows))
 
     # Set labels and title
-    plt.xlabel('Plate')
-    plt.ylabel('Normalized Value')
-    plt.title('Normalized Values with Normalized Standard Deviations')
+    ax.set_xlabel('Plate')
+    ax.set_ylabel('Normalized Value')
+    ax.set_title('Normalized Values with Normalized Standard Deviations')
     ax.xaxis.set_ticks(ticks, minor=False)
     ax.set_xticklabels(labels, minor=False, rotation=90)
-    plt.legend()
-    plt.grid(True)
+    ax.legend()
+    ax.grid(True)
+    # Compute dynamic lower bound so plots start at 0 when data >= 0
+    cols = ['norm_meanNegCtrl', 'norm_meanPosCtrl', 'norm_stdNegCtrl', 'norm_stdPosCtrl', 'Z-factor']
+    present = [c for c in cols if c in df.columns]
+    if len(present):
+        vals = df[present].replace([np.inf, -np.inf], np.nan).dropna(how='all').values
+        if vals.size:
+            min_val = float(np.nanmin(vals))
+            max_val = float(np.nanmax(vals))
+            span = max_val - min_val
+            margin = span * 0.05 if span > 0 else max(1.0, abs(min_val) * 0.05)
+            ymin = min(0.0, min_val - margin)
+        else:
+            ymin = 0.0
+    else:
+        ymin = 0.0
+    ax.set_ylim(bottom=ymin)
 
     canvas = FigureCanvasAgg(fig)
     canvas.draw()
@@ -203,6 +232,19 @@ def inhibitionScatterPlotNew(df_inhibition, hitLimit):
     
     # Add a legend
     ax.legend()
+    # Compute dynamic lower bound so plot is fully visible when negatives exist
+    series = pd.concat([df_inhibition['posCtrlInhibition'].dropna(),
+                        df_inhibition['inhibition'].dropna(),
+                        df_inhibition['negCtrlInhibition'].dropna()])
+    if not series.empty:
+        min_val = float(series.min())
+        max_val = float(series.max())
+        span = max_val - min_val
+        margin = span * 0.05 if span > 0 else max(1.0, abs(min_val) * 0.05)
+        ymin = min(0.0, min_val - margin)
+    else:
+        ymin = 0.0
+    ax.set_ylim(bottom=ymin)
 
     canvas = FigureCanvasAgg(fig)
     canvas.draw()
@@ -232,7 +274,19 @@ def inhibitionScatterPlot(df_inhibition, hitLimit):
     plt.xlabel('Data Points')
     plt.ylabel('Inhibition')
     plt.title('Inhibition scatterplot')
-    
+    # Compute dynamic lower bound so plot is fully visible when negatives exist
+    series = pd.concat([df_inhibition['posCtrlInhibition'].dropna(),
+                        df_inhibition['inhibition'].dropna(),
+                        df_inhibition['negCtrlInhibition'].dropna()])
+    if not series.empty:
+        min_val = float(series.min())
+        max_val = float(series.max())
+        span = max_val - min_val
+        margin = span * 0.05 if span > 0 else max(1.0, abs(min_val) * 0.05)
+        ymin = min(0.0, min_val - margin)
+    else:
+        ymin = 0.0
+    plt.ylim(bottom=ymin)
     # Add a legend
     plt.legend()
     
@@ -250,6 +304,16 @@ def plotInhibitionHistogram(df_inhibition):
     plt.xlabel('Inhibition')
     plt.ylabel('Frequency')
     plt.title('Distribution of Inhibition')
+    # Compute dynamic lower bound so histogram is fully visible when negatives exist
+    if df_inhibition['inhibition'].dropna().size:
+        min_val = float(df_inhibition['inhibition'].min())
+        max_val = float(df_inhibition['inhibition'].max())
+        span = max_val - min_val
+        margin = span * 0.05 if span > 0 else max(1.0, abs(min_val) * 0.05)
+        ymin = min(0.0, min_val - margin)
+    else:
+        ymin = 0.0
+    plt.ylim(bottom=ymin)
 
     image_buffer = io.BytesIO()
     plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
@@ -270,6 +334,18 @@ def plotMeanStd(values, stds, sHeader):
     # Add a legend
     plt.legend()
     plt.grid()
+    # Compute dynamic lower bound so plot is fully visible when negatives exist
+    arr_vals = np.array(values)
+    arr_stds = np.array(stds)
+    if arr_vals.size:
+        min_val = float(np.nanmin(arr_vals - arr_stds))
+        max_val = float(np.nanmax(arr_vals + arr_stds))
+        span = max_val - min_val
+        margin = span * 0.05 if span > 0 else max(1.0, abs(min_val) * 0.05)
+        ymin = min(0.0, min_val - margin)
+    else:
+        ymin = 0.0
+    plt.ylim(bottom=ymin)
 
     image_buffer = io.BytesIO()
     plt.savefig(image_buffer, format='png', dpi=300, bbox_inches='tight')
