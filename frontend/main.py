@@ -63,7 +63,14 @@ clipboard = app.clipboard()
 
 app.setApplicationName(f"AssayLoader")
 welcome = LoginScreen(f'AssayLoader {version}')
-widget = QtWidgets.QStackedWidget()
+class MainStack(QtWidgets.QStackedWidget):
+    def closeEvent(self, event):
+        # print a message to the terminal when the main window is closed
+        print("Closing")
+        # accept the close event so the application exits
+        event.accept()
+
+widget = MainStack()
 widget.addWidget(welcome)
 
 #window sizing stuff
